@@ -2,6 +2,11 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "HrExamples/HrHelloWorldRoot.h"
+
+#include <memory>
+
+using namespace Hr;
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -14,6 +19,8 @@ public:
 
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+
+	std::shared_ptr<HrHelloWorldRoot> m_pFrameRoot;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

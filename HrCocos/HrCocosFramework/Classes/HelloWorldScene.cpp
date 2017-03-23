@@ -1,8 +1,13 @@
 #include "HelloWorldScene.h"
 #include "cocostudio/CocoStudio.h"
 #include "ui/CocosGUI.h"
+#include "ui/UIButton.h"
+
+#include "HrExamples/HrHelloWorldView.h"
+#include "HrExamples/HrHelloWorldMediator.h"
 
 USING_NS_CC;
+using namespace cocos2d::ui;
 
 using namespace cocostudio::timeline;
 
@@ -32,6 +37,15 @@ bool HelloWorld::init()
     }
     
     auto rootNode = CSLoader::createNode("MainScene.csb");
+	m_pFrameRoot = std::make_shared<HrHelloWorldRoot>();
+	m_pFrameRoot->Init();
+	m_pFrameRoot->Start();
+
+	auto pHelloworldLayer = new HrHelloWorldView();
+	pHelloworldLayer->autorelease();
+	pHelloworldLayer->HrInit();
+	rootNode->addChild(pHelloworldLayer);
+	m_pFrameRoot->BindViewToMediator<HrHelloWorldMediator>(pHelloworldLayer);
 
     addChild(rootNode);
 
