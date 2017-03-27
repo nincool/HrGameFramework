@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Models/Lenzo/Scenes/AllCharacters.unity
+  isLoaded: 1
+  isActive: 1
