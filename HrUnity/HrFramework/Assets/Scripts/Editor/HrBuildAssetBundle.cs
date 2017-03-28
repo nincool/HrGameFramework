@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using HrCommonUtility;
 
-namespace HrEditorAssetBundles
+namespace HrEditorAssetBundle
 {
     public class HrBuildAssetBundle
     {
@@ -47,6 +47,15 @@ namespace HrEditorAssetBundles
 #if ENABLE_IOS_APP_SLICING
                 options |= BuildAssetBundleOptions.UncompressedAssetBundle;
 #endif
+            }
+            else
+            {
+                if (HrAssetBundleManager.sbLZMACompression)
+                    options = BuildAssetBundleOptions.None;
+                if (HrAssetBundleManager.sbLZ4Compression)
+                    options = BuildAssetBundleOptions.ChunkBasedCompression;
+                if (HrAssetBundleManager.sbUnCompression)
+                    options = BuildAssetBundleOptions.UncompressedAssetBundle;
             }
 
             if (builds == null || builds.Length == 0)

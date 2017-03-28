@@ -32,22 +32,33 @@ namespace HrCommonUtility
 {
     public class HrAssetBundleManager : MonoBehaviour
     {
+        public static bool mbLZ4Compression = false;
+
+        public static bool sbLZ4Compression = true;
+        public static bool sbLZMACompression = false;
+        public static bool sbUnCompression = false;
+
         public static void LoadAssetBundleManifest()
         {
             string strPlatformName = HrAssetBundleUtility.GetPlatformName();
 #if UNITY_EDITOR
             HrLoger.Log(String.Format("LoadAssetBundleManifest PlatformName:{0}", strPlatformName));
 #endif
-            string strFilePath =  HrAssetBundleUtility.GetPlatformName();
-            strFilePath = strFilePath + "/hrassets/" + "hrtestassetbundle01";
-            HrLoger.Log("FileName:" + strFilePath);
-            UnityEngine.Object obj = AssetBundle.LoadFromFile(strFilePath);
-            AssetBundleManifest mainManifest = obj as AssetBundleManifest;
-            string[] strAllAssetBundles = mainManifest.GetAllAssetBundles();
-            for (var i = 0; i < strAllAssetBundles.Length; ++i)
+            string strFilePath = Application.streamingAssetsPath + "/" + HrAssetBundleUtility.GetPlatformName() + "/" + HrAssetBundleUtility.GetPlatformName();
+            AssetBundle manifestAssetBundle = AssetBundle.LoadFromFile(strFilePath);
+            AssetBundleManifest manifest = manifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+            manifestAssetBundle.Unload(false);
+            string[] strAllAssetBundles = manifest.GetAllAssetBundles();
+            foreach (var item in strAllAssetBundles)
             {
-                HrLoger.Log(strAllAssetBundles[i]);
+                HrLoger.Log(item);
             }
+            string[] strAllAssetWithVariant = manifest.GetAllAssetBundlesWithVariant();
+            foreach (var item in strAllAssetWithVariant)
+            {
+                HrLoger.Log(item);
+            }
+            
         }
         
 
