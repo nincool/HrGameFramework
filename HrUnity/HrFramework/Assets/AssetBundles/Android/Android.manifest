@@ -1,0 +1,11 @@
+ManifestFileVersion: 0
+CRC: 1611331622
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: hrassets/hrtest01.normal
+      Dependencies:
+        Dependency_0: hrassets/texture01.normal
+    Info_1:
+      Name: hrassets/texture01.normal
+      Dependencies: {}
