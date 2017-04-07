@@ -13,7 +13,16 @@ namespace Hr.EditorAssetBundle
     {
         static HrBuildAssetBundleWin sWindowInstance;
 
+
+        public static bool sbLZ4Compression = true;
+        public static bool sbLZMACompression = false;
+        public static bool sbUnCompression = false;
+
         private static string sStrCurrentBuildPath = "";
+
+        private static string sStrOutputPath = "";
+
+        private static List<List<string> > slistBuildPath = new List<List<string> >();
 
         public static void OpenBuildAssetBundleWin()
         {
@@ -50,17 +59,31 @@ namespace Hr.EditorAssetBundle
                 return;
             }
 
-            Rect rtToggleCompression = new Rect(0, 0, position.width, 500);
+            Rect rtPlayGround = new Rect(0, 0, position.width, 500);
+            Rect rtCompression = new Rect(0, 0, 350, 70);
 
-            GUILayout.BeginArea(rtToggleCompression);
+            GUILayout.BeginArea(rtPlayGround);
 
+            OnGUICheckCompression();
+
+            OnGUIBuildButton();
+
+            GUILayout.Space(20);
+
+            OnGUIBuildPath();
+
+            GUILayout.EndArea();
+        }
+
+        private void OnGUICheckCompression()
+        {
             #region CHECK_COMPRESSION
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-                HrAssetBundleManager.sbLZ4Compression = EditorGUILayout.ToggleLeft("LZ4 Compression", HrAssetBundleManager.sbLZ4Compression);
-                HrAssetBundleManager.sbLZMACompression = EditorGUILayout.ToggleLeft("LZMA Compression", HrAssetBundleManager.sbLZMACompression);
-                HrAssetBundleManager.sbUnCompression = EditorGUILayout.ToggleLeft("UnCompression", HrAssetBundleManager.sbUnCompression);
+                HrBuildAssetBundleWin.sbLZ4Compression = EditorGUILayout.ToggleLeft("LZ4 Compression", HrBuildAssetBundleWin.sbLZ4Compression);
+                HrBuildAssetBundleWin.sbLZMACompression = EditorGUILayout.ToggleLeft("LZMA Compression", HrBuildAssetBundleWin.sbLZMACompression);
+                HrBuildAssetBundleWin.sbUnCompression = EditorGUILayout.ToggleLeft("UnCompression", HrBuildAssetBundleWin.sbUnCompression);
 
                 EditorGUILayout.HelpBox("you must select one mode!", MessageType.Warning);
 
@@ -68,6 +91,10 @@ namespace Hr.EditorAssetBundle
             }
             #endregion
 
+        }
+
+        private void OnGUIBuildButton()
+        {
             #region BUILD_BUTTON
             {
                 EditorGUILayout.BeginHorizontal();
@@ -75,9 +102,9 @@ namespace Hr.EditorAssetBundle
                 {
 
                     int nTempCheckCount = 0;
-                    if (HrAssetBundleManager.sbLZ4Compression) ++nTempCheckCount;
-                    if (HrAssetBundleManager.sbLZMACompression) ++nTempCheckCount;
-                    if (HrAssetBundleManager.sbUnCompression) ++nTempCheckCount;
+                    if (HrBuildAssetBundleWin.sbLZ4Compression) ++nTempCheckCount;
+                    if (HrBuildAssetBundleWin.sbLZMACompression) ++nTempCheckCount;
+                    if (HrBuildAssetBundleWin.sbUnCompression) ++nTempCheckCount;
                     if (nTempCheckCount != 1)
                     {
                         EditorUtility.DisplayDialog("Error", "you must select one mode!", "OK");
@@ -149,7 +176,7 @@ namespace Hr.EditorAssetBundle
 
                         lisAssetBundleBuilds.Add(build);
                     }
-                    HrBuildAssetBundle.BuildAssetBundles(lisAssetBundleBuilds.ToArray());
+                    HrBuildAssetBundle.BuildAssetBundles(lisAssetBundleBuilds.ToArray(), sStrOutputPath);
                 }
 
                 if (GUILayout.Button("BuildAll", EditorStyles.miniButton, GUILayout.Width(120), GUILayout.Height(30)))
@@ -162,87 +189,144 @@ namespace Hr.EditorAssetBundle
             }
             #endregion
 
-            #region BUILD_PATH
+        }
+
+        private void OnGUIBuildPath()
+        {
+            EditorGUILayout.BeginVertical();
+
+            EditorGUILayout.BeginVertical();
+
+            for (var i = 0; i < slistBuildPath.Count; ++i)
             {
-                EditorGUILayout.BeginVertical();
+                using (new GUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("-", GUILayout.Width(30)))
+                    {
+                        slistBuildPath.RemoveAt(i);
+                        break;
+                    }
+                    else
+                    {
+                        var rtTextField = EditorGUILayout.GetControlRect(GUILayout.Width(position.width));
+                        slistBuildPath[i][0] = EditorGUI.TextField(rtTextField, "Path:", slistBuildPath[i][0]);
+                        if ((Event.current.type == EventType.DragUpdated
+                            || Event.current.type == EventType.DragExited)
+                              && rtTextField.Contains(Event.current.mousePosition))
+                        {
+                            DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+                            if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
+                            {
+                                slistBuildPath[i][0] = DragAndDrop.paths[0];
+                            }
+                        }
 
-                string strRootPath = "Assets";
-                EditorGUILayout.LabelField("RootPath:" + strRootPath, GUILayout.Width(280));
+                    }
+                }
+                using (new GUILayout.VerticalScope())
+                {
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        var rtTextField = EditorGUILayout.GetControlRect(GUILayout.Width(300));
+                        slistBuildPath[i][1] = EditorGUI.TextField(rtTextField, "AssetName:", slistBuildPath[i][1]);
 
+                        rtTextField.x += 350;
+                        slistBuildPath[i][2] = EditorGUI.TextField(rtTextField, "Variant:", slistBuildPath[i][2]);
+
+                    }
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        string strPath = HrFileUtil.GetPathWithProjectPath(slistBuildPath[i][0]);
+                        if (GUILayout.Button("Select in Window", GUILayout.Width(120)))
+                        {
+                            var obj = AssetDatabase.LoadMainAssetAtPath(slistBuildPath[i][0]);
+                            EditorGUIUtility.PingObject(obj);
+                        }
+                        if (GUILayout.Button("Show in Explorer", GUILayout.Width(120)))
+                        {
+
+                            if (!Directory.Exists(strPath))
+                                Directory.CreateDirectory(strPath);
+                            EditorUtility.RevealInFinder(strPath);
+                        }
+                        if (GUILayout.Button("Build Path", GUILayout.Width(120)))
+                        {
+                            var strFilePathArr = HrFileUtil.GetAllFilePathsInFolder(strPath);
+                            List<AssetBundleBuild> lisAssetBundleBuilds = new List<AssetBundleBuild>();
+                            HashSet<string> processedBundles = new HashSet<string>();
+
+                            foreach (var item in strFilePathArr)
+                            {
+                                string strAssetsDir = item.Substring(item.IndexOf("Assets"));
+                                var assetImporter = AssetImporter.GetAtPath(strAssetsDir);
+
+                                if (assetImporter == null)
+                                {
+                                    HrLoger.LogError("asset importer is null! path:" + item);
+                                    continue;
+                                }
+
+                                // Get asset bundle name & variant
+                                var assetBundleName = assetImporter.assetBundleName;
+                                var assetBundleVariant = assetImporter.assetBundleVariant;
+
+                                if (!string.IsNullOrEmpty(slistBuildPath[i][1]) )
+                                {
+                                    assetBundleName = slistBuildPath[i][1];
+                                }
+                                if (!string.IsNullOrEmpty(slistBuildPath[i][2]))
+                                {
+                                    assetBundleVariant = slistBuildPath[i][2];
+                                }
+                                assetImporter.SetAssetBundleNameAndVariant(assetBundleName, assetBundleVariant);
+                                AssetDatabase.Refresh();
+
+                                var assetBundleFullName = string.IsNullOrEmpty(assetBundleVariant) ? assetBundleName : assetBundleName + "." + assetBundleVariant;
+
+                                // Only process assetBundleFullName once. No need to add it again.
+                                if (processedBundles.Contains(assetBundleFullName))
+                                {
+                                    continue;
+                                }
+
+                                processedBundles.Add(assetBundleFullName);
+
+                                AssetBundleBuild build = new AssetBundleBuild();
+
+                                build.assetBundleName = assetBundleName;
+                                build.assetBundleVariant = assetBundleVariant;
+                                build.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleFullName);
+
+                                lisAssetBundleBuilds.Add(build);
+                            }
+                            HrBuildAssetBundle.BuildAssetBundles(lisAssetBundleBuilds.ToArray(), sStrOutputPath);
+                        }
+                    }
+                }
+            }
+
+            EditorGUILayout.EndVertical();
+
+            if (GUILayout.Button("Add One Item"))
+            {
+                var lis = new List<string>();
+                lis.Add("");
+                lis.Add("");
+                lis.Add("");
+                slistBuildPath.Add(lis);
+            }
+               
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(20);
+
+            using (new GUILayout.VerticalScope())
+            {
                 var rtTextField = EditorGUILayout.GetControlRect(GUILayout.Width(position.width));
-                var strTempPath = EditorGUI.TextField(rtTextField, "", sStrCurrentBuildPath);
-                if (strTempPath != sStrCurrentBuildPath)
-                {
-                    sStrCurrentBuildPath = strTempPath;
-                }
-                if ((Event.current.type == EventType.DragUpdated
-                  || Event.current.type == EventType.DragExited)
-                  && rtTextField.Contains(Event.current.mousePosition))
-                {
-                    DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
-                    if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
-                    {
-                        sStrCurrentBuildPath = DragAndDrop.paths[0];
-                    }
-                }
-                EditorGUILayout.BeginHorizontal();
 
-                string strPath = HrFileUtil.GetPathWithProjectPath(sStrCurrentBuildPath);
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Select in Window", GUILayout.Width(120)))
-                {
-                    var obj = AssetDatabase.LoadMainAssetAtPath(sStrCurrentBuildPath);
-                    EditorGUIUtility.PingObject(obj);
-                }
-                if (GUILayout.Button("Show in Explorer", GUILayout.Width(120)))
-                {
-                   
-                    if (!Directory.Exists(strPath))
-                        Directory.CreateDirectory(strPath);
-                    EditorUtility.RevealInFinder(strPath);
-                }
-                if (GUILayout.Button("Build Path", GUILayout.Width(120)))
-                {
-                    var strFilePathArr = HrFileUtil.GetAllFilePathsInFolder(strPath);
-                    List<AssetBundleBuild> lisAssetBundleBuilds = new List<AssetBundleBuild>();
-                    HashSet<string> processedBundles = new HashSet<string>();
+                sStrOutputPath = EditorGUI.TextField(rtTextField, "OutputPath:", sStrOutputPath);
 
-                    foreach (var item in strFilePathArr)
-                    {
-                        var assetImporter = AssetImporter.GetAtPath(item);
-
-                        if (assetImporter == null)
-                        {
-                            HrLoger.LogError("asset importer is null! path:" + item);
-                            continue;
-                        }
-
-                        // Get asset bundle name & variant
-                        var assetBundleName = assetImporter.assetBundleName;
-                        var assetBundleVariant = assetImporter.assetBundleVariant;
-                        var assetBundleFullName = string.IsNullOrEmpty(assetBundleVariant) ? assetBundleName : assetBundleName + "." + assetBundleVariant;
-
-                        // Only process assetBundleFullName once. No need to add it again.
-                        if (processedBundles.Contains(assetBundleFullName))
-                        {
-                            continue;
-                        }
-
-                        processedBundles.Add(assetBundleFullName);
-
-                        AssetBundleBuild build = new AssetBundleBuild();
-
-                        build.assetBundleName = assetBundleName;
-                        build.assetBundleVariant = assetBundleVariant;
-                        build.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleFullName);
-
-                        lisAssetBundleBuilds.Add(build);
-                    }
-                    HrBuildAssetBundle.BuildAssetBundles(lisAssetBundleBuilds.ToArray());
-                }
-
-                EditorGUILayout.EndHorizontal();
-
+                string strPath = HrFileUtil.GetPathWithProjectPath(sStrOutputPath);
                 if (!Directory.Exists(strPath))
                 {
                     EditorGUILayout.LabelField("Available Directories:");
@@ -258,9 +342,18 @@ namespace Hr.EditorAssetBundle
                 }
                 else
                 {
+
+                    if (GUILayout.Button("Show in Explorer", GUILayout.Width(120)))
+                    {
+
+                        if (!Directory.Exists(strPath))
+                            Directory.CreateDirectory(strPath);
+                        EditorUtility.RevealInFinder(strPath);
+                    }
+
                     EditorGUILayout.LabelField("Exist Assets:");
                     //except asset folder
-                    if (Path.GetDirectoryName(strPath).Contains("Assets") 
+                    if (Path.GetDirectoryName(strPath).Contains("Assets")
                         && Event.current.type != EventType.DragUpdated
                         && Event.current.type != EventType.DragExited)
                     {
@@ -272,13 +365,7 @@ namespace Hr.EditorAssetBundle
                         }
                     }
                 }
-
-                EditorGUILayout.EndVertical();
             }
-
-            #endregion
-
-            GUILayout.EndArea();
         }
 
         private void OnInspectorGUI()

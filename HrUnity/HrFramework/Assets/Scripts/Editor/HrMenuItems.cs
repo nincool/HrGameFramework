@@ -16,6 +16,9 @@ namespace Hr.EditorAssetBundle
 
         const string STR_BUILD_ASSETBUNDLES_WIN = "HrTools/Assets/AssetBundles/Build AssetBundles";
         const string STR_SERIALIZE_DATA_WIN = "HrTools/Assets/AssetBundles/Serialize Data";
+
+        const string STR_ZIP_ASSET = "HrTools/Assets/AssetBundles/Zip File";
+
         const string STR_PRINT_MONO_VERSION = "HrTools/PrintMono Version";
 
         const string STR_HR_TEST = "HrTools/HrTestButton";
@@ -49,6 +52,12 @@ namespace Hr.EditorAssetBundle
         public static void OpenSerializeDataWin()
         {
             HrSerializeDataWin.OpenSerializeDataWin();
+        }
+
+        [MenuItem(STR_ZIP_ASSET, false, 102)]
+        public static void OpenZipFileWin()
+        {
+            HrZipFileWin.OpenZipFileWin();
         }
 
         [MenuItem(STR_PRINT_MONO_VERSION)]

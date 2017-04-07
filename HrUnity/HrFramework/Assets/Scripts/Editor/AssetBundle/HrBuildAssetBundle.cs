@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Hr.CommonUtility;
+using Hr.Resource;
 
 namespace Hr.EditorAssetBundle
 {
@@ -15,7 +16,7 @@ namespace Hr.EditorAssetBundle
         static public string CreateAssetBundleDirectory()
         {
             // Choose the output path according to the build target.
-            string strOutputPath = Path.Combine(HrAssetBundleUtility.STR_ASSETBUNDLES_OUTPUT_PATH, HrAssetBundleUtility.GetPlatformName());
+            string strOutputPath = Path.Combine(HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH, HrAssetBundleUtility.GetPlatformName());
             if (!Directory.Exists(strOutputPath))
                 Directory.CreateDirectory(strOutputPath);
 
@@ -24,13 +25,17 @@ namespace Hr.EditorAssetBundle
 
         public static void BuildAssetBundles()
         {
-            BuildAssetBundles(null);
+            BuildAssetBundles(null, null);
         }
 
-        public static void BuildAssetBundles(AssetBundleBuild[] builds)
+        public static void BuildAssetBundles(AssetBundleBuild[] builds, string strPath)
         {
             // Choose the output path according to the build target.
-            string strOutputPath = CreateAssetBundleDirectory();
+            string strOutputPath = strPath;
+            if (string.IsNullOrEmpty(strOutputPath))
+            {
+                strOutputPath = CreateAssetBundleDirectory();
+            }
 
             var options = BuildAssetBundleOptions.None;
 
@@ -50,11 +55,11 @@ namespace Hr.EditorAssetBundle
             }
             else
             {
-                if (HrAssetBundleManager.sbLZMACompression)
+                if (HrBuildAssetBundleWin.sbLZMACompression)
                     options = BuildAssetBundleOptions.None;
-                if (HrAssetBundleManager.sbLZ4Compression)
+                if (HrBuildAssetBundleWin.sbLZ4Compression)
                     options = BuildAssetBundleOptions.ChunkBasedCompression;
-                if (HrAssetBundleManager.sbUnCompression)
+                if (HrBuildAssetBundleWin.sbUnCompression)
                     options = BuildAssetBundleOptions.UncompressedAssetBundle;
             }
 

@@ -7,25 +7,9 @@ namespace Hr.CommonUtility
 {
     public class HrAssetBundleUtility
     {
-        public const string STR_ASSETBUNDLES_OUTPUT_PATH = "Assets/AssetBundles";
-
-        public static readonly string mStrProjectplatform;
-
-        public static readonly string mStrSteamAssetsPath = Application.streamingAssetsPath;
-
-        public static readonly string mStrStreamingAssetBundlePath;
-        //数据持久化目录
-        public static readonly string mStrPersistentPath = Application.persistentDataPath;
-
-        public static readonly string mStrPersistentAssetBundlePath;
-
         static HrAssetBundleUtility()
         {
             string strPlatformName = HrAssetBundleUtility.GetPlatformName();
-
-            mStrStreamingAssetBundlePath = mStrSteamAssetsPath + "/" + strPlatformName + "/";
-            mStrPersistentAssetBundlePath = mStrPersistentPath + "/" + "AssetBundles/";
-
         }
 
         public static string GetPlatformName()
@@ -111,7 +95,7 @@ namespace Hr.CommonUtility
 
         public static string GetAssetBundleManifestPath()
         {
-            return HrAssetBundleUtility.mStrStreamingAssetBundlePath + GetPlatformName();
+            return "";
         }
     }
 }

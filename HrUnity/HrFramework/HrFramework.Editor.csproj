@@ -195,9 +195,11 @@
     <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\RecordUndoScope.cs" />
     <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\SaveScope.cs" />
     <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\TypeUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Generated\Editor\MyModifier.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrBuildAssetBundle.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrBuildAssetBundleWin.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrSerializeDataWin.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetBundle\HrZipFileWin.cs" />
     <Compile Include="Assets\Scripts\Editor\HrMenuItems.cs" />
     <Compile Include="Assets\Scripts\Editor\Utility\HrFindReferences.cs" />
   </ItemGroup>

@@ -34,11 +34,6 @@ namespace Hr.CommonUtility
     {
         public static bool mbLZ4Compression = false;
 
-        public static bool sbLZ4Compression = true;
-        public static bool sbLZMACompression = false;
-        public static bool sbUnCompression = false;
-
-
         public static void LoadAssetBundleManifest()
         {
             string strPlatformName = HrAssetBundleUtility.GetPlatformName();
