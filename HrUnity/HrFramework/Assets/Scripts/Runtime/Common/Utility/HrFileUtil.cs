@@ -107,7 +107,14 @@ namespace Hr.CommonUtility
             return "";
         }
 
-
+        public static bool IsDirectory(string path)
+        {
+            if (path[path.Length - 1] == '/')
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
 

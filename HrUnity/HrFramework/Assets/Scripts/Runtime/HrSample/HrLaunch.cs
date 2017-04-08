@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hr.CommonUtility;
+using Hr.Resource;
+
+using System.IO;
 
 namespace Hr.Sample
 {
@@ -19,6 +23,43 @@ namespace Hr.Sample
         void Update()
         {
 
+        }
+
+        public void OnClickStart()
+        {
+            StartCoroutine(CopyZipAssetToPersistentPath());
+        }
+
+        private IEnumerator CopyZipAssetToPersistentPath()
+        {
+            string strAssetSrcPath = HrResourcePath.sStreamingAssetPathForWWW + HrResourcePath.STR_ZIP_ASSETFILE;
+            string strAssetOutPath = HrResourcePath.sZipAssetBundleUnPackPath;
+
+            using (WWW www = new WWW(strAssetSrcPath))
+            {
+                yield return www;
+
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    HrLoger.LogError("HrLaunch error! CopyZipAssetToPersistentPath:" + www.error);
+
+                    Application.Quit(); 
+                }
+                else
+                {
+                    HrUnpackZipFileThread unpackZip = new HrUnpackZipFileThread(www.bytes, strAssetOutPath, (a, b) => { Debug.Log("UnPack:" + a + " " + b); });
+                    unpackZip.Start();
+                    while (!unpackZip.IsDone)
+                    {
+                        yield return 0;
+                    }
+                }
+            }
+            HrResourceManager.Instance.LoadAssetBundleManifest();
+            HrResourceManager.Instance.LoadAssetBundleSync("hrasset/test01.normal");
+            var goAsset = HrResourceManager.Instance.GetAsset<GameObject>("assets/hrresource/uncompressedasset/prefab/hrtest01.prefab");
+            if (goAsset != null)
+                GameObject.Instantiate(goAsset);
         }
     }
 }

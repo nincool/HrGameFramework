@@ -16,7 +16,7 @@ namespace Hr.EditorAssetBundle
         static public string CreateAssetBundleDirectory()
         {
             // Choose the output path according to the build target.
-            string strOutputPath = Path.Combine(HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH, HrAssetBundleUtility.GetPlatformName());
+            string strOutputPath = Application.dataPath + "/" + HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH + HrAssetBundleUtility.GetPlatformName();
             if (!Directory.Exists(strOutputPath))
                 Directory.CreateDirectory(strOutputPath);
 

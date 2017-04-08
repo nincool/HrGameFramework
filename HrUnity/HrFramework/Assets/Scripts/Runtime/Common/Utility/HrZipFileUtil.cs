@@ -3,10 +3,140 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 
 namespace Hr.CommonUtility
 {
+    public class HrUnpackZipFileThread
+    {
+        private Action<long, long> mActProgress = null;
+
+        private byte[] mMemoryDatas = null;
+
+        private string mStrDesPath = null;
+
+        private bool mbFinished = false;
+        public bool IsDone
+        {
+            get { return mbFinished; }
+        }
+
+        public HrUnpackZipFileThread(byte[] datas, string strDesPath, Action<long, long> actProgress)
+        {
+            mMemoryDatas = datas;
+            mStrDesPath = strDesPath;
+            mActProgress = actProgress;
+        }
+
+        public void Start()
+        {
+            HrLoger.Log("UnpackZipFile Start! DesPath:" + mStrDesPath);
+            if (!Directory.Exists(mStrDesPath))
+            {
+                Directory.CreateDirectory(mStrDesPath);
+            }
+            Thread thread = new Thread(UnpackFiles);
+            thread.Start();
+        }
+
+        private void UnpackFiles()
+        {
+            ZipEntry zip = null;
+
+            Stream stream = new MemoryStream(mMemoryDatas);
+
+            long nStreamLength = stream.Length;
+            long nReadSize = 0;
+            ZipInputStream zipInStream = new ZipInputStream(stream);
+            while ((zip = zipInStream.GetNextEntry()) != null)
+            {
+                UnzipFile(zip, zipInStream, mStrDesPath);
+                nReadSize = zipInStream.Position;
+
+                if (mActProgress != null)
+                {
+                    mActProgress(nReadSize, nStreamLength);
+                }
+            }
+
+            try
+            {
+                zipInStream.Close();
+            }
+            catch (Exception ex)
+            {
+                HrLoger.LogError(ex.ToString());
+                throw ex;
+            }
+
+            if (mActProgress != null)
+            {
+                mActProgress(1, 1);
+            }
+
+            mbFinished = true;
+        }
+
+        private void UnzipFile(ZipEntry zip, ZipInputStream zipInStream, string dirPath)
+        {
+            try
+            {
+                //文件名不为空    
+                if (!string.IsNullOrEmpty(zip.Name))
+                {
+                    string directoryName = Path.GetDirectoryName(zip.Name);
+                    string fileName = Path.GetFileName(zip.Name);
+
+                    string strFilePath = dirPath;
+                    if (!string.IsNullOrEmpty(directoryName))
+                    {
+                        strFilePath += directoryName;
+                    }
+                    strFilePath.Replace("\\", "/");
+                    if (!Directory.Exists(strFilePath))
+                    {
+                        Directory.CreateDirectory(strFilePath);
+                    }
+                    string strFullFileName = strFilePath + "/" + fileName;
+
+                    //如果是一个新的文件路径　这里需要创建这个文件路径    
+                    FileStream fs = null;
+                    //当前文件夹下有该文件  删掉  重新创建    
+                    if (File.Exists(strFullFileName))
+                    {
+                        File.Delete(strFullFileName);
+                    }
+
+                    fs = File.Create(strFullFileName);
+                    int size = 0;
+                    byte[] data = new byte[2048];
+                    //每次读取2MB  直到把这个内容读完    
+                    while (true)
+                    {
+                        size = zipInStream.Read(data, 0, data.Length);
+                        //小于0， 也就读完了当前的流    
+                        if (size > 0)
+                        {
+                            fs.Write(data, 0, size);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    fs.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                HrLoger.LogError(e.ToString());
+            }
+        }
+
+    }
+
     public class HrZipFileUtil
     {
 
@@ -99,6 +229,6 @@ namespace Hr.CommonUtility
                 return false;
             }
         }
-    }
 
+    }
 }

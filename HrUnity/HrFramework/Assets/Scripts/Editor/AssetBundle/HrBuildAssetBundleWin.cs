@@ -272,11 +272,11 @@ namespace Hr.EditorAssetBundle
 
                                 if (!string.IsNullOrEmpty(slistBuildPath[i][1]) )
                                 {
-                                    assetBundleName = slistBuildPath[i][1];
+                                    assetBundleName = slistBuildPath[i][1].ToLower();
                                 }
                                 if (!string.IsNullOrEmpty(slistBuildPath[i][2]))
                                 {
-                                    assetBundleVariant = slistBuildPath[i][2];
+                                    assetBundleVariant = slistBuildPath[i][2].ToLower();
                                 }
                                 assetImporter.SetAssetBundleNameAndVariant(assetBundleName, assetBundleVariant);
                                 AssetDatabase.Refresh();

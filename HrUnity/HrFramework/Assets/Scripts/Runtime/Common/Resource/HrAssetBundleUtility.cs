@@ -2,6 +2,7 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Hr.Resource;
 
 namespace Hr.CommonUtility
 {
@@ -93,9 +94,15 @@ namespace Hr.CommonUtility
             }
         }
 
+        public static string GetAssetBundlePath()
+        {
+            return HrResourcePath.mStrPersistentAssetBundlePath;
+        }
+
         public static string GetAssetBundleManifestPath()
         {
-            return "";
+            return GetAssetBundlePath() + HrResourcePath.sStrProjectplatform;
         }
+
     }
 }

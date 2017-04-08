@@ -5,13 +5,21 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using Hr.CommonUtility;
-
+using System.Text.RegularExpressions;
 
 namespace Hr.Resource
 {
+    public enum EnumHrAssetLoadMode
+    {
+        STREAMING,
+        PERSISTENT,
+    }
+
     public class HrResourceManager : UnitySingleton<HrResourceManager>
     {
-        private string mStrVariant = "normal";
+        public const EnumHrAssetLoadMode mAssetLoadMode = EnumHrAssetLoadMode.PERSISTENT;
+
+        private string mStrVariant = "";
 
         private List<string> mLisAssetBundleName = new List<string>();
         private List<string> mLisAssetBundleWithVariantName = new List<string>();
@@ -52,23 +60,22 @@ namespace Hr.Resource
             assetBundle.Unload(false);
 
             var strAllAssetBundles = manifest.GetAllAssetBundles();
-            if (mStrVariant.Length > 0)
+            if (!string.IsNullOrEmpty(mStrVariant))
             {
                 strAllAssetBundles = strAllAssetBundles.Where(o => HrFileUtil.GetFileSuffix(o) == mStrVariant).ToArray<string>();
             }
             foreach (var strAssetName in strAllAssetBundles)
             {
                 var lisDependicesArr = manifest.GetAllDependencies(strAssetName)
-                    .Select(o => HrResourcePath.mStrStreamingAssetBundlePath + o).ToList<string>();
-                mDicAssetDependicesInfo.Add(HrResourcePath.mStrStreamingAssetBundlePath + strAssetName, lisDependicesArr);
+                    .Select(o =>  o.ToLower() ).ToList<string>();
+                mDicAssetDependicesInfo.Add(strAssetName, lisDependicesArr);
             }
-            mLisAssetBundleName.AddRange(strAllAssetBundles.Select(o => HrResourcePath.mStrStreamingAssetBundlePath + o).ToList<string>());
+            mLisAssetBundleName.AddRange(strAllAssetBundles.ToList<string>());
 
             var strAllAssetWithVariant = manifest.GetAllAssetBundlesWithVariant();
-            if (mStrVariant.Length > 0)
+            if (!string.IsNullOrEmpty(mStrVariant))
             {
-                strAllAssetWithVariant = strAllAssetWithVariant.Where(o => HrFileUtil.GetFileSuffix(o) == mStrVariant)
-                    .Select(o => HrResourcePath.mStrStreamingAssetBundlePath + o).ToArray<string>();
+                strAllAssetWithVariant = strAllAssetWithVariant.Where(o => HrFileUtil.GetFileSuffix(o) == mStrVariant).ToArray<string>();
             }
             mLisAssetBundleWithVariantName.AddRange(strAllAssetWithVariant);
 
@@ -77,6 +84,12 @@ namespace Hr.Resource
 
         public void LoadAssetBundleSync(string strAssetBundleName)
         {
+#if UNITY_EDITOR
+            if (Regex.IsMatch(strAssetBundleName, "[A-Z]"))
+            {
+                HrLoger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
+            }
+#endif
             HrAssetBundle loadedAssetBundle = null;
             mDicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
             if (loadedAssetBundle != null)
@@ -88,13 +101,15 @@ namespace Hr.Resource
 
             }
 
-            if (!File.Exists(strAssetBundleName))
+            string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
+
+            if (!File.Exists(strAssetBundleFullPath))
             {
-                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBunde is not exist!:" + strAssetBundleName);
+                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBunde is not exist!:" + strAssetBundleFullPath);
                 return;
             }
 
-            HrAssetBundle assetBundle = new HrAssetBundle(ref strAssetBundleName, new Action<HrAssetBundle>(ActionAssetBundleLoadFinished));
+            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath, new Action<HrAssetBundle>(ActionAssetBundleLoadFinished));
             assetBundle.LoadSync();
         }
 

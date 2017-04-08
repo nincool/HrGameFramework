@@ -19,6 +19,7 @@ namespace Hr.Resource
     public class HrAssetBundle : HrRef, IAssetLoad
     {
         //AssetBundle Name
+        private string mStrName;
         private string mStrFullName;
 
         private AssetBundle mAssetBundle;
@@ -28,14 +29,22 @@ namespace Hr.Resource
         //当前资源状态
         private EnumHrAssetBundleStatus mAssetBundleStatus = EnumHrAssetBundleStatus.UNDEFINED;
 
-        public HrAssetBundle(ref string strFullName, Action<HrAssetBundle> loadedAction)
+        public HrAssetBundle(string strName, string strFullName,  Action<HrAssetBundle> loadedAction)
         {
+            mStrName = strName;
             mStrFullName = strFullName;
+
             mAssetBundleStatus = EnumHrAssetBundleStatus.DECLARED;
             mLoadedAction = loadedAction;
         }
 
         public string Name
+        {
+            set { mStrName = value; }
+            get { return mStrName; }
+        }
+
+        public string FullName
         {
             set { mStrFullName = value; }
             get { return mStrFullName; }
@@ -69,13 +78,14 @@ namespace Hr.Resource
 
         public void LoadSync()
         {
-            var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(mStrFullName);
+            var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(mStrName);
 
             //遍历加载依赖资源
             foreach (var itemAsset in lisDependices)
             {
                 HrResourceManager.Instance.LoadAssetBundleSync(itemAsset);
             }
+
             this.mAssetBundle = AssetBundle.LoadFromFile(mStrFullName);
 
             this.mAssetBundleStatus = EnumHrAssetBundleStatus.LOADED;
