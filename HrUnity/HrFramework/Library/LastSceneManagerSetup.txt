@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Scene/HrAssetBundles.unity
-  isLoaded: 1
-  isActive: 1
