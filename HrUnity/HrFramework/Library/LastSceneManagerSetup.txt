@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Models/Lenzo/Scenes/AllCharacters.unity
+- path: Assets/Scene/HrAssetBundles.unity
   isLoaded: 1
   isActive: 1
