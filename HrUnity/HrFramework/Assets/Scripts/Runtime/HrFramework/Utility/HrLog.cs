@@ -8,11 +8,11 @@ namespace Hr.CommonUtility
     {
         protected enum EnumLogType { INFO, WARNING, ERROR};
 
-        protected static EnumLogType mEnumLogMode = EnumLogType.INFO;
+        protected static EnumLogType m_enumLogMode = EnumLogType.INFO;
 
         public static void Log(string strContent)
         {
-            if (mEnumLogMode != EnumLogType.INFO)
+            if (m_enumLogMode != EnumLogType.INFO)
             {
                 return;
             }
@@ -21,7 +21,7 @@ namespace Hr.CommonUtility
 
         public static void LogWaring(string strContent)
         {
-            if (mEnumLogMode == EnumLogType.INFO)
+            if (m_enumLogMode == EnumLogType.INFO)
             {
                 return;
             }

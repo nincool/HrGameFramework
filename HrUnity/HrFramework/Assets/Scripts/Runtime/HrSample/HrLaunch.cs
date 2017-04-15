@@ -5,9 +5,11 @@ using Hr.CommonUtility;
 using Hr.Resource;
 
 using System.IO;
+using UnityEngine.EventSystems;
 
 namespace Hr.Sample
 {
+
     public class HrLaunch : MonoBehaviour
     {
 
@@ -27,13 +29,14 @@ namespace Hr.Sample
 
         public void OnClickStart()
         {
-            StartCoroutine(CopyZipAssetToPersistentPath());
+            //StartCoroutine(CopyZipAssetToPersistentPath());
+            ExecuteEvents.Execute<ICustomMessageTarget>(this.gameObject, null, (x, y) => x.Message1());
         }
 
         private IEnumerator CopyZipAssetToPersistentPath()
         {
-            string strAssetSrcPath = HrResourcePath.sStreamingAssetPathForWWW + HrResourcePath.STR_ZIP_ASSETFILE;
-            string strAssetOutPath = HrResourcePath.sZipAssetBundleUnPackPath;
+            string strAssetSrcPath = HrResourcePath.ms_strStreamingAssetPathForWWW + HrResourcePath.STR_ZIP_ASSETFILE;
+            string strAssetOutPath = HrResourcePath.ms_strZipAssetBundleUnPackPath;
 
             using (WWW www = new WWW(strAssetSrcPath))
             {

@@ -10,31 +10,31 @@ namespace Hr.CommonUtility
 {
     public class HrUnpackZipFileThread
     {
-        private Action<long, long> mActProgress = null;
+        private Action<long, long> m_actProgress = null;
 
-        private byte[] mMemoryDatas = null;
+        private byte[] m_memoryDatas = null;
 
-        private string mStrDesPath = null;
+        private string m_strDesPath = null;
 
-        private bool mbFinished = false;
+        private bool m_bFinished = false;
         public bool IsDone
         {
-            get { return mbFinished; }
+            get { return m_bFinished; }
         }
 
         public HrUnpackZipFileThread(byte[] datas, string strDesPath, Action<long, long> actProgress)
         {
-            mMemoryDatas = datas;
-            mStrDesPath = strDesPath;
-            mActProgress = actProgress;
+            m_memoryDatas = datas;
+            m_strDesPath = strDesPath;
+            m_actProgress = actProgress;
         }
 
         public void Start()
         {
-            HrLoger.Log("UnpackZipFile Start! DesPath:" + mStrDesPath);
-            if (!Directory.Exists(mStrDesPath))
+            HrLoger.Log("UnpackZipFile Start! DesPath:" + m_strDesPath);
+            if (!Directory.Exists(m_strDesPath))
             {
-                Directory.CreateDirectory(mStrDesPath);
+                Directory.CreateDirectory(m_strDesPath);
             }
             Thread thread = new Thread(UnpackFiles);
             thread.Start();
@@ -44,19 +44,19 @@ namespace Hr.CommonUtility
         {
             ZipEntry zip = null;
 
-            Stream stream = new MemoryStream(mMemoryDatas);
+            Stream stream = new MemoryStream(m_memoryDatas);
 
             long nStreamLength = stream.Length;
             long nReadSize = 0;
             ZipInputStream zipInStream = new ZipInputStream(stream);
             while ((zip = zipInStream.GetNextEntry()) != null)
             {
-                UnzipFile(zip, zipInStream, mStrDesPath);
+                UnzipFile(zip, zipInStream, m_strDesPath);
                 nReadSize = zipInStream.Position;
 
-                if (mActProgress != null)
+                if (m_actProgress != null)
                 {
-                    mActProgress(nReadSize, nStreamLength);
+                    m_actProgress(nReadSize, nStreamLength);
                 }
             }
 
@@ -70,12 +70,12 @@ namespace Hr.CommonUtility
                 throw ex;
             }
 
-            if (mActProgress != null)
+            if (m_actProgress != null)
             {
-                mActProgress(1, 1);
+                m_actProgress(1, 1);
             }
 
-            mbFinished = true;
+            m_bFinished = true;
         }
 
         private void UnzipFile(ZipEntry zip, ZipInputStream zipInStream, string dirPath)

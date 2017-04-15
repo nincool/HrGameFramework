@@ -19,56 +19,56 @@ namespace Hr.Resource
     public class HrAssetBundle : HrRef, IAssetLoad
     {
         //AssetBundle Name
-        private string mStrName;
-        private string mStrFullName;
+        private string m_strName;
+        private string m_strFullName;
 
-        private AssetBundle mAssetBundle;
+        private AssetBundle m_assetBundle;
 
-        private Action<HrAssetBundle> mLoadedAction;
+        private Action<HrAssetBundle> m_actLoaded;
 
         //当前资源状态
-        private EnumHrAssetBundleStatus mAssetBundleStatus = EnumHrAssetBundleStatus.UNDEFINED;
+        private EnumHrAssetBundleStatus m_assetBundleStatus = EnumHrAssetBundleStatus.UNDEFINED;
 
         public HrAssetBundle(string strName, string strFullName,  Action<HrAssetBundle> loadedAction)
         {
-            mStrName = strName;
-            mStrFullName = strFullName;
+            m_strName = strName;
+            m_strFullName = strFullName;
 
-            mAssetBundleStatus = EnumHrAssetBundleStatus.DECLARED;
-            mLoadedAction = loadedAction;
+            m_assetBundleStatus = EnumHrAssetBundleStatus.DECLARED;
+            m_actLoaded = loadedAction;
         }
 
         public string Name
         {
-            set { mStrName = value; }
-            get { return mStrName; }
+            set { m_strName = value; }
+            get { return m_strName; }
         }
 
         public string FullName
         {
-            set { mStrFullName = value; }
-            get { return mStrFullName; }
+            set { m_strFullName = value; }
+            get { return m_strFullName; }
         }
 
         public EnumHrAssetBundleStatus AssetBundleStatus
         {
-            set { mAssetBundleStatus = value; }
-            get { return mAssetBundleStatus; }
+            set { m_assetBundleStatus = value; }
+            get { return m_assetBundleStatus; }
         }
 
         public AssetBundle MonoAssetBundle
         {
-            get { return mAssetBundle; }
+            get { return m_assetBundle; }
         }
 
         public bool IsLoading()
         {
-            return (mAssetBundleStatus == EnumHrAssetBundleStatus.LOADING);
+            return (m_assetBundleStatus == EnumHrAssetBundleStatus.LOADING);
         }
 
         public bool IsLoaded()
         {
-            return (mAssetBundleStatus == EnumHrAssetBundleStatus.LOADED);
+            return (m_assetBundleStatus == EnumHrAssetBundleStatus.LOADED);
         }
 
         public bool IsError()
@@ -78,7 +78,7 @@ namespace Hr.Resource
 
         public void LoadSync()
         {
-            var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(mStrName);
+            var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(m_strName);
 
             //遍历加载依赖资源
             foreach (var itemAsset in lisDependices)
@@ -86,13 +86,13 @@ namespace Hr.Resource
                 HrResourceManager.Instance.LoadAssetBundleSync(itemAsset);
             }
 
-            this.mAssetBundle = AssetBundle.LoadFromFile(mStrFullName);
+            this.m_assetBundle = AssetBundle.LoadFromFile(m_strFullName);
 
-            this.mAssetBundleStatus = EnumHrAssetBundleStatus.LOADED;
+            this.m_assetBundleStatus = EnumHrAssetBundleStatus.LOADED;
 
-            if (this.mLoadedAction != null)
+            if (this.m_actLoaded != null)
             {
-                this.mLoadedAction(this);
+                this.m_actLoaded(this);
             }
         }
 

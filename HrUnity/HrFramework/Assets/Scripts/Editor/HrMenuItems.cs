@@ -18,6 +18,7 @@ namespace Hr.EditorAssetBundle
         const string STR_SERIALIZE_DATA_WIN = "HrTools/Assets/AssetBundles/Serialize Data";
 
         const string STR_ZIP_ASSET = "HrTools/Assets/AssetBundles/Zip File";
+        const string STR_ATLAS_TOOL_WIN = "HrTools/Assets/Atlas Maker";
 
         const string STR_PRINT_MONO_VERSION = "HrTools/PrintMono Version";
 
@@ -76,6 +77,12 @@ namespace Hr.EditorAssetBundle
         public static void HrTestButton()
         {
             HrZipFileUtil.PackFiles("E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\123.zip", "E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\AssetBundles");
+        }
+
+        [MenuItem(STR_ATLAS_TOOL_WIN)]
+        public static void OpenAtlasWin()
+        {
+            HrAtlasMakerWin.OpenHrAtlasMakerWin();
         }
     }
 }

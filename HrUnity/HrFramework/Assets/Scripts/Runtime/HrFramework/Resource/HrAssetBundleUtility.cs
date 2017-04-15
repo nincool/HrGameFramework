@@ -96,7 +96,7 @@ namespace Hr.CommonUtility
 
         public static string GetAssetBundlePath()
         {
-            return HrResourcePath.mStrPersistentAssetBundlePath;
+            return HrResourcePath.ms_strPersistentAssetBundlePath;
         }
 
         public static string GetAssetBundleManifestPath()

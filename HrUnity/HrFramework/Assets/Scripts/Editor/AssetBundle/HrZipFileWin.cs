@@ -32,11 +32,11 @@ namespace Hr.EditorAssetBundle
             }
             if (string.IsNullOrEmpty(sFromPath))
             {
-                sFromPath = HrResourcePath.sAssetBundleOutputPath;
+                sFromPath = HrResourcePath.ms_strAssetBundleOutputPath;
             }
             if (string.IsNullOrEmpty(sToPath))
             {
-                sToPath = HrResourcePath.sZipAssetBundlePath;
+                sToPath = HrResourcePath.ms_strZipAssetBundlePath;
             }
 
             sWindowInstance.Show();

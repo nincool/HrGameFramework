@@ -13,55 +13,58 @@ namespace Hr.Resource
         public static readonly string sStrProjectplatform;
 
         //AssetBundle打包输出目录
-        public static readonly string sAssetBundleOutputPath;
+        public static readonly string ms_strAssetBundleOutputPath;
 
         //AssetBundle压缩为zip存放目录 
-        public static readonly string sZipAssetBundlePath;
+        public static readonly string ms_strZipAssetBundlePath;
 
         //AssetBundle解压缩目录
-        public static readonly string sZipAssetBundleUnPackPath;
+        public static readonly string ms_strZipAssetBundleUnPackPath;
 
         //StreamingAsset www加载路径
-        public static readonly string sStreamingAssetPathForWWW;
+        public static readonly string ms_strStreamingAssetPathForWWW;
 
 
-        public static readonly string mStrStreamingAssetBundlePath;
+        public static readonly string ms_strStreamingAssetBundlePath;
 
         //数据持久化目录
-        public static readonly string mStrPersistentAssetBundlePath;
+        public static readonly string ms_strPersistentAssetBundlePath;
+
+        //PC端项目目录
+        public static readonly string ms_strWorkingPath = Application.dataPath + "/../";
 
         static HrResourcePath()
         {
             sStrProjectplatform = HrAssetBundleUtility.GetPlatformName();
-            sAssetBundleOutputPath = Application.dataPath + "/" + STR_ASSETBUNDLES_OUTPUT_PATH;
-            sZipAssetBundlePath = Application.streamingAssetsPath + "/" + STR_ZIP_ASSETFILE;
-            sZipAssetBundleUnPackPath = Application.persistentDataPath + "/" + "AssetBundles/";
+            ms_strAssetBundleOutputPath = Application.dataPath + "/" + STR_ASSETBUNDLES_OUTPUT_PATH;
+            ms_strZipAssetBundlePath = Application.streamingAssetsPath + "/" + STR_ZIP_ASSETFILE;
+            ms_strZipAssetBundleUnPackPath = Application.persistentDataPath + "/" + "AssetBundles/";
 
 
             if (sStrProjectplatform == "Android")
             {
-                sStreamingAssetPathForWWW = Application.streamingAssetsPath + "/";
+                ms_strStreamingAssetPathForWWW = Application.streamingAssetsPath + "/";
             }
             else
             {
-                sStreamingAssetPathForWWW = "file://" + Application.streamingAssetsPath + "/";
+                ms_strStreamingAssetPathForWWW = "file://" + Application.streamingAssetsPath + "/";
             }
-            mStrPersistentAssetBundlePath = Application.persistentDataPath + "/" + "AssetBundles/" + sStrProjectplatform + "/";
+            ms_strPersistentAssetBundlePath = Application.persistentDataPath + "/" + "AssetBundles/" + sStrProjectplatform + "/";
         }
         
         public static string CombineAssetBundlePath(string assetPath)
         {
-            return mStrPersistentAssetBundlePath + assetPath;
+            return ms_strPersistentAssetBundlePath + assetPath;
         }
 
         public static string GetAssetBundlePath()
         {
-            return mStrPersistentAssetBundlePath;
+            return ms_strPersistentAssetBundlePath;
         }
 
         public static string GetStreamingAssetBundlePath()
         {
-            return mStrStreamingAssetBundlePath;
+            return ms_strStreamingAssetBundlePath;
         }
 
     }

@@ -8,29 +8,29 @@ namespace Hr.CommonUtility
 
     public class HrRef
     {
-        private int mnReferenceCount = 0;
+        private int m_nReferenceCount = 0;
 
         public HrRef()
         {
-            mnReferenceCount = 1;
+            m_nReferenceCount = 1;
         }
 
         public int ReferenceCount
         {
-            get { return mnReferenceCount; }
+            get { return m_nReferenceCount; }
         }
 
         public void Retain()
         {
-            Assert.IsTrue(mnReferenceCount > 0);
-            ++mnReferenceCount;
+            Assert.IsTrue(m_nReferenceCount > 0);
+            ++m_nReferenceCount;
         }
 
         public void Release()
         {
-            Assert.IsTrue(mnReferenceCount > 0);
-            --mnReferenceCount;
-            if (mnReferenceCount == 0)
+            Assert.IsTrue(m_nReferenceCount > 0);
+            --m_nReferenceCount;
+            if (m_nReferenceCount == 0)
             {
                 //todo release
                 ReleaseImp();

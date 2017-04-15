@@ -2,26 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hr.Resource;
+using UnityEngine.EventSystems;
 
 public class HrTestResourceLoad : MonoBehaviour {
 
+    public GameObject target;
 
     void Awake()
     {
-        //HrResourceManager.Instance.LoadAssetBundleSync(HrResourcePath.mStrStreamingAssetBundlePath + "hrassets/hrtest01.normal");
-        HrResourceManager.Instance.LoadAssetBundleManifest();
-        HrResourceManager.Instance.LoadAssetBundleSync(HrResourcePath.mStrStreamingAssetBundlePath + "hrassets/hrtest01.normal");
+        //HrResourceManager.Instance.LoadAssetBundleSync(HrResourcePath.ms_strStreamingAssetBundlePath + "hrassets/hrtest01.normal");
     }
     // Use this for initialization
     void Start ()
     {
-        var goAsset = HrResourceManager.Instance.GetAsset<GameObject>("assets/hrresource/hrtest01.prefab");
-        if (goAsset != null)
-           GameObject.Instantiate(goAsset);
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    public void OnBtnClick()
+    {
+        ExecuteEvents.Execute<ICustomMessageTarget>(this.gameObject, null, (x, y) => x.Message1());
+    }
 }

@@ -17,32 +17,32 @@ namespace Hr.Resource
 
     public class HrResourceManager : UnitySingleton<HrResourceManager>
     {
-        public const EnumHrAssetLoadMode mAssetLoadMode = EnumHrAssetLoadMode.PERSISTENT;
+        public const EnumHrAssetLoadMode m_assetLoadMode = EnumHrAssetLoadMode.PERSISTENT;
 
-        private string mStrVariant = "";
+        private string m_strVariant = "";
 
-        private List<string> mLisAssetBundleName = new List<string>();
-        private List<string> mLisAssetBundleWithVariantName = new List<string>();
-        private Dictionary<string, List<string>> mDicAssetDependicesInfo = new Dictionary<string, List<string>>();
+        private List<string> m_lisAssetBundleName = new List<string>();
+        private List<string> m_lisAssetBundleWithVariantName = new List<string>();
+        private Dictionary<string, List<string>> m_dicAssetDependicesInfo = new Dictionary<string, List<string>>();
 
-        private Dictionary<string, HrAssetBundle> mDicAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
-        private Dictionary<string, HrAssetBundle> mDicAssetInAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
+        private Dictionary<string, HrAssetBundle> m_dicAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
+        private Dictionary<string, HrAssetBundle> m_dicAssetInAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
 
         public Dictionary<string, HrAssetBundle> AssetBundlePool
         {
-            get { return mDicAssetBundleInfo; }
+            get { return m_dicAssetBundleInfo; }
         }
 
         public string Variant
         {
-            set { mStrVariant = value; }
-            get { return mStrVariant; }
+            set { m_strVariant = value; }
+            get { return m_strVariant; }
         }
 
         public List<string> GetAssetBundleDependices(string strAssetBundleName)
         {
             List<string> lisRt = null;
-            mDicAssetDependicesInfo.TryGetValue(strAssetBundleName, out lisRt);
+            m_dicAssetDependicesInfo.TryGetValue(strAssetBundleName, out lisRt);
 
             return lisRt;
         }
@@ -60,24 +60,24 @@ namespace Hr.Resource
             assetBundle.Unload(false);
 
             var strAllAssetBundles = manifest.GetAllAssetBundles();
-            if (!string.IsNullOrEmpty(mStrVariant))
+            if (!string.IsNullOrEmpty(m_strVariant))
             {
-                strAllAssetBundles = strAllAssetBundles.Where(o => HrFileUtil.GetFileSuffix(o) == mStrVariant).ToArray<string>();
+                strAllAssetBundles = strAllAssetBundles.Where(o => HrFileUtil.GetFileSuffix(o) == m_strVariant).ToArray<string>();
             }
             foreach (var strAssetName in strAllAssetBundles)
             {
                 var lisDependicesArr = manifest.GetAllDependencies(strAssetName)
                     .Select(o =>  o.ToLower() ).ToList<string>();
-                mDicAssetDependicesInfo.Add(strAssetName, lisDependicesArr);
+                m_dicAssetDependicesInfo.Add(strAssetName, lisDependicesArr);
             }
-            mLisAssetBundleName.AddRange(strAllAssetBundles.ToList<string>());
+            m_lisAssetBundleName.AddRange(strAllAssetBundles.ToList<string>());
 
             var strAllAssetWithVariant = manifest.GetAllAssetBundlesWithVariant();
-            if (!string.IsNullOrEmpty(mStrVariant))
+            if (!string.IsNullOrEmpty(m_strVariant))
             {
-                strAllAssetWithVariant = strAllAssetWithVariant.Where(o => HrFileUtil.GetFileSuffix(o) == mStrVariant).ToArray<string>();
+                strAllAssetWithVariant = strAllAssetWithVariant.Where(o => HrFileUtil.GetFileSuffix(o) == m_strVariant).ToArray<string>();
             }
-            mLisAssetBundleWithVariantName.AddRange(strAllAssetWithVariant);
+            m_lisAssetBundleWithVariantName.AddRange(strAllAssetWithVariant);
 
             return true;
         }
@@ -91,7 +91,7 @@ namespace Hr.Resource
             }
 #endif
             HrAssetBundle loadedAssetBundle = null;
-            mDicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
+            m_dicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
             if (loadedAssetBundle != null)
             {
                 while (loadedAssetBundle.IsLoading() && !loadedAssetBundle.IsError()) { }
@@ -117,19 +117,19 @@ namespace Hr.Resource
         {
             Debug.Log("ActionAssetBundleLoadFinished AssetBundle:" + assetBundle.Name);
 
-            mDicAssetBundleInfo.Add(assetBundle.Name, assetBundle);
+            m_dicAssetBundleInfo.Add(assetBundle.Name, assetBundle);
 
             var strAssetNameArr = assetBundle.MonoAssetBundle.GetAllAssetNames();
             foreach (var strAsset in strAssetNameArr)
             {
-                mDicAssetInAssetBundleInfo.Add(strAsset, assetBundle);
+                m_dicAssetInAssetBundleInfo.Add(strAsset, assetBundle);
             }
         }
 
         public T GetAsset<T>(string strAssetName) where T : UnityEngine.Object
         {
             HrAssetBundle assetBundleInfo = null;
-            mDicAssetInAssetBundleInfo.TryGetValue(strAssetName, out assetBundleInfo);
+            m_dicAssetInAssetBundleInfo.TryGetValue(strAssetName, out assetBundleInfo);
             if (assetBundleInfo != null)
             {
                 return assetBundleInfo.MonoAssetBundle.LoadAsset<T>(strAssetName);

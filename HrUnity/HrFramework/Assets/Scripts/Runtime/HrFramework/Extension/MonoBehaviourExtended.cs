@@ -2,7 +2,7 @@
 
 namespace Hr.CommonUtility
 {
-    static public class MethodExtensionForMonoBehaviourTransform
+    static public class MethodExtensionForMonoBehaviour
     {
         /// <summary>
         /// Gets or add a component. Usage example:

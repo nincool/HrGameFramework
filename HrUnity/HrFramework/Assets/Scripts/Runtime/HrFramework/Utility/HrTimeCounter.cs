@@ -7,16 +7,16 @@ namespace Hr.CommonUtility
 {
     public class HrSimpleTimeCounter
     {
-        private long mlStartTimeInMiliSeconds = 0;
+        private long m_nStartTimeInMiliSeconds = 0;
 
         public HrSimpleTimeCounter()
         {
-            mlStartTimeInMiliSeconds = HrTimeUtils.GetClientTimeInMilliseconds();
+            m_nStartTimeInMiliSeconds = HrTimeUtils.GetClientTimeInMilliseconds();
         }
 
         public long GetTimeElapsed()
         {
-            return HrTimeUtils.GetClientTimeInMilliseconds() - mlStartTimeInMiliSeconds;
+            return HrTimeUtils.GetClientTimeInMilliseconds() - m_nStartTimeInMiliSeconds;
         }
     }
 

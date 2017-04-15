@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.6.0f3</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -126,88 +128,92 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\AssetBundleGraphEditorWindow.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\ConnectionEvent.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\ConnectionGUI.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\ConnectionGUIEditor.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\ConnectionGUIInspectorHelper.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\ConnectionGUIUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\GraphBackground.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\NodeEvent.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\NodeGUI.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\NodeGUIEditor.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\NodeGUIInspectorHelper.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\NodeGUIUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\AssetBundleBuildReport.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\AssetBundleGraphController.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\AssetBundleGraphSettings.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\AssetReferenceStreamManager.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\PerformGraph.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Core\SystemDataUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Exception\AssetBundleGraphException.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Exception\AssetReferenceException.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Exception\NodeException.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Libs\MiniJSONForAssetGraph.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\AssetReference.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\AssetReferenceDatabase.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\AssetReferenceDatabasePostprocessor.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\ConnectionData.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\ConnectionPointData.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\NodeData.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\SaveData.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\SerializableMultiTargetInt.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\SerializableMultiTargetString.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Model\SerializableVector2Dictionary.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\AnimationModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\AnimatorModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\AvatarMaskModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\CubemapModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\FlareModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\FontModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\GUISkinModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\IModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\MaterialModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\PhysicMaterialModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\PhysicsMaterial2DModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\RenderTextureModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\SceneModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Modifiers\ShaderModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\INodeOperation.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\IPostprocess.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\IPrefabBuilder.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIBundleBuilder.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIBundleConfigurator.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIExporter.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIFilter.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIGrouping.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIImportSetting.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUILoader.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIModifier.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedPrefabBuilder.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\NodeOperation\PrefabBuildInfo.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\BuildTargetUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\CUIUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\CustomScriptUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\FileUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\ImportSettingsConfigurator.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\InstanceDataUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\LogUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\RecordUndoScope.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\SaveScope.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Editor\System\Utility\TypeUtility.cs" />
-    <Compile Include="Assets\PluginTools\AssetBundleGraph\Generated\Editor\MyModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\AssetBundleGraphEditorWindow.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\ConnectionEvent.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\ConnectionGUI.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\ConnectionGUIEditor.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\ConnectionGUIInspectorHelper.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\ConnectionGUIUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\GraphBackground.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\NodeEvent.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\NodeGUI.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\NodeGUIEditor.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\NodeGUIInspectorHelper.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\GUI\NodeGUIUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\AssetBundleBuildReport.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\AssetBundleGraphController.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\AssetBundleGraphSettings.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\AssetReferenceStreamManager.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\PerformGraph.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Core\SystemDataUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Exception\AssetBundleGraphException.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Exception\AssetReferenceException.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Exception\NodeException.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Libs\MiniJSONForAssetGraph.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\AssetReference.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\AssetReferenceDatabase.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\AssetReferenceDatabasePostprocessor.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\ConnectionData.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\ConnectionPointData.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\NodeData.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\SaveData.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\SerializableMultiTargetInt.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\SerializableMultiTargetString.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Model\SerializableVector2Dictionary.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\AnimationModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\AnimatorModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\AvatarMaskModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\CubemapModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\FlareModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\FontModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\GUISkinModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\IModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\MaterialModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\PhysicMaterialModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\PhysicsMaterial2DModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\RenderTextureModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\SceneModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Modifiers\ShaderModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\INodeOperation.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\IPostprocess.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\IPrefabBuilder.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIBundleBuilder.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIBundleConfigurator.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIExporter.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIFilter.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIGrouping.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIImportSetting.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUILoader.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedGUIModifier.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\Integrated\IntegratedPrefabBuilder.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\NodeOperation\PrefabBuildInfo.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\BuildTargetUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\CUIUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\CustomScriptUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\FileUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\ImportSettingsConfigurator.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\InstanceDataUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\LogUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\RecordUndoScope.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\SaveScope.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Editor\System\Utility\TypeUtility.cs" />
+    <Compile Include="Assets\AssetBundleGraph\Generated\Editor\MyModifier.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrBuildAssetBundle.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrBuildAssetBundleWin.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrSerializeDataWin.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetBundle\HrZipFileWin.cs" />
     <Compile Include="Assets\Scripts\Editor\HrMenuItems.cs" />
+    <Compile Include="Assets\Scripts\Editor\UGUI\HrAtlasMakerWin.cs" />
     <Compile Include="Assets\Scripts\Editor\Utility\HrFindReferences.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\AssetBundleGraph\Editor\GUI\GraphicResources\LineDraw.shader" />
+    <None Include="Assets\AssetBundleGraph\Editor\SettingTemplate\readme.txt" />
     <None Include="Assets\HrResource\Models\Lenzo\readme.txt" />
     <None Include="Assets\HrResource\UncompressedAsset\Texture\UISprites\005-number combo\number_font.fnt" />
-    <None Include="Assets\PluginTools\AssetBundleGraph\Editor\GUI\GraphicResources\LineDraw.shader" />
-    <None Include="Assets\PluginTools\AssetBundleGraph\Editor\SettingTemplate\readme.txt" />
+    <None Include="Assets\StrangeIoC\LICENSE-2.0.txt" />
+    <None Include="Assets\StrangeIoC\README.txt" />
+    <None Include="Assets\StrangeIoC\scripts\strange\extensions\ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
