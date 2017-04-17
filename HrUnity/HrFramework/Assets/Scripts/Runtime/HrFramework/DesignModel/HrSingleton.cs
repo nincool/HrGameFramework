@@ -10,7 +10,7 @@
 
 namespace Hr.CommonUtility
 {
-    public abstract class Singleton<T> where T : new()
+    public abstract class HrSingleton<T> where T : new()
     {
         private static T _instance;
         static object _lock = new object();
@@ -31,7 +31,7 @@ namespace Hr.CommonUtility
         }
     }
 
-    public class UnitySingleton<T> : MonoBehaviour where T : MonoBehaviour
+    public class HrUnitySingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 

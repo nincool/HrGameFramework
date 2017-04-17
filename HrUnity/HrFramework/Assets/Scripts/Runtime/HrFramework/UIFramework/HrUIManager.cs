@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Hr.UI
 {
-    public class HrUIManager : Singleton<HrUIManager>
+    public class HrUIManager : HrSingleton<HrUIManager>
     {
         /// <summary>
         /// 存储所有面板资源路径， 从配置文件中读取 TODO 配置文件读取
@@ -47,7 +47,14 @@ namespace Hr.UI
 
             return panel;
         }
-        
+
+        /// <summary>
+        /// 逻辑更新
+        /// </summary>
+        public void LogicUpdate()
+        {
+
+        }
     }
 
 }

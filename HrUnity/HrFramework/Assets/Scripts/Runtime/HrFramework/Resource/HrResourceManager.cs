@@ -15,8 +15,11 @@ namespace Hr.Resource
         PERSISTENT,
     }
 
-    public class HrResourceManager : UnitySingleton<HrResourceManager>
+    public class HrResourceManager : HrUnitySingleton<HrResourceManager>
     {
+        /// <summary>
+        /// 资源加载模式
+        /// </summary>
         public const EnumHrAssetLoadMode m_assetLoadMode = EnumHrAssetLoadMode.PERSISTENT;
 
         private string m_strVariant = "";
@@ -37,6 +40,11 @@ namespace Hr.Resource
         {
             set { m_strVariant = value; }
             get { return m_strVariant; }
+        }
+
+        public void Init()
+        {
+
         }
 
         public List<string> GetAssetBundleDependices(string strAssetBundleName)

@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Hr.CommonUtility;
+﻿using Hr.CommonUtility;
 using Hr.Resource;
-
+using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using UnityEngine.EventSystems;
+using UnityEngine;
 
-namespace Hr.Sample
+
+namespace Hr.Game
 {
-
     public class HrLaunch : MonoBehaviour
     {
 
@@ -29,8 +28,7 @@ namespace Hr.Sample
 
         public void OnClickStart()
         {
-            //StartCoroutine(CopyZipAssetToPersistentPath());
-            ExecuteEvents.Execute<ICustomMessageTarget>(this.gameObject, null, (x, y) => x.Message1());
+            StartCoroutine(CopyZipAssetToPersistentPath());
         }
 
         private IEnumerator CopyZipAssetToPersistentPath()

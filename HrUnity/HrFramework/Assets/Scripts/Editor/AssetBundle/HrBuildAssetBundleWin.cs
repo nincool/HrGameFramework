@@ -22,6 +22,12 @@ namespace Hr.EditorAssetBundle
 
         private static string sStrOutputPath = "";
 
+        /// <summary>
+        /// 设置资源的AssetBundle打包名称
+        /// </summary> 
+        private static string ms_strAssetName = "";
+        private static string ms_strAssetVariant = "";
+
         private static List<List<string> > slistBuildPath = new List<List<string> >();
 
         public static void OpenBuildAssetBundleWin()
@@ -67,6 +73,8 @@ namespace Hr.EditorAssetBundle
             OnGUICheckCompression();
 
             OnGUIBuildButton();
+
+            OnGUISetAssetBundleName();
 
             GUILayout.Space(20);
 
@@ -189,6 +197,51 @@ namespace Hr.EditorAssetBundle
             }
             #endregion
 
+        }
+
+        private void OnGUISetAssetBundleName()
+        {
+            using (new GUILayout.HorizontalScope())
+            {
+                var rtTextField = EditorGUILayout.GetControlRect(GUILayout.Width(300));
+                ms_strAssetName = EditorGUI.TextField(rtTextField, "AssetName:", ms_strAssetName);
+
+                rtTextField.x += 350;
+                ms_strAssetVariant = EditorGUI.TextField(rtTextField, "Variant:", ms_strAssetVariant);
+            }
+            using (new GUILayout.VerticalScope())
+            {
+                if (GUILayout.Button("SetNameFromSelection", EditorStyles.miniButton, GUILayout.Width(150), GUILayout.Height(30)))
+                {
+                    if (!string.IsNullOrEmpty(ms_strAssetName) && !string.IsNullOrEmpty(ms_strAssetVariant))
+                    {
+                        var assetsArr = Selection.objects.Where(o => !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(o))).ToArray();
+
+                        // Get asset bundle names from selection
+                        foreach (var o in assetsArr)
+                        {
+                            var strAssetPath = AssetDatabase.GetAssetPath(o);
+                            var assetImporter = AssetImporter.GetAtPath(strAssetPath);
+
+                            if (assetImporter == null)
+                            {
+                                HrLoger.LogError("asset importer is null! path:" + strAssetPath);
+                                continue;
+                            }
+
+                            string assetBundleName = ms_strAssetName.ToLower();
+                            string assetBundleVariant = ms_strAssetVariant.ToLower();
+                            assetImporter.SetAssetBundleNameAndVariant(assetBundleName, assetBundleVariant);
+                            AssetDatabase.Refresh();
+                        }
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("Error", "you must input the name!", "OK");
+                        return;
+                    }
+                }
+            }
         }
 
         private void OnGUIBuildPath()
@@ -324,7 +377,14 @@ namespace Hr.EditorAssetBundle
             {
                 var rtTextField = EditorGUILayout.GetControlRect(GUILayout.Width(position.width));
 
-                sStrOutputPath = EditorGUI.TextField(rtTextField, "OutputPath:", sStrOutputPath);
+                if (string.IsNullOrEmpty(sStrOutputPath))
+                {
+                    sStrOutputPath = EditorGUI.TextField(rtTextField, "OutputPath:", HrBuildAssetBundle.CreateAssetBundleDirectory());
+                }
+                else
+                {
+                    sStrOutputPath = EditorGUI.TextField(rtTextField, "OutputPath:", sStrOutputPath);
+                }
 
                 string strPath = HrFileUtil.GetPathWithProjectPath(sStrOutputPath);
                 if (!Directory.Exists(strPath))

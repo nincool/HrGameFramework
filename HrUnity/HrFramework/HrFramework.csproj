@@ -81,10 +81,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Runtime\HrExample\Event\HrEventDefine.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrExample\EventSystem\CustomMessageTarget.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrExample\EventSystem\ICustomMessageTarget.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrExample\HrLaunch.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrExample\HrTestResourceLoad.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\DesignModel\HrRef.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\DesignModel\HrSingleton.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrFramework\Event\HrEventManager.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Extension\HrExtended.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Extension\MonoBehaviourExtended.cs" />
+    <Compile Include="Assets\Scripts\Runtime\HrFramework\HrGameApp.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Resource\HrAssetBundle.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Resource\HrAssetBundleUtility.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Resource\HrResourceManager.cs" />
@@ -101,10 +108,6 @@
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Utility\HrTimeUtils.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Utility\HrUGUIShowRaycast.cs" />
     <Compile Include="Assets\Scripts\Runtime\HrFramework\Utility\HrZipFileUtil.cs" />
-    <Compile Include="Assets\Scripts\Runtime\HrSample\EventSystem\CustomMessageTarget.cs" />
-    <Compile Include="Assets\Scripts\Runtime\HrSample\EventSystem\ICustomMessageTarget.cs" />
-    <Compile Include="Assets\Scripts\Runtime\HrSample\HrLaunch.cs" />
-    <Compile Include="Assets\Scripts\Runtime\HrSample\HrTestResourceLoad.cs" />
     <Compile Include="Assets\StrangeIoC\scripts\strange\ReadMe.cs" />
     <Compile Include="Assets\StrangeIoC\scripts\strange\extensions\command\api\CommandExceptionType.cs" />
     <Compile Include="Assets\StrangeIoC\scripts\strange\extensions\command\api\CommandKeys.cs" />
