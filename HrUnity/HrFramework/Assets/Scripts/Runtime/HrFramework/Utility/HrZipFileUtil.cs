@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     public class HrUnpackZipFileThread
     {
@@ -31,7 +31,7 @@ namespace Hr.CommonUtility
 
         public void Start()
         {
-            HrLoger.Log("UnpackZipFile Start! DesPath:" + m_strDesPath);
+            HrLogger.Log("UnpackZipFile Start! DesPath:" + m_strDesPath);
             if (!Directory.Exists(m_strDesPath))
             {
                 Directory.CreateDirectory(m_strDesPath);
@@ -66,7 +66,7 @@ namespace Hr.CommonUtility
             }
             catch (Exception ex)
             {
-                HrLoger.LogError(ex.ToString());
+                HrLogger.LogError(ex.ToString());
                 throw ex;
             }
 
@@ -131,7 +131,7 @@ namespace Hr.CommonUtility
             }
             catch (Exception e)
             {
-                HrLoger.LogError(e.ToString());
+                HrLogger.LogError(e.ToString());
             }
         }
 

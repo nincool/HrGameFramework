@@ -7,7 +7,7 @@ namespace AssetBundleGraph {
 		static void OnPostprocessAllAssets (string[] importedAssets, 
 			string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) 
 		{
-			LogUtility.Logger.Log("[OnPostprocessAllAssets]");
+			//LogUtility.Logger.Log("[OnPostprocessAllAssets]");
 			AssetBundleGraphEditorWindow.OnAssetsReimported(importedAssets, deletedAssets, movedAssets, movedFromAssetPaths);
 
 			foreach (string str in deletedAssets) 

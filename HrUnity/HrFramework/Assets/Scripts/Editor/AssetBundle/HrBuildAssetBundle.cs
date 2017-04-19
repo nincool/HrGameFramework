@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using Hr.CommonUtility;
-using Hr.Resource;
+using Hr;
+using Hr;
 
-namespace Hr.EditorAssetBundle
+namespace Hr.Editor
 {
     public class HrBuildAssetBundle
     {

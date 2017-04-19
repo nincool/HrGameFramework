@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     public class HrTimeUtils 
     {

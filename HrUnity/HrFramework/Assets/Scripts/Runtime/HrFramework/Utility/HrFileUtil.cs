@@ -7,7 +7,7 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     public class HrFileUtil
     {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
-    public class HrLoger
+    public class HrLogger
     {
         protected enum EnumLogType { INFO, WARNING, ERROR};
 
@@ -16,7 +16,9 @@ namespace Hr.CommonUtility
             {
                 return;
             }
-            LogType(EnumLogType.INFO, strContent);
+            Debug.Log(strContent);
+
+            //LogType(EnumLogType.INFO, strContent);
         }
 
         public static void LogWaring(string strContent)
@@ -25,12 +27,20 @@ namespace Hr.CommonUtility
             {
                 return;
             }
-            LogType(EnumLogType.WARNING, strContent);
+            Debug.LogWarning(strContent);
+            
+            //LogType(EnumLogType.WARNING, strContent);
         }
 
         public static void LogError(string strContent)
         {
-            LogType(EnumLogType.ERROR, strContent);
+            if (m_enumLogMode == EnumLogType.INFO || m_enumLogMode == EnumLogType.WARNING)
+            {
+                return;
+            }
+            Debug.LogError(strContent);
+            
+            //LogType(EnumLogType.ERROR, strContent);
         }
 
         protected static void LogType(EnumLogType type, string strContent)

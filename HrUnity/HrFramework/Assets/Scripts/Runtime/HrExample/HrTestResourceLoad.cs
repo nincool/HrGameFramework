@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Hr.Resource;
+using Hr;
 using UnityEngine.EventSystems;
 
 public class HrTestResourceLoad : MonoBehaviour {

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine.SceneManagement;
-using Hr.CommonUtility;
+using Hr;
 
-namespace Hr.EditorAssetBundle
+namespace Hr.Editor
 {
     public class HrBuildAssetBundleWin : EditorWindow
     {
@@ -151,6 +151,7 @@ namespace Hr.EditorAssetBundle
                     List<AssetBundleBuild> lisAssetBundleBuilds = new List<AssetBundleBuild>();
                     HashSet<string> processedBundles = new HashSet<string>();
 
+                    List<string> lisAssetPath = new List<string>();
                     // Get asset bundle names from selection
                     foreach (var o in assetsArr)
                     {
@@ -159,7 +160,7 @@ namespace Hr.EditorAssetBundle
 
                         if (assetImporter == null)
                         {
-                            HrLoger.LogError("asset importer is null! path:" + strAssetPath);
+                            HrLogger.LogError("asset importer is null! path:" + strAssetPath);
                             continue;
                         }
 
@@ -182,9 +183,16 @@ namespace Hr.EditorAssetBundle
                         build.assetBundleVariant = assetBundleVariant;
                         build.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleFullName);
 
+                        foreach (var strAssetName in build.assetNames)
+                        {
+                            lisAssetPath.Add(strAssetName);
+                        }
+
                         lisAssetBundleBuilds.Add(build);
                     }
+
                     HrBuildAssetBundle.BuildAssetBundles(lisAssetBundleBuilds.ToArray(), sStrOutputPath);
+                    //HrJsonUtil.SaveJsonFile(Application.dataPath + "/" + HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH)
                 }
 
                 if (GUILayout.Button("BuildAll", EditorStyles.miniButton, GUILayout.Width(120), GUILayout.Height(30)))
@@ -225,7 +233,7 @@ namespace Hr.EditorAssetBundle
 
                             if (assetImporter == null)
                             {
-                                HrLoger.LogError("asset importer is null! path:" + strAssetPath);
+                                HrLogger.LogError("asset importer is null! path:" + strAssetPath);
                                 continue;
                             }
 
@@ -315,7 +323,7 @@ namespace Hr.EditorAssetBundle
 
                                 if (assetImporter == null)
                                 {
-                                    HrLoger.LogError("asset importer is null! path:" + item);
+                                    HrLogger.LogError("asset importer is null! path:" + item);
                                     continue;
                                 }
 
@@ -362,10 +370,10 @@ namespace Hr.EditorAssetBundle
 
             if (GUILayout.Button("Add One Item"))
             {
-                var lis = new List<string>();
-                lis.Add("");
-                lis.Add("");
-                lis.Add("");
+                var lis = new List<string>
+                {
+                    "","",""
+                };
                 slistBuildPath.Add(lis);
             }
                

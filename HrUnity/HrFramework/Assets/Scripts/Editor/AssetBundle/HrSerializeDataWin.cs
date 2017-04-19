@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine.SceneManagement;
-using Hr.CommonUtility;
+using Hr;
 
-namespace Hr.EditorAssetBundle
+namespace Hr.Editor
 {
     public class HrSerializeDataWin : EditorWindow
     {

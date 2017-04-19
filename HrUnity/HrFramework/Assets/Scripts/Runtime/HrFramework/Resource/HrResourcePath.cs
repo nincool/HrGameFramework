@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Hr.CommonUtility;
+using Hr;
 
-namespace Hr.Resource
+namespace Hr
 {
     public class HrResourcePath
     {

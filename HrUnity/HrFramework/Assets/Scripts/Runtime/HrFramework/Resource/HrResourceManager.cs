@@ -4,10 +4,10 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Hr.CommonUtility;
+using Hr;
 using System.Text.RegularExpressions;
 
-namespace Hr.Resource
+namespace Hr
 {
     public enum EnumHrAssetLoadMode
     {
@@ -24,12 +24,35 @@ namespace Hr.Resource
 
         private string m_strVariant = "";
 
+        /// <summary>
+        /// 所有资源的名称
+        /// </summary>
         private List<string> m_lisAssetBundleName = new List<string>();
+        
+        /// <summary>
+        /// 所有带有Variant资源的名称
+        /// </summary>
         private List<string> m_lisAssetBundleWithVariantName = new List<string>();
+
+        /// <summary>
+        /// 资源的依赖资源
+        /// </summary>
         private Dictionary<string, List<string>> m_dicAssetDependicesInfo = new Dictionary<string, List<string>>();
 
+        /// <summary>
+        /// 加载的AssetBundle
+        /// </summary>
         private Dictionary<string, HrAssetBundle> m_dicAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
-        private Dictionary<string, HrAssetBundle> m_dicAssetInAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
+
+        /// <summary>
+        /// 具体的资源信息
+        /// </summary>
+        private Dictionary<string, HrResource> m_dicItemResourceInfo = new Dictionary<string, HrResource>();
+
+        /// <summary>
+        /// 资源对应的Resource类型
+        /// </summary>
+        private static Dictionary<System.Object, System.Object> ms_dicUnityType2AssetType = new Dictionary<object, object>();
 
         public Dictionary<string, HrAssetBundle> AssetBundlePool
         {
@@ -45,6 +68,11 @@ namespace Hr.Resource
         public void Init()
         {
 
+        }
+
+        public static void AddResourceType(System.Object unityType, System.Object assetType)
+        {
+            ms_dicUnityType2AssetType.Add(unityType, assetType);
         }
 
         public List<string> GetAssetBundleDependices(string strAssetBundleName)
@@ -95,7 +123,7 @@ namespace Hr.Resource
 #if UNITY_EDITOR
             if (Regex.IsMatch(strAssetBundleName, "[A-Z]"))
             {
-                HrLoger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
+                HrLogger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
             }
 #endif
             HrAssetBundle loadedAssetBundle = null;
@@ -127,30 +155,33 @@ namespace Hr.Resource
 
             m_dicAssetBundleInfo.Add(assetBundle.Name, assetBundle);
 
-            var strAssetNameArr = assetBundle.MonoAssetBundle.GetAllAssetNames();
-            foreach (var strAsset in strAssetNameArr)
+            var assetObjectArr = assetBundle.MonoAssetBundle.LoadAllAssets();
+            foreach (var o in assetObjectArr)
             {
-                m_dicAssetInAssetBundleInfo.Add(strAsset, assetBundle);
+                //判断类型
+                System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
+                if (type != null)
+                {
+                    HrResource res = Activator.CreateInstance(type, new object[] { o.name, assetBundle}) as HrResource;
+                    if (res == null)
+                    {
+                        HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + o.name + " AssetBundle:" + assetBundle.Name);
+                    }
+                    else
+                    {
+                        m_dicItemResourceInfo.Add(o.name, res);
+                    }
+                }
             }
         }
 
-        public T GetAsset<T>(string strAssetName) where T : UnityEngine.Object
+        /// <summary>
+        /// 加载AssetBundle中的资源 如果AssetBundle都没有加载那么同步加载AssetBundle
+        /// </summary>
+        public void LoadAsset(string strAssetPath)
         {
-            HrAssetBundle assetBundleInfo = null;
-            m_dicAssetInAssetBundleInfo.TryGetValue(strAssetName, out assetBundleInfo);
-            if (assetBundleInfo != null)
-            {
-                return assetBundleInfo.MonoAssetBundle.LoadAsset<T>(strAssetName);
-            }
-            else
-            {
-                HrLoger.LogError("HrResourceManager:: GetAsset Error! AssetName:" + strAssetName);
-            }
 
-            return null;
         }
-
-
     }
 }
 

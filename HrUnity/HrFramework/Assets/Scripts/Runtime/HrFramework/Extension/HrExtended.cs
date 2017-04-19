@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     static public class MethodExtension
     {

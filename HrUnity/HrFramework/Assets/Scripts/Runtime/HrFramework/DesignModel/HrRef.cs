@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
 
     public class HrRef

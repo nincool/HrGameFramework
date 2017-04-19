@@ -8,7 +8,7 @@
 /// As a note, this is made as MonoBehaviour because we need Coroutines.
 /// </summary>
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     public abstract class HrSingleton<T> where T : new()
     {

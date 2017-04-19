@@ -1,12 +1,12 @@
-﻿using Hr.CommonUtility;
-using Hr.Resource;
+﻿using Hr;
+using Hr;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Hr.EditorAssetBundle
+namespace Hr.Editor
 {
     public class HrZipFileWin : EditorWindow
     {

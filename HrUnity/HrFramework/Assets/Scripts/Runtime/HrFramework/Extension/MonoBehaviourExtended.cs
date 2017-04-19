@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     static public class MethodExtensionForMonoBehaviour
     {

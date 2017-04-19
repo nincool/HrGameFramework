@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Hr.CommonUtility;
+using Hr;
 
-namespace Hr.Resource
+namespace Hr
 {
     public enum EnumHrAssetBundleStatus
     {

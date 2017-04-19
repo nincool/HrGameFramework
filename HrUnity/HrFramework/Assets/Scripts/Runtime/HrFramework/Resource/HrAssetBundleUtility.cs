@@ -2,9 +2,9 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Hr.Resource;
+using Hr;
 
-namespace Hr.CommonUtility
+namespace Hr
 {
     public class HrAssetBundleUtility
     {

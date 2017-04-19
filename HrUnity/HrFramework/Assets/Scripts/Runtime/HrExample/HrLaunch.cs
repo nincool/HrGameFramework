@@ -1,5 +1,5 @@
-﻿using Hr.CommonUtility;
-using Hr.Resource;
+﻿using Hr;
+using Hr;
 using System.Collections.Generic;
 using System.Collections;
 using System.IO;
@@ -42,7 +42,7 @@ namespace Hr.Game
 
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    HrLoger.LogError("HrLaunch error! CopyZipAssetToPersistentPath:" + www.error);
+                    HrLogger.LogError("HrLaunch error! CopyZipAssetToPersistentPath:" + www.error);
 
                     Application.Quit(); 
                 }
@@ -58,9 +58,9 @@ namespace Hr.Game
             }
             HrResourceManager.Instance.LoadAssetBundleManifest();
             HrResourceManager.Instance.LoadAssetBundleSync("hrasset/test01.normal");
-            var goAsset = HrResourceManager.Instance.GetAsset<GameObject>("assets/hrresource/uncompressedasset/prefab/hrtest01.prefab");
-            if (goAsset != null)
-                GameObject.Instantiate(goAsset);
+            //var goAsset = HrResourceManager.Instance.GetAsset<GameObject>("assets/hrresource/uncompressedasset/prefab/hrtest01.prefab");
+            //if (goAsset != null)
+            //    GameObject.Instantiate(goAsset);
         }
     }
 }
