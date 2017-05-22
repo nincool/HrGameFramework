@@ -15,6 +15,9 @@ namespace Hr
         {
             Assert.IsTrue(m_imgProgress != null);
 
+            m_viewType = EnumView.VIEW_LAUNCH_LOADING;
+
+            //HrEventManager.Instance.SendEvent(EnumEvent.EVENT_UI_ONCREATE, this);
         }
 
         private void Start()

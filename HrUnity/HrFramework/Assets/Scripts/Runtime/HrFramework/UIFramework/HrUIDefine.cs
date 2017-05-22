@@ -6,6 +6,7 @@ namespace Hr
 {
     public enum EnumView
     {
+        VIEW_UNKNOW,
         VIEW_LAUNCH_LOADING,
     }   
 }

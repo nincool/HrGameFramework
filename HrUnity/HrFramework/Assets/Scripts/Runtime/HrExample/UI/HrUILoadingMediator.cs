@@ -10,7 +10,7 @@ namespace Hr
         {
             if (m_view == null)
             {
-                HrEventManager.Instance.SendEvent(EnumEvent.EVENT_UI_CREATE, EnumView.VIEW_LAUNCH_LOADING);
+                //HrEventManager.Instance.SendEvent(EnumEvent.EVENT_UI_CREATE, EnumView.VIEW_LAUNCH_LOADING);
             }
         }
 

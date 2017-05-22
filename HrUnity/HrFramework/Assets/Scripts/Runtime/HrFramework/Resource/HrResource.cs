@@ -8,6 +8,8 @@ namespace Hr
 {
     public class HrResource
     {
+        public UnityEngine.Object m_unityAsset;
+
         private string m_strAssetName;
 
         private WeakReference m_weakRefAssetBundle;
@@ -29,9 +31,10 @@ namespace Hr
             }
         }
 
-        public HrResource(string strAssetName, HrAssetBundle assetBundle)
+        public HrResource(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle)
         {
             m_strAssetName = strAssetName;
+            m_unityAsset = o;
             m_weakRefAssetBundle = new WeakReference(assetBundle);
         }
     }

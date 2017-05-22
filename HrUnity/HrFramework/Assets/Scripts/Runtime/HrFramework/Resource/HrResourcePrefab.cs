@@ -6,7 +6,7 @@ namespace Hr
 {
     public class HrResourcePrefab : HrResource
     {
-        public HrResourcePrefab(string strAssetName, HrAssetBundle assetBundle) : base(strAssetName, assetBundle)
+        public HrResourcePrefab(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle) : base(strAssetName, o, assetBundle)
         {
         }
 

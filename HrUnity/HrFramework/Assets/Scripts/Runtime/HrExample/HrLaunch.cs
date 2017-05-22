@@ -56,8 +56,8 @@ namespace Hr.Game
                     }
                 }
             }
-            HrResourceManager.Instance.LoadAssetBundleManifest();
-            HrResourceManager.Instance.LoadAssetBundleSync("hrasset/test01.normal");
+            //HrResourceManager.Instance.LoadAssetBundleManifest();
+            //HrResourceManager.Instance.LoadAssetBundleSync("hrasset/test01.normal");
             //var goAsset = HrResourceManager.Instance.GetAsset<GameObject>("assets/hrresource/uncompressedasset/prefab/hrtest01.prefab");
             //if (goAsset != null)
             //    GameObject.Instantiate(goAsset);

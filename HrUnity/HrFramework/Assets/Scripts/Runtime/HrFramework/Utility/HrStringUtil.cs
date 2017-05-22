@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HrStringUtil
+public static class HrStringUtil
 {
 
-
+    
 }

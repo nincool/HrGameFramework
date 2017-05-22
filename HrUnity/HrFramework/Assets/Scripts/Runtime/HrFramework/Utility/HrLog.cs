@@ -34,10 +34,6 @@ namespace Hr
 
         public static void LogError(string strContent)
         {
-            if (m_enumLogMode == EnumLogType.INFO || m_enumLogMode == EnumLogType.WARNING)
-            {
-                return;
-            }
             Debug.LogError(strContent);
             
             //LogType(EnumLogType.ERROR, strContent);

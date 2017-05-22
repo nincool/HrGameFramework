@@ -19,6 +19,10 @@ namespace Hr
                 HrLogger.LogError("HrUIMediator Error!");
                 return null;
             }
+            set
+            {
+                m_view = value;
+            }
         }
 
         /// <summary>

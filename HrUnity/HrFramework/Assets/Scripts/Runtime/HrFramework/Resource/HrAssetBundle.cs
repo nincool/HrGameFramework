@@ -79,11 +79,13 @@ namespace Hr
         public void LoadSync()
         {
             var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(m_strName);
-
-            //遍历加载依赖资源
-            foreach (var itemAsset in lisDependices)
+            if (lisDependices != null && lisDependices.Count > 0)
             {
-                HrResourceManager.Instance.LoadAssetBundleSync(itemAsset);
+                //遍历加载依赖资源
+                foreach (var itemAsset in lisDependices)
+                {
+                    HrResourceManager.Instance.LoadAssetBundleSync(itemAsset);
+                }
             }
 
             this.m_assetBundle = AssetBundle.LoadFromFile(m_strFullName);

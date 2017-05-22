@@ -1,1 +1,0 @@
-"C:\Program Files\Unity\Editor\Unity.exe" -batchmode -quit -projectPath "E:/Workspace/HrGitHub/HrGameFramework/HrUnity/HrFramework/" -logFile abbuild.log -executeMethod AssetBundleGraph.CUIUtility.BuildFromCommandline %1 %2 %3 %4 %5 %6 %7 %8 %9

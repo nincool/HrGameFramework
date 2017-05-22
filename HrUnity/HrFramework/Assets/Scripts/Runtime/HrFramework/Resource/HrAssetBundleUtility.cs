@@ -94,14 +94,9 @@ namespace Hr
             }
         }
 
-        public static string GetAssetBundlePath()
-        {
-            return HrResourcePath.ms_strPersistentAssetBundlePath;
-        }
-
         public static string GetAssetBundleManifestPath()
         {
-            return GetAssetBundlePath() + HrResourcePath.sStrProjectplatform;
+            return HrResourcePath.CombineAssetBundlePath(GetPlatformName());
         }
 
     }

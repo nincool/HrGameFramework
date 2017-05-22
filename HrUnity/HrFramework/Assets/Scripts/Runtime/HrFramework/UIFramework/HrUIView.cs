@@ -6,6 +6,15 @@ namespace Hr
 {
     public class HrUIView : MonoBehaviour
     {
+        protected EnumView m_viewType = EnumView.VIEW_UNKNOW;
+
+        public EnumView ViewType
+        {
+            get
+            {
+                return m_viewType;
+            }
+        }
 
         /// <summary>
         /// 首次挂载界面

@@ -3,17 +3,12 @@ using System.Collections.Generic;
 
 namespace Hr
 {
-    public enum EnumEvent
+    public partial class HrEventType
     {
-        #region     UI事件
-        EVENT_UI_CREATE,
-
-        EVENT_UI_ONCREATE,
-        EVENT_UI_ONDESTROY,
-
-        EVENT_UI_SHOW,
-        EVENT_UI_HIDE,
-
-        #endregion
+        public static readonly int EVENT_UI_CREATE = 1;
+        public static readonly int EVENT_UI_ONCREATE = 2;
+        public static readonly int EVENT_UI_ONDESTROY = 3;
+        public static readonly int EVENT_UI_SHOW = 4;
+        public static readonly int EVENT_UI_HIDE = 5;
     }
 }
