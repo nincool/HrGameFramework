@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using LitJson;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,6 +10,40 @@ namespace Hr.Editor
 {
     public class HrAssetBundleController
     {
+        private const string m_c_strConfigurationName = "HrFramework/Configs/AssetBundleBuilder.json";
+
+        private HrAssetBundleContainer m_assetBundleContainer = new HrAssetBundleContainer();
+
+
+        public string ProductName
+        {
+            get
+            {
+                return PlayerSettings.productName;
+            }
+        }
+
+        public string CompanyName
+        {
+            get
+            {
+                return PlayerSettings.companyName;
+            }
+        }
+
+
+        public string GameIdentifier
+        {
+            get
+            {
+#if UNITY_5_6_OR_NEWER
+                return PlayerSettings.applicationIdentifier;
+#else
+                return PlayerSettings.bundleIdentifier;
+#endif
+            }
+        }
+
 
         #region Build Target
         public bool WindowsSelected
@@ -204,272 +240,272 @@ namespace Hr.Editor
             }
         }
 
-        //public bool BuildAssetBundles()
-        //{
-        //    if (!IsValidOutputDirectory)
-        //    {
-        //        return false;
-        //    }
+        public HrAssetBundleController()
+        {
 
-        //    if (Directory.Exists(OutputPackagePath))
-        //    {
-        //        Directory.Delete(OutputPackagePath, true);
-        //    }
 
-        //    Directory.CreateDirectory(OutputPackagePath);
+            Load();
+        }
 
-        //    if (Directory.Exists(OutputFullPath))
-        //    {
-        //        Directory.Delete(OutputFullPath, true);
-        //    }
+        public bool Save()
+        {
+            string strConfigurationName = HrFileUtil.GetCombinePath(Application.dataPath, m_c_strConfigurationName);
+            try
+            {
+                JsonWriter writer = new JsonWriter();
 
-        //    Directory.CreateDirectory(OutputFullPath);
+                writer.WriteObjectStart();
 
-        //    if (Directory.Exists(OutputPackedPath))
-        //    {
-        //        Directory.Delete(OutputPackedPath, true);
-        //    }
+                writer.WritePropertyName("WindowsSelected");
+                writer.Write(WindowsSelected);
+                writer.WritePropertyName("MacOSXSelected");
+                writer.Write(MacOSXSelected);
+                writer.WritePropertyName("IOSSelected");
+                writer.Write(IOSSelected);
+                writer.WritePropertyName("AndroidSelected");
+                writer.Write(AndroidSelected);
+                writer.WritePropertyName("WindowsStoreSelected");
+                writer.Write(WindowsStoreSelected);
 
-        //    Directory.CreateDirectory(OutputPackedPath);
+                writer.WritePropertyName("UncompressedAssetBundleSelected");
+                writer.Write(UncompressedAssetBundleSelected);
+                writer.WritePropertyName("DisableWriteTypeTreeSelected");
+                writer.Write(DisableWriteTypeTreeSelected);
+                writer.WritePropertyName("DeterministicAssetBundleSelected");
+                writer.Write(DeterministicAssetBundleSelected);
+                writer.WritePropertyName("ForceRebuildAssetBundleSelected");
+                writer.Write(ForceRebuildAssetBundleSelected);
+                writer.WritePropertyName("IgnoreTypeTreeChangesSelected");
+                writer.Write(IgnoreTypeTreeChangesSelected);
+                writer.WritePropertyName("AppendHashToAssetBundleNameSelected");
+                writer.Write(AppendHashToAssetBundleNameSelected);
+                writer.WritePropertyName("ChunkBasedCompressionSelected");
+                writer.Write(ChunkBasedCompressionSelected);
 
-        //    if (Directory.Exists(BuildReportPath))
-        //    {
-        //        Directory.Delete(BuildReportPath, true);
-        //    }
+                writer.WritePropertyName("OutputDirectory");
+                writer.Write(OutputDirectory);
 
-        //    Directory.CreateDirectory(BuildReportPath);
+                writer.WriteObjectEnd();
 
-        //    BuildAssetBundleOptions buildAssetBundleOptions = GetBuildAssetBundleOptions();
 
- 
+                File.WriteAllText(strConfigurationName, writer.ToString(), Encoding.UTF8);
+            }
+            catch
+            {
+                Debug.LogError(string.Format("AssetBundleController SaveConfiguration '{0}' failed!", m_c_strConfigurationName));
+                return false;
+            }
 
-        //}
+            return true;
+        }
 
-        //private BuildAssetBundleOptions GetBuildAssetBundleOptions()
-        //{
-        //    BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.None;
+        public bool Load()
+        {
+            string strConfigurationName = HrFileUtil.GetCombinePath(Application.dataPath, m_c_strConfigurationName);
+            if (!File.Exists(strConfigurationName))
+            {
+                return false;
+            }
 
-        //    if (UncompressedAssetBundleSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
-        //    }
+            string strData = File.ReadAllText(strConfigurationName);
+            JsonData jsonData = JsonMapper.ToObject(strData);
+            IDictionary dicJsonData = jsonData as IDictionary;
+            if (dicJsonData == null)
+            {
+                return false;
+            }
 
-        //    if (DisableWriteTypeTreeSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.DisableWriteTypeTree;
-        //    }
+            WindowsSelected = (bool)jsonData["WindowsSelected"];
+            MacOSXSelected = (bool)jsonData["MacOSXSelected"];
+            IOSSelected = (bool)jsonData["IOSSelected"];
+            AndroidSelected = (bool)jsonData["AndroidSelected"];
+            WindowsStoreSelected = (bool)jsonData["WindowsStoreSelected"];
 
-        //    if (DeterministicAssetBundleSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.DeterministicAssetBundle;
-        //    }
+            UncompressedAssetBundleSelected = (bool)jsonData["UncompressedAssetBundleSelected"];
+            DisableWriteTypeTreeSelected = (bool)jsonData["DisableWriteTypeTreeSelected"];
+            DeterministicAssetBundleSelected = (bool)jsonData["DeterministicAssetBundleSelected"];
+            ForceRebuildAssetBundleSelected = (bool)jsonData["ForceRebuildAssetBundleSelected"];
+            IgnoreTypeTreeChangesSelected = (bool)jsonData["IgnoreTypeTreeChangesSelected"];
+            AppendHashToAssetBundleNameSelected = (bool)jsonData["AppendHashToAssetBundleNameSelected"];
+            ChunkBasedCompressionSelected = (bool)jsonData["ChunkBasedCompressionSelected"];
 
-        //    if (ForceRebuildAssetBundleSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.ForceRebuildAssetBundle;
-        //    }
+            OutputDirectory = jsonData["OutputDirectory"].ToString();
 
-        //    if (IgnoreTypeTreeChangesSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.IgnoreTypeTreeChanges;
-        //    }
+            m_assetBundleContainer.Load();
 
-        //    if (AppendHashToAssetBundleNameSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.AppendHashToAssetBundleName;
-        //    }
+            return true;
+        }
 
-        //    if (ChunkBasedCompressionSelected)
-        //    {
-        //        buildOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
-        //    }
+        public bool BuildAssetBundles()
+        {
+            if (!IsValidOutputDirectory)
+            {
+                return false;
+            }
 
-        //    return buildOptions;
-        //}
 
-        //private void BuildAssetBundles(AssetBundleBuild[] buildMap, BuildAssetBundleOptions buildOptions, bool zip, BuildTarget buildTarget)
-        //{
-        //    m_BuildReport.LogInfo("Start build AssetBundles for '{0}'...", buildTarget.ToString());
+            if (Directory.Exists(OutputPackagePath))
+            {
+                Directory.Delete(OutputPackagePath, true);
+            }
 
-        //    string buildTargetUrlName = GetBuildTargetName(buildTarget);
+            Directory.CreateDirectory(OutputPackagePath);
 
-        //    string workingPath = string.Format("{0}{1}/", WorkingPath, buildTargetUrlName);
-        //    m_BuildReport.LogInfo("Working path is '{0}'.", workingPath);
+            if (Directory.Exists(OutputFullPath))
+            {
+                Directory.Delete(OutputFullPath, true);
+            }
 
-        //    string outputPackagePath = string.Format("{0}{1}/", OutputPackagePath, buildTargetUrlName);
-        //    Directory.CreateDirectory(outputPackagePath);
-        //    m_BuildReport.LogInfo("Output package path is '{0}'.", outputPackagePath);
+            Directory.CreateDirectory(OutputFullPath);
 
-        //    string outputFullPath = string.Format("{0}{1}/", OutputFullPath, buildTargetUrlName);
-        //    Directory.CreateDirectory(outputFullPath);
-        //    m_BuildReport.LogInfo("Output full path is '{0}'.", outputFullPath);
+            if (Directory.Exists(OutputPackedPath))
+            {
+                Directory.Delete(OutputPackedPath, true);
+            }
 
-        //    string outputPackedPath = string.Format("{0}{1}/", OutputPackedPath, buildTargetUrlName);
-        //    Directory.CreateDirectory(outputPackedPath);
-        //    m_BuildReport.LogInfo("Output packed path is '{0}'.", outputPackedPath);
+            Directory.CreateDirectory(OutputPackedPath);
 
-        //    // Clean working path
-        //    List<string> validNames = new List<string>();
-        //    foreach (AssetBundleBuild i in buildMap)
-        //    {
-        //        string assetBundleName = GetAssetBundleFullName(i.assetBundleName, i.assetBundleVariant);
-        //        validNames.Add(assetBundleName);
-        //    }
+            if (Directory.Exists(BuildReportPath))
+            {
+                Directory.Delete(BuildReportPath, true);
+            }
 
-        //    if (Directory.Exists(workingPath))
-        //    {
-        //        Uri workingUri = new Uri(workingPath, UriKind.RelativeOrAbsolute);
-        //        string[] fileNames = Directory.GetFiles(workingPath, "*", SearchOption.AllDirectories);
-        //        foreach (string fileName in fileNames)
-        //        {
-        //            if (fileName.EndsWith(".manifest"))
-        //            {
-        //                continue;
-        //            }
+            BuildAssetBundleOptions buildAssetBundleOptions = GetBuildAssetBundleOptions();
 
-        //            string relativeName = workingUri.MakeRelativeUri(new Uri(fileName)).ToString();
-        //            if (!validNames.Contains(relativeName))
-        //            {
-        //                File.Delete(fileName);
-        //            }
-        //        }
+            var lisBuildMap = GetBuildMap();
 
-        //        string[] manifestNames = Directory.GetFiles(workingPath, "*.manifest", SearchOption.AllDirectories);
-        //        foreach (string manifestName in manifestNames)
-        //        {
-        //            if (!File.Exists(Path.GetFileNameWithoutExtension(manifestName)))
-        //            {
-        //                File.Delete(manifestName);
-        //            }
-        //        }
+            BuildTarget buildTarget = BuildTarget.StandaloneWindows;
+            if (WindowsSelected)
+            {
+                buildTarget = BuildTarget.StandaloneWindows;
+                BuildAssetBundles(buildTarget, lisBuildMap, buildAssetBundleOptions);
+            }
 
-        //        Utility.Path.RemoveEmptyDirectory(workingPath);
-        //    }
+            if (MacOSXSelected)
+            {
+                buildTarget = BuildTarget.StandaloneOSXIntel;
+                BuildAssetBundles(buildTarget, lisBuildMap, buildAssetBundleOptions);
+            }
 
-        //    if (!Directory.Exists(workingPath))
-        //    {
-        //        Directory.CreateDirectory(workingPath);
-        //    }
+            if (IOSSelected)
+            {
+                buildTarget = BuildTarget.iOS;
+                BuildAssetBundles(buildTarget, lisBuildMap, buildAssetBundleOptions);
+            }
 
-        //    // Build AssetBundles
-        //    m_BuildReport.LogInfo("Unity start build AssetBundles for '{0}'...", buildTarget.ToString());
-        //    AssetBundleManifest assetBundleManifest = BuildPipeline.BuildAssetBundles(workingPath, buildMap, buildOptions, buildTarget);
-        //    if (assetBundleManifest == null)
-        //    {
-        //        m_BuildReport.LogError("Build AssetBundles for '{0}' failure.", buildTarget.ToString());
-        //        return;
-        //    }
+            if (AndroidSelected)
+            {
+                buildTarget = BuildTarget.Android;
+                BuildAssetBundles(buildTarget, lisBuildMap, buildAssetBundleOptions);
+            }
 
-        //    m_BuildReport.LogInfo("Unity build AssetBundles for '{0}' complete.", buildTarget.ToString());
+            if (WindowsStoreSelected)
+            {
+                buildTarget = BuildTarget.WSAPlayer;
+                BuildAssetBundles(buildTarget, lisBuildMap, buildAssetBundleOptions);
+            }
 
-        //    // Process AssetBundles
-        //    for (int i = 0; i < buildMap.Length; i++)
-        //    {
-        //        string assetBundleFullName = GetAssetBundleFullName(buildMap[i].assetBundleName, buildMap[i].assetBundleVariant);
-        //        if (ProcessingAssetBundle != null)
-        //        {
-        //            if (ProcessingAssetBundle(assetBundleFullName, (float)(i + 1) / buildMap.Length))
-        //            {
-        //                m_BuildReport.LogWarning("The build has been canceled by user.");
-        //                return;
-        //            }
-        //        }
+            return true;
+        }
 
-        //        m_BuildReport.LogInfo("Start process '{0}' for '{1}'...", assetBundleFullName, buildTarget.ToString());
+        private bool BuildAssetBundles(BuildTarget buildTarget, List<AssetBundleBuild> lisBuildMap, BuildAssetBundleOptions buildAssetBundleOptions)
+        {
+            string strBuildTargetName = GetBuildTargetName(buildTarget);
+            string strWorkingPath = string.Format("{0}{1}/", WorkingPath, strBuildTargetName);
 
-        //        ProcessAssetBundle(workingPath, outputPackagePath, outputFullPath, outputPackedPath, zip, buildTarget, buildMap[i].assetBundleName, buildMap[i].assetBundleVariant);
+            if (!Directory.Exists(strWorkingPath))
+            {
+                Directory.CreateDirectory(strWorkingPath);
+            }
 
-        //        m_BuildReport.LogInfo("Process '{0}' for '{1}' complete.", assetBundleFullName, buildTarget.ToString());
-        //    }
+            var assetBundleManifest = BuildPipeline.BuildAssetBundles(strWorkingPath, lisBuildMap.ToArray(), buildAssetBundleOptions, buildTarget);
+            if (assetBundleManifest == null)
+            {
+                Debug.LogError(string.Format("Build AssetBundles for '{0}' failure.", buildTarget.ToString()));
+                return false;
+            }
 
-        //    ProcessPackageList(outputPackagePath, buildTarget);
-        //    m_BuildReport.LogInfo("Process package list for '{0}' complete.", buildTarget.ToString());
+            return true;
+        } 
 
-        //    VersionListData versionListData = ProcessVersionList(outputFullPath, buildTarget);
-        //    m_BuildReport.LogInfo("Process version list for '{0}' complete.", buildTarget.ToString());
+        private BuildAssetBundleOptions GetBuildAssetBundleOptions()
+        {
+            BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.None;
 
-        //    ProcessReadOnlyList(outputPackedPath, buildTarget);
-        //    m_BuildReport.LogInfo("Process readonly list for '{0}' complete.", buildTarget.ToString());
+            if (UncompressedAssetBundleSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
+            }
 
-        //    m_VersionListDatas.Add(buildTarget, versionListData);
+            if (DisableWriteTypeTreeSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.DisableWriteTypeTree;
+            }
 
-        //    if (ProcessAssetBundleComplete != null)
-        //    {
-        //        ProcessAssetBundleComplete(buildTarget, versionListData.Path, versionListData.Length, versionListData.HashCode, versionListData.ZipLength, versionListData.ZipHashCode);
-        //    }
+            if (DeterministicAssetBundleSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.DeterministicAssetBundle;
+            }
 
-        //    m_BuildReport.LogInfo("Build AssetBundles for '{0}' success.", buildTarget.ToString());
-        //}
+            if (ForceRebuildAssetBundleSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.ForceRebuildAssetBundle;
+            }
 
-        //private AssetBundleBuild[] GetBuildMap()
-        //{
-        //    m_AssetBundleDatas.Clear();
+            if (IgnoreTypeTreeChangesSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.IgnoreTypeTreeChanges;
+            }
 
-        //    AssetBundle[] assetBundles = m_AssetBundleCollection.GetAssetBundles();
-        //    foreach (AssetBundle assetBundle in assetBundles)
-        //    {
-        //        m_AssetBundleDatas.Add(assetBundle.FullName.ToLower(), new AssetBundleData(assetBundle.Name.ToLower(), (assetBundle.Variant != null ? assetBundle.Variant.ToLower() : null), assetBundle.LoadType, assetBundle.Packed));
-        //    }
+            if (AppendHashToAssetBundleNameSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.AppendHashToAssetBundleName;
+            }
 
-        //    Asset[] assets = m_AssetBundleCollection.GetAssets();
-        //    foreach (Asset asset in assets)
-        //    {
-        //        string assetName = asset.Name;
-        //        if (string.IsNullOrEmpty(assetName))
-        //        {
-        //            m_BuildReport.LogError("Can not find asset by guid '{0}'.", asset.Guid);
-        //            return null;
-        //        }
+            if (ChunkBasedCompressionSelected)
+            {
+                buildOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
+            }
 
-        //        string assetFileFullName = Utility.Path.GetCombinePath(Application.dataPath, assetName.Substring(AssetsSubstringLength));
-        //        if (!File.Exists(assetFileFullName))
-        //        {
-        //            m_BuildReport.LogError("Can not find asset '{0}'.", assetFileFullName);
-        //            return null;
-        //        }
+            return buildOptions;
+        }
 
-        //        byte[] assetBytes = File.ReadAllBytes(assetFileFullName);
-        //        int assetHashCode = Utility.Converter.GetIntFromBytes(Utility.Verifier.GetCrc32(assetBytes));
+        private List<AssetBundleBuild> GetBuildMap()
+        {
+            List<AssetBundleBuild> lisAssetBundleBuild = new List<AssetBundleBuild>();
 
-        //        List<string> dependencyAssetNames = new List<string>();
-        //        DependencyData dependencyData = m_AssetBundleAnalyzerController.GetDependencyData(assetName);
-        //        Asset[] dependencyAssets = dependencyData.GetDependencyAssets();
-        //        foreach (Asset dependencyAsset in dependencyAssets)
-        //        {
-        //            dependencyAssetNames.Add(dependencyAsset.Name);
-        //        }
+            HrAssetBundle[] assetBundles = m_assetBundleContainer.GetAssetBundles();
 
-        //        if (RecordScatteredDependencyAssetsSelected)
-        //        {
-        //            dependencyAssetNames.AddRange(dependencyData.GetScatteredDependencyAssetNames());
-        //        }
+            foreach (var assetBundle in assetBundles)
+            {
+                AssetBundleBuild buildMap = new AssetBundleBuild();
+                buildMap.assetBundleName = assetBundle.Name;
+                buildMap.assetBundleVariant = assetBundle.Variant;
+                buildMap.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundle.FullName);
 
-        //        dependencyAssetNames.Sort();
+                lisAssetBundleBuild.Add(buildMap);
+            }
 
-        //        m_AssetBundleDatas[asset.AssetBundle.FullName.ToLower()].AddAssetData(asset.Guid, assetName, assetBytes.Length, assetHashCode, dependencyAssetNames.ToArray());
-        //    }
+            return lisAssetBundleBuild;
+        }
 
-        //    foreach (AssetBundleData assetBundleData in m_AssetBundleDatas.Values)
-        //    {
-        //        if (assetBundleData.AssetCount <= 0)
-        //        {
-        //            m_BuildReport.LogError("AssetBundle '{0}' has no asset.", GetAssetBundleFullName(assetBundleData.Name, assetBundleData.Variant));
-        //            return null;
-        //        }
-        //    }
-
-        //    AssetBundleBuild[] buildMap = new AssetBundleBuild[m_AssetBundleDatas.Count];
-        //    int index = 0;
-        //    foreach (AssetBundleData assetBundleData in m_AssetBundleDatas.Values)
-        //    {
-        //        buildMap[index].assetBundleName = assetBundleData.Name;
-        //        buildMap[index].assetBundleVariant = assetBundleData.Variant;
-        //        buildMap[index].assetNames = assetBundleData.GetAssetNames();
-        //        index++;
-        //    }
-
-        //    return buildMap;
-        //}
-
+        private string GetBuildTargetName(BuildTarget buildTarget)
+        {
+            switch (buildTarget)
+            {
+                case BuildTarget.StandaloneWindows:
+                    return "windows";
+                case BuildTarget.StandaloneOSXIntel:
+                    return "osx";
+                case BuildTarget.iOS:
+                    return "ios";
+                case BuildTarget.Android:
+                    return "android";
+                case BuildTarget.WSAPlayer:
+                    return "winstore";
+                default:
+                    return "notsupported";
+            }
+        }
     }
 }

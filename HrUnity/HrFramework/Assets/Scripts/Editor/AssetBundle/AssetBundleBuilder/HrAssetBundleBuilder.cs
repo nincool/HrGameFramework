@@ -11,13 +11,18 @@ namespace Hr.Editor
 {
     public class HrAssetBundleBuilder : EditorWindow
     {
-        private HrAssetBundleController m_builderCtrler = new HrAssetBundleController();
+        private HrAssetBundleController m_builderCtrler = null;
 
         [MenuItem("Hr Tools/AssetBundle Tools/AssetBundle Builder", false, 101)]
         private static void Opne()
         {
             HrAssetBundleBuilder window = GetWindow<HrAssetBundleBuilder>(true, "AssetBundle Builder", true);
             window.minSize = window.maxSize = new Vector2(666f, 555f);
+        }
+
+        private void OnEnable()
+        {
+            m_builderCtrler = new HrAssetBundleController();
         }
 
         private void OnGUI()
@@ -190,13 +195,30 @@ namespace Hr.Editor
                     {
                         if (GUILayout.Button("Start Build AssetBundles"))
                         {
-                            //m_OrderBuildAssetBundles = true;
+                            EditorUtility.DisplayProgressBar("build", "start build assetbundles...", 0f);
+                            BuildAssetBundles();
+                            EditorUtility.ClearProgressBar();
                         }
                     }
                     EditorGUI.EndDisabledGroup();
                     if (GUILayout.Button("Save", GUILayout.Width(80f)))
                     {
-                        //SaveConfiguration();
+                        EditorUtility.DisplayProgressBar("save", "save configuration...", 0f);
+                        if (string.IsNullOrEmpty(m_builderCtrler.OutputDirectory))
+                        {
+                            EditorUtility.DisplayDialog("warning", "outputpaht can not be null!", "ok");
+                            EditorUtility.ClearProgressBar();
+                            return;
+                        }
+                        m_builderCtrler.Save();
+                        EditorUtility.ClearProgressBar(); 
+                    }
+                }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Start Zip AssetBundles", GUILayout.Width(160f)))
+                    {
+
                     }
                 }
             }
@@ -301,7 +323,7 @@ namespace Hr.Editor
 
         private void BuildAssetBundles()
         {
-
+            m_builderCtrler.BuildAssetBundles();
         }
     }
 }
