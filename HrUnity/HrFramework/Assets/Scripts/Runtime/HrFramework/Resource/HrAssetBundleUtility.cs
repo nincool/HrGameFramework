@@ -4,7 +4,7 @@ using UnityEditor;
 #endif
 using Hr;
 
-namespace Hr
+namespace Hr.Resource
 {
     public class HrAssetBundleUtility
     {
@@ -28,15 +28,15 @@ namespace Hr
             switch (target)
             {
                 case BuildTarget.Android:
-                    return "Android";
+                    return "android";
 #if UNITY_TVOS
                 case BuildTarget.tvOS:
                     return "tvOS";
 #endif
                 case BuildTarget.iOS:
-                    return "iOS";
+                    return "ios";
                 case BuildTarget.WebGL:
-                    return "WebGL";
+                    return "webgl";
 
 #if (UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9)
                 case BuildTarget.WebPlayer:
@@ -47,11 +47,11 @@ namespace Hr
 #endif
                 case BuildTarget.StandaloneWindows:
                 case BuildTarget.StandaloneWindows64:
-                    return "Windows";
+                    return "windows";
                 case BuildTarget.StandaloneOSXIntel:
                 case BuildTarget.StandaloneOSXIntel64:
                 case BuildTarget.StandaloneOSXUniversal:
-                    return "OSX";
+                    return "osx";
                 // Add more build targets for your own.
                 // If you add more targets, don't forget to add the same platforms to GetPlatformForAssetBundles(RuntimePlatform) function.
                 default:

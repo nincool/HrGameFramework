@@ -49,7 +49,7 @@ namespace Hr.Editor
         {
             get
             {
-                return Variant != null ? string.Format("{0}.{1}", Name, Variant) : Name;
+                return !string.IsNullOrEmpty(Variant) ? string.Format("{0}.{1}", Name, Variant) : Name;
             }
         }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Hr
 {
-    public class HrUIManager : HrSingleton<HrUIManager>
+    public class HrUIManager
     {
         /// <summary>
         /// 存储所有面板资源路径， 从配置文件中读取 TODO 配置文件读取
@@ -72,10 +72,10 @@ namespace Hr
                 string strUIAssetPath = m_dicViewAssetPath.HrTryGet(viewType);
                 if (strUIAssetPath != null)
                 {
-                    GameObject obPanel = HrResourceManager.Instance.LoadAsset<GameObject>(strUIAssetPath);
+                    GameObject obPanel = null;//HrGameWorld.Instance.ResourceComponent.LoadAsset<GameObject>(strUIAssetPath);
                     if (obPanel != null)
                     {
-                        HrGameObjectUtil.InstantiateUI(obPanel, GetUIAnchor(EnumUIAnchor.ANCHOR_CENTER));
+                        //HrGameObjectUtil.InstantiateUI(obPanel, GetUIAnchor(EnumUIAnchor.ANCHOR_CENTER));
                     }
                     else
                         HrLogger.LogError("HrUIManager HandleCreateUI Error! Asset is null:" + strUIAssetPath);
@@ -135,11 +135,11 @@ namespace Hr
         }
         #endregion
 
-        private Transform GetUIAnchor(EnumUIAnchor anchor)
-        {
-            return null;
-            //return HrGameWorld.Instance.SceneManager.CurrentScene.UIRoot.GetAnchor(anchor);
-        }
+        //private Transform GetUIAnchor(EnumUIAnchor anchor)
+        //{
+        //    return null;
+        //    //return HrGameWorld.Instance.SceneManager.CurrentScene.UIRoot.GetAnchor(anchor);
+        //}
     }
 
 }

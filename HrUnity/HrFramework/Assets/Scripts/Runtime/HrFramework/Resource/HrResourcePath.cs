@@ -2,74 +2,95 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hr;
+using System;
 
-namespace Hr
+namespace Hr.Resource
 {
     public class HrResourcePath
     {
-        public const string STR_ASSETBUNDLES_OUTPUT_PATH = "../../AssetBundles/";
         public const string STR_ZIP_ASSETFILE = "assets.zip";
 
-        public static readonly string ms_strProjectplatform;
+        /// <summary>
+        /// 平台名称
+        /// </summary>
+        public static readonly string m_s_strProjectplatform;
 
-        //AssetBundle打包输出目录
-        public static readonly string ms_strAssetBundleOutputPath;
+        /// <summary>
+        /// PC AssetBundle所在目录
+        /// </summary>
+        public static readonly string m_s_strAssetBundleOutputPath;
 
-        //AssetBundle压缩为zip存放目录 
-        public static readonly string ms_strZipAssetBundlePath;
+        /// <summary>
+        ///  初始化安装包 AssetBundle压缩为zip存放目录 
+        /// </summary>
+        public static readonly string m_s_strZipAssetBundlePath;
 
-        //AssetBundle解压缩目录
-        public static readonly string ms_strZipAssetBundleUnPackPath;
+        /// <summary>
+        /// zip包解压缩目录
+        /// </summary>
+        public static readonly string m_s_strZipAssetBundleUnPackPath;
 
-        //StreamingAsset www加载路径
-        public static readonly string ms_strStreamingAssetPathForWWW;
+        /// <summary>
+        /// StreamingAsset www加载路径
+        /// </summary>
+        public static readonly string m_s_strStreamingAssetPathForWWW;
 
-        //AssetBundle Streaming目录
-        public static readonly string ms_strStreamingAssetBundlePath;
+        /// <summary>
+        /// AssetBundle Streaming目录 目前不用只放初始Zip包
+        /// </summary>
+        public static readonly string m_s_strStreamingAssetBundlePath;
 
-        //AssetBundle Persistent目录
-        public static readonly string ms_strPersistentAssetBundlePath;
+        /// <summary>
+        /// AssetBundle Persistent目录
+        /// </summary>
+        public static readonly string m_s_strPersistentAssetBundlePath;
 
-        //windows 下AssetBundle加载目录
-        public static readonly string ms_strWin32AssetBundlePath;
+        /// <summary>
+        /// windows 下AssetBundle加载目录
+        /// </summary>
+        public static readonly string m_s_strWin32AssetBundlePath;
 
-        //AssetBundle 加载目录
-        public static readonly string ms_strAssetBundlePath;
+        /// <summary>
+        /// AssetBundle 加载目录
+        /// </summary>
+        public static readonly string m_s_strAssetBundlePath;
 
         //PC端项目目录
         public static readonly string ms_strWorkingPath = Application.dataPath + "/../";
 
         static HrResourcePath()
         {
-            ms_strProjectplatform = HrAssetBundleUtility.GetPlatformName();
-            ms_strAssetBundleOutputPath = Application.dataPath + "/" + STR_ASSETBUNDLES_OUTPUT_PATH;
-            ms_strZipAssetBundlePath = Application.streamingAssetsPath + "/" + STR_ZIP_ASSETFILE;
-            ms_strZipAssetBundleUnPackPath = Application.persistentDataPath + "/" + "AssetBundles/";
+            m_s_strProjectplatform = HrAssetBundleUtility.GetPlatformName();
 
+            m_s_strZipAssetBundlePath = Application.streamingAssetsPath + "/" + STR_ZIP_ASSETFILE;
 
-            if (ms_strProjectplatform == "Android")
+            if (m_s_strProjectplatform.Equals("android", StringComparison.OrdinalIgnoreCase))
             {
-                ms_strStreamingAssetPathForWWW = Application.streamingAssetsPath + "/";
+                m_s_strStreamingAssetPathForWWW = Application.streamingAssetsPath + "/";
             }
             else
             {
-                ms_strStreamingAssetPathForWWW = "file://" + Application.streamingAssetsPath + "/";
+                m_s_strStreamingAssetPathForWWW = "file://" + Application.streamingAssetsPath + "/";
             }
-            ms_strPersistentAssetBundlePath = Application.persistentDataPath + "/AssetBundles/" + ms_strProjectplatform + "/";
-            ms_strWin32AssetBundlePath = Application.dataPath + "/../../AssetBundles/" + ms_strProjectplatform + "/";
-            if (ms_strProjectplatform == "Windows")
+
+            m_s_strPersistentAssetBundlePath = Application.persistentDataPath + "/AssetBundles/" + m_s_strProjectplatform + "/";
+            m_s_strWin32AssetBundlePath = Application.dataPath + "/../../AssetBundles/AssetBundles/" + m_s_strProjectplatform + "/";
+
+            if (m_s_strProjectplatform.Equals("windows", StringComparison.OrdinalIgnoreCase))
             {
-                ms_strAssetBundlePath = ms_strWin32AssetBundlePath;
+                m_s_strAssetBundlePath = m_s_strWin32AssetBundlePath;
+                m_s_strZipAssetBundleUnPackPath = Application.persistentDataPath + "/../../AssetBundles/";
             }
             else
             {
-                ms_strAssetBundlePath = ms_strPersistentAssetBundlePath;
+                m_s_strAssetBundlePath = Application.persistentDataPath + "/AssetBundles/";
+                m_s_strZipAssetBundleUnPackPath = Application.persistentDataPath + "/AssetBundles/";
             }
         }
 
         public static string AssetBundlePath
         {
-            get { return ms_strAssetBundlePath; }
+            get { return m_s_strAssetBundlePath; }
         }
         
         public static string CombineAssetBundlePath(string assetPath)
@@ -79,12 +100,12 @@ namespace Hr
 
         public static string GetAssetBundlePath()
         {
-            return ms_strAssetBundlePath;
+            return m_s_strAssetBundlePath;
         }
 
         public static string GetStreamingAssetBundlePath()
         {
-            return ms_strStreamingAssetBundlePath;
+            return m_s_strStreamingAssetBundlePath;
         }
 
     }

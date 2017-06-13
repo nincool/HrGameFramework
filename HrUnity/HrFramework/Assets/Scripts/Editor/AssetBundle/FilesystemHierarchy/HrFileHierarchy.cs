@@ -171,17 +171,17 @@ namespace Hr.Editor.Hierarchy
             EditorGUILayout.BeginHorizontal();
             {
 
-                if (file.Selected != EditorGUILayout.Toggle(file.Selected, GUILayout.Width(12f + 14f * file.Depth)))
+                if (file.Selected != EditorGUILayout.Toggle(file.Selected, GUILayout.Width(28f)))
                 {
                     file.Selected = !file.Selected;
                 }
 
                 GUI.DrawTexture(new Rect(35f + 14f * file.Depth, 18f * file.Row, 18f, 18f), file.Icon);
-                EditorGUILayout.LabelField(string.Empty, GUILayout.Width(10 * file.Depth));
+                EditorGUILayout.LabelField(string.Empty, GUILayout.Width(14f + 14 * file.Depth));
                 if (file.FileItem.AssetBundle == null)
-                    EditorGUILayout.LabelField(string.Format("{0}", file.Name));
+                    EditorGUILayout.LabelField(string.Format("{0} [{1}]", file.Name, file.Depth));
                 else
-                    EditorGUILayout.LabelField(string.Format("{0}            [{1}]", file.Name, file.FileItem.AssetBundle.FullName));
+                    EditorGUILayout.LabelField(string.Format("{0}            [{1}] [{2}]", file.Name, file.FileItem.AssetBundle.FullName, file.Depth));
             }
             EditorGUILayout.EndHorizontal();
         }

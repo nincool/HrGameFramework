@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using Hr.Logic;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +7,7 @@ namespace Hr
 {
     public class HrGameWorld : HrSingleton<HrGameWorld>
     {
+
         /// <summary>
         /// 游戏组件 持有游戏模块
         /// </summary>
@@ -17,75 +18,137 @@ namespace Hr
         /// </summary>
         private readonly LinkedList<HrModule> m_modules = new LinkedList<HrModule>();
 
-        //事件管理器组件 
+        /// <summary>
+        /// 资源组件
+        /// </summary>
+        public HrResourceComponent ResourceComponent { get; private set; }
+
+        /// <summary>
+        /// 事件管理器组件
+        /// </summary>
         public HrEventComponent EventComponent { get; private set; }
 
-        //状态机组件
+        /// <summary>
+        /// 状态机组件
+        /// </summary>
         public HrFSMComponent FSMComponent { get; private set; }
 
-        //场景管理器组件
+        /// <summary>
+        /// 场景管理器组件
+        /// </summary>
         public HrSceneComponent SceneComponent { get; private set; }
 
-
-        public HrUIManager UIManager { get; private set; }
-
-        public HrSceneManager SceneManager { get; private set; }
-
-        public HrGameWorld()
+        /// <summary>
+        /// 组件节点
+        /// </summary>
+        public Transform ComponentRoot
         {
-            UIManager = new HrUIManager();
-            SceneManager = new HrSceneManager();    
+            get;
+            set;
         }
 
-        public void Init()
+        /// <summary>
+        /// 游戏根节点
+        /// </summary>
+        public Transform GameRoot
         {
-            EventComponent = GetHrComponent<HrEventComponent>();
-            FSMComponent = GetHrComponent<HrFSMComponent>();
-            SceneComponent = GetHrComponent<HrSceneComponent>();
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 初始化的场景
+        /// </summary>
+        public string EntryScene
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 初始化ILaunch
+        /// </summary>
+        private ILaunch m_launch;
+
+        public void Initialize(string strLaunch)
+        {
+            InitGameComonent();
 
             foreach (var module in m_modules)
             {
                 module.Init();
             }
+
+            Type t = Type.GetType(strLaunch);
+            if (t == null)
+            {
+                HrLogger.LogError(string.Format("HrGameWorld initialize error! error launch type! [{0}]", strLaunch));
+                return;
+            }
+            m_launch = (ILaunch)Activator.CreateInstance(t);
+            if (m_launch != null)
+            {
+                m_launch.Initialize();
+            }
+            else
+            {
+                HrLogger.LogError("create launch error!");
+            }
         }
 
-        public void StartGame(string strEntryScene)
+        private void InitGameComonent()
         {
-            HrLogger.Log("HrGameWorld Start Game EntryScene:" + strEntryScene);
-            SceneComponent.SwitchToScene(strEntryScene);
+            EventComponent = GetHrComponent<HrEventComponent>();
+            FSMComponent = GetHrComponent<HrFSMComponent>();
+            ResourceComponent = GetHrComponent<HrResourceComponent>();
+            SceneComponent = GetHrComponent<HrSceneComponent>();
+        }
+
+        public void StartGame()
+        {
+            HrLogger.Log("HrGameWorld Start Game EntryScene:" + EntryScene);
+            if (!string.IsNullOrEmpty(EntryScene))
+            {
+                SceneComponent.SwitchToScene(EntryScene);
+            }
         }
 
         #region HrComponent
-        public void AddHrComponent(HrComponent component)
+        private T AddHrComponent<T>() where T : HrComponent
         {
-            if (component == null)
-            {
-                HrLogger.LogError("Component is invalid.");
-                return;
-            }
+            Type type = typeof(T);
 
-            Type type = component.GetType();
             LinkedListNode<HrComponent> current = m_components.First;
             while (current != null)
             {
                 if (current.Value.GetType() == type)
                 {
                     HrLogger.LogError(string.Format("Game framework component type '{0}' is already exist.", type.FullName));
-                    return;
+                    return (T)current.Value;
                 }
 
                 current = current.Next;
             }
 
+            GameObject eventComponent = new GameObject(typeof(T).FullName);
+            HrComponent component = eventComponent.AddComponent<T>();
+            if (component == null)
+            {
+                HrLogger.LogError(string.Format("can not add the component '{0}' .", type.FullName));
+                return null;
+            }
+            eventComponent.transform.parent = ComponentRoot;
             m_components.AddLast(component);
+
+            return (T)component;
         }
 
-        public void RemoveHrComponent<T>() where T : HrComponent
+        private void RemoveHrComponent<T>() where T : HrComponent
         {
             RemoveHrComponent(typeof(T));
         }
 
-        public void RemoveHrComponent(Type type)
+        private void RemoveHrComponent(Type type)
         {
             LinkedListNode<HrComponent> current = m_components.First;
             while (current != null)
@@ -102,7 +165,14 @@ namespace Hr
 
         public T GetHrComponent<T>() where T : HrComponent
         {
-            return (T)GetHrComponent(typeof(T));
+            var component = (T)GetHrComponent(typeof(T));
+            if (component == null)
+            {
+                component = AddHrComponent<T>();
+                if (component == null)
+                    HrLogger.Log(string.Format("can not find the component '{0}'", typeof(T).FullName));
+            }
+            return component;
         }
 
         public HrComponent GetHrComponent(Type type)
@@ -168,9 +238,12 @@ namespace Hr
         }
         #endregion
 
-        public void Update(float fElapseSeconds, float fRealElapseSeconds)
+        public void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
-
+            foreach (var module in m_modules)
+            {
+                module.OnUpdate(fElapseSeconds, fRealElapseSeconds);
+            }
         }
     }
 

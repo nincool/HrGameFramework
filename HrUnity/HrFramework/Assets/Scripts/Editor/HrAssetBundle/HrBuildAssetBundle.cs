@@ -1,12 +1,7 @@
-﻿using UnityEngine;
-using UnityEditor;
-using UnityEditor.Callbacks;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Hr.Resource;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using Hr;
+using UnityEditor;
+using UnityEngine;
 
 namespace Hr.Editor
 {
@@ -15,9 +10,9 @@ namespace Hr.Editor
         static public string CreateAssetBundleDirectory()
         {
             // Choose the output path according to the build target.
-            string strOutputPath = Application.dataPath + "/" + HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH + HrAssetBundleUtility.GetPlatformName();
-            if (!Directory.Exists(strOutputPath))
-                Directory.CreateDirectory(strOutputPath);
+            string strOutputPath = "";// Application.dataPath + "/" + HrResourcePath.STR_ASSETBUNDLES_OUTPUT_PATH + HrAssetBundleUtility.GetPlatformName();
+            //if (!Directory.Exists(strOutputPath))
+            //    Directory.CreateDirectory(strOutputPath);
 
             return strOutputPath;
         }

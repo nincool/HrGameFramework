@@ -24,7 +24,7 @@ namespace Hr.Editor
         private HrAssetBundleSourceListView m_assetBundleSourceListView = null;
         
 
-        [MenuItem("Hr Tools/AssetBundle Tools/AssetBundle Editor2", false, 103)]
+        [MenuItem("Hr Tools/AssetBundle Tools/AssetBundle Editor", false, 103)]
         private static void Open()
         {
             HrAssetBundleAssignEditor window = GetWindow<HrAssetBundleAssignEditor>(true, "AssetBundle Editor", true);

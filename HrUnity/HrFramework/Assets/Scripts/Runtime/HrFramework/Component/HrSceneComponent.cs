@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hr.Scene;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Hr
     {
         public bool InitSuccess { get; private set; }
 
-        private HrSceneManager m_sceneManager = null;
+        private ISceneManager m_sceneManager = null;
 
         protected override void Awake()
         {
@@ -26,9 +27,14 @@ namespace Hr
             base.Start();
         }
 
+        public void AddScene(string strSceneType)
+        {
+            m_sceneManager.AddScene(strSceneType);
+        }
+
         public void SwitchToScene<T>()
         {
-            m_sceneManager.SwitchToScene(typeof(T).FullName);
+            //m_sceneManager.SwitchToScene(typeof(T).FullName);
         }
 
         public void SwitchToScene(string strSceneName)
@@ -38,7 +44,7 @@ namespace Hr
 
         public string GetRunningSceneName()
         {
-            return m_sceneManager.CurrentScene.GetType().FullName;
+            return m_sceneManager.GetRunningScene().GetType().FullName;
         }
     }
 

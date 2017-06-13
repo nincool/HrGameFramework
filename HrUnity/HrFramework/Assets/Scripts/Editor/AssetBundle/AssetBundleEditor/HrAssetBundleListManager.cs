@@ -7,6 +7,7 @@ using System.Linq;
 using LitJson;
 using System.IO;
 using System.Text;
+using System;
 
 namespace Hr.Editor
 {
@@ -72,7 +73,7 @@ namespace Hr.Editor
                     string strVariant = jsonData[strAssetBundle]["Variant"].ToString();
                     if (!AddAssetBundle(strName, strVariant))
                     {
-                        string strAssetBundleFullName = strVariant != null ? string.Format("{0}.{1}", strName, strVariant) : strName;
+                        string strAssetBundleFullName = !string.IsNullOrEmpty(strVariant) ? string.Format("{0}.{1}", strName, strVariant) : strName;
                         Debug.LogError(string.Format("Can not add AssetBundle '{0}'.", strAssetBundleFullName));
                     }
                 }
@@ -94,7 +95,7 @@ namespace Hr.Editor
                     string strAssetBundleVariant = jsonData[strAsset]["AssetBundleVariant"].ToString();
                     if (!AssignFile(strAssetBundleName, strAssetBundleVariant, strGUID))
                     {
-                        string strAssetBundleFullName = strAssetBundleVariant != null ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
+                        string strAssetBundleFullName = !string.IsNullOrEmpty(strAssetBundleVariant) ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
                         Debug.LogError(string.Format("Can not assign asset '{0}' to AssetBundle '{1}'", strGUID, strAssetBundleFullName));
                     }
                 }
@@ -114,6 +115,17 @@ namespace Hr.Editor
         public bool Save()
         {
             string strConfigurationName = HrFileUtil.GetCombinePath(Application.dataPath, m_c_strConfigurationName);
+
+            if (File.Exists(strConfigurationName))
+            {
+
+                string strOldConfigurationFileName = HrFileUtil.GetFileNameWithoutSuffix(m_c_strConfigurationName) + HrTimeUtils.DateTime2DateTimeStr(DateTime.Now).Replace(':', '-') + ".json";
+                string strDirectoryPath = Path.GetDirectoryName(strConfigurationName) + "/Backup";
+                string strOldConfigurationName = HrFileUtil.GetCombinePath(strDirectoryPath, strOldConfigurationFileName);
+
+                File.Move(strConfigurationName, strOldConfigurationName);
+            }
+
             JsonWriter writer = new JsonWriter();
 
             writer.WriteObjectStart();
@@ -189,7 +201,7 @@ namespace Hr.Editor
         /// <returns></returns>
         private string GetAssetBundleFullName(string strAssetBundleName, string strAssetBundleVariant)
         {
-            return strAssetBundleVariant != null ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
+            return !string.IsNullOrEmpty(strAssetBundleVariant) ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
         }
 
         /// <summary>
@@ -210,7 +222,7 @@ namespace Hr.Editor
                 return false;
             }
 
-            if (strAssetBundleVariant != null && !Regex.IsMatch(strAssetBundleVariant, m_c_strAssetBundleVariantPattern))
+            if (!string.IsNullOrEmpty(strAssetBundleVariant) && !Regex.IsMatch(strAssetBundleVariant, m_c_strAssetBundleVariantPattern))
             {
                 return false;
             }

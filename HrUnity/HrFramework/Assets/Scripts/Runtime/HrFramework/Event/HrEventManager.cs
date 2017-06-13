@@ -64,7 +64,7 @@ namespace Hr
             }
         }
 
-        public override void Update(float fElapseSeconds, float fRealElapseSeconds)
+        public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
 
         }

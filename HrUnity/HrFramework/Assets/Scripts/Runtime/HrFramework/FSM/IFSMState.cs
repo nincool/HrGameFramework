@@ -6,16 +6,16 @@ namespace Hr
 {
     public interface IFSMState 
     {
-        void OnEnter(IFSMStateMachine fsm);
+        void OnEnter();
 
 
-        void OnUpdate(IFSMStateMachine fsm, float fElapseSeconds, float fRealElapseSeconds);
+        void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
 
 
-        void OnExit(IFSMStateMachine fsm);
+        void OnExit();
 
 
-        void OnDestroy(IFSMStateMachine fsm);
+        void OnDestroy();
     }
 
 }

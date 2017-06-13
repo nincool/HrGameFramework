@@ -1,8 +1,4 @@
-﻿using Hr;
-using Hr;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using Hr.Resource;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,11 +28,11 @@ namespace Hr.Editor
             }
             if (string.IsNullOrEmpty(sFromPath))
             {
-                sFromPath = HrResourcePath.ms_strAssetBundleOutputPath;
+                //sFromPath = HrResourcePath.ms_strAssetBundleOutputPath;
             }
             if (string.IsNullOrEmpty(sToPath))
             {
-                sToPath = HrResourcePath.ms_strZipAssetBundlePath;
+                //sToPath = HrResourcePath.ms_strZipAssetBundlePath;
             }
 
             sWindowInstance.Show();

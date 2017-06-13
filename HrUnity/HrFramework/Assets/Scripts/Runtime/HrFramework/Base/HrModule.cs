@@ -7,6 +7,6 @@ namespace Hr
     {
         public abstract void Init();
 
-        public abstract void Update(float fElapseSeconds, float fRealElapseSeconds);
+        public abstract void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
     }
 }

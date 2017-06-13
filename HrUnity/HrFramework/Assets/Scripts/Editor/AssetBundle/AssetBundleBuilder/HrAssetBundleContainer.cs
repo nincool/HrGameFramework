@@ -100,7 +100,7 @@ namespace Hr.Editor
         /// <returns></returns>
         private string GetAssetBundleFullName(string strAssetBundleName, string strAssetBundleVariant)
         {
-            return strAssetBundleVariant != null ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
+            return !string.IsNullOrEmpty(strAssetBundleVariant) ? string.Format("{0}.{1}", strAssetBundleName, strAssetBundleVariant) : strAssetBundleName;
         }
 
         public HrAssetBundle GetAssetBundle(string strAssetBundleName, string strAssetBundleVariant)
@@ -133,7 +133,7 @@ namespace Hr.Editor
             }
             else
             {
-                Debug.LogError(string.Format("AssignFile Error! can not fine the assetbundle '{0}.{1}'", strAssetBundleName, strAssetBundleVariant));
+                Debug.LogError(string.Format("AssignFile Error! can not find the assetbundle '{0}.{1}'", strAssetBundleName, strAssetBundleVariant));
             }
             return false;
         }

@@ -77,12 +77,15 @@ namespace Hr.Editor
                 if (displayName != null)
                     Debug.Log(displayName.Invoke(null, null));
             }
+            Debug.Log("Application.persistentDataPath:" + Application.persistentDataPath);
         }
+
 
         [MenuItem(STR_HR_TEST)]
         public static void HrTestButton()
         {
-            HrZipFileUtil.PackFiles("E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\123.zip", "E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\AssetBundles");
+            //HrZipFileUtil.PackFiles("E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\123.zip", "E:\\Workspace\\HrGitHub\\HrGameFramework\\HrUnity\\HrFramework\\Assets\\AssetBundles");
+            Debug.Log(SystemInfo.graphicsShaderLevel);
         }
 
         [MenuItem(STR_ATLAS_TOOL_WIN)]

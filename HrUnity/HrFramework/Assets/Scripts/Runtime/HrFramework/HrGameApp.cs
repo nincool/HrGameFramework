@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using Hr.Environment;
 
 namespace Hr
 {
-    public class HrGameApp : MonoBehaviour 
+    public class HrGameApp : HrUnitySingleton<HrGameApp>
     {
         /// <summary>
         /// 游戏内置版本号
@@ -17,7 +20,10 @@ namespace Hr
         private bool m_bNeverSleep = true;
 
         [SerializeField]
-        private bool m_bRunInBackGround = true;
+        private bool m_bRunInBackground = true;
+
+        [SerializeField]
+        private string m_strLaunch = string.Empty;
 
         [SerializeField]
         private string m_strEntryScene = string.Empty;
@@ -60,73 +66,60 @@ namespace Hr
         {
             get
             {
-                return m_bRunInBackGround;
+                return m_bRunInBackground;
             }
             set
             {
-                Application.runInBackground = m_bRunInBackGround = value;
+                Application.runInBackground = m_bRunInBackground = value;
             }
         }
 
         /// <summary>
-        /// 初始化场景
+        /// 启动Scene
         /// </summary>
-        public string EntryScene
+        public string Launch
         {
             get
             {
-                return m_strEntryScene;
+                return m_strLaunch;
             }
             set
             {
-                m_strEntryScene = value;
+                m_strLaunch = value;
             }
         }
 
-        protected virtual void Awake()
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected  void Awake()
         {
-            InitGameComponent();
+            if (HrEnvironment.IsEditorMode)
+            {
+                HrLogger.Log("GameApp will use editor model!");
+            }
+            Initialize();
         }
 
-        protected virtual void Start()
+        protected  void Start()
         {
             HrLogger.Log("HrGameApp Start!");
 
-            DontDestroyOnLoad(this);
-
             Application.runInBackground = RunInBackground;
 
-            if (!string.IsNullOrEmpty(m_strEntryScene))
-            {
-                HrGameWorld.Instance.StartGame(m_strEntryScene);
-            }
-            else
-            {
-                HrLogger.LogError("HrGameApp Start EntryScene is null");
-            }
+            HrGameWorld.Instance.StartGame();
         }
 
-        private void InitGameComponent()
+        private void Initialize()
         {
-            AddGameComponent<HrEventComponent>();
-            AddGameComponent<HrFSMComponent>();
-            AddGameComponent<HrSceneComponent>();
-
-            HrGameWorld.Instance.Init();
-        }
-
-        private void AddGameComponent<T>() where T : Component
-        {
-            GameObject eventComponent = new GameObject(typeof(T).FullName);
-            eventComponent.AddComponent<T>();
-            eventComponent.transform.parent = this.transform;
+            HrGameWorld.Instance.ComponentRoot = this.transform;
+            HrGameWorld.Instance.Initialize(m_strLaunch);
         }
 
         protected virtual void Update()
         {
-            HrGameWorld.Instance.Update(Time.deltaTime, Time.unscaledDeltaTime);
+            HrGameWorld.Instance.OnUpdate(Time.deltaTime, Time.unscaledDeltaTime);
         }
-
     }
 
 }

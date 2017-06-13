@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Hr;
 
-namespace Hr
+namespace Hr.Resource
 {
-    public enum EnumHrAssetBundleStatus
+    public enum EnumAssetBundleStatus
     {
         UNDEFINED,
         DECLARED,
@@ -16,26 +16,46 @@ namespace Hr
         LOADED,
     }
 
+    public enum EnumAssetBundleLoadMode
+    {
+        LOAD_SYNC,
+        LOAD_ASYNC
+    }
+
     public class HrAssetBundle : HrRef, IAssetLoad
     {
-        //AssetBundle Name
         private string m_strName;
-        private string m_strFullName;
+        
+        private string m_strFullPath;
 
         private AssetBundle m_assetBundle;
 
-        private Action<HrAssetBundle> m_actLoaded;
+        /// <summary>
+        /// 加载资源事件
+        /// </summary>
+        private HrLoadAssetEvent m_loadAssetBundleEvent = new HrLoadAssetEvent();
 
-        //当前资源状态
-        private EnumHrAssetBundleStatus m_assetBundleStatus = EnumHrAssetBundleStatus.UNDEFINED;
+        public HrLoadAssetEvent LoadAssetBundleEvent
+        {
+            get { return m_loadAssetBundleEvent; }
+        }
 
-        public HrAssetBundle(string strName, string strFullName,  Action<HrAssetBundle> loadedAction)
+        /// <summary>
+        /// 当前的资源状态
+        /// </summary>
+        private EnumAssetBundleStatus m_assetBundleStatus = EnumAssetBundleStatus.UNDEFINED;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private EnumAssetBundleLoadMode m_assetBundleLoadMode = EnumAssetBundleLoadMode.LOAD_SYNC;
+
+        public HrAssetBundle(string strName, string strFullPath)
         {
             m_strName = strName;
-            m_strFullName = strFullName;
+            m_strFullPath = strFullPath;
 
-            m_assetBundleStatus = EnumHrAssetBundleStatus.DECLARED;
-            m_actLoaded = loadedAction;
+            m_assetBundleStatus = EnumAssetBundleStatus.DECLARED;
         }
 
         public string Name
@@ -44,13 +64,13 @@ namespace Hr
             get { return m_strName; }
         }
 
-        public string FullName
+        public string FullPath
         {
-            set { m_strFullName = value; }
-            get { return m_strFullName; }
+            set { m_strFullPath = value; }
+            get { return m_strFullPath; }
         }
 
-        public EnumHrAssetBundleStatus AssetBundleStatus
+        public EnumAssetBundleStatus AssetBundleStatus
         {
             set { m_assetBundleStatus = value; }
             get { return m_assetBundleStatus; }
@@ -63,12 +83,12 @@ namespace Hr
 
         public bool IsLoading()
         {
-            return (m_assetBundleStatus == EnumHrAssetBundleStatus.LOADING);
+            return (m_assetBundleStatus == EnumAssetBundleStatus.LOADING);
         }
 
         public bool IsLoaded()
         {
-            return (m_assetBundleStatus == EnumHrAssetBundleStatus.LOADED);
+            return (m_assetBundleStatus == EnumAssetBundleStatus.LOADED);
         }
 
         public bool IsError()
@@ -78,23 +98,27 @@ namespace Hr
 
         public void LoadSync()
         {
-            var lisDependices = HrResourceManager.Instance.GetAssetBundleDependices(m_strName);
+            HrSimpleTimeCounter timeCounter = new HrSimpleTimeCounter();
+
+            m_assetBundleLoadMode = EnumAssetBundleLoadMode.LOAD_SYNC;
+
+            var lisDependices = new List<string>();// = HrGameWorld.Instance.ResourceComponent.GetAssetBundleDependices(m_strName);
             if (lisDependices != null && lisDependices.Count > 0)
             {
                 //遍历加载依赖资源
                 foreach (var itemAsset in lisDependices)
                 {
-                    HrResourceManager.Instance.LoadAssetBundleSync(itemAsset);
+                    //HrGameWorld.Instance.ResourceComponent.LoadAssetBundleSync(itemAsset);
                 }
             }
 
-            this.m_assetBundle = AssetBundle.LoadFromFile(m_strFullName);
+            this.m_assetBundle = AssetBundle.LoadFromFile(m_strFullPath);
 
-            this.m_assetBundleStatus = EnumHrAssetBundleStatus.LOADED;
+            this.m_assetBundleStatus = EnumAssetBundleStatus.LOADED;
 
-            if (this.m_actLoaded != null)
+            if (this.LoadAssetBundleEvent != null)
             {
-                this.m_actLoaded(this);
+                LoadAssetBundleEvent.TriggerLoadSuccess(this, m_strName, this, timeCounter.GetTimeElapsed());
             }
         }
 

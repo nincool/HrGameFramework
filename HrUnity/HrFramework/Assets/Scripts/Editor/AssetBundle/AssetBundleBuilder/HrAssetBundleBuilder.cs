@@ -13,20 +13,37 @@ namespace Hr.Editor
     {
         private HrAssetBundleController m_builderCtrler = null;
 
+        private bool m_bReadyBuildAssetBundle = false;
+
         [MenuItem("Hr Tools/AssetBundle Tools/AssetBundle Builder", false, 101)]
         private static void Opne()
         {
             HrAssetBundleBuilder window = GetWindow<HrAssetBundleBuilder>(true, "AssetBundle Builder", true);
-            window.minSize = window.maxSize = new Vector2(666f, 555f);
+            window.minSize = window.maxSize = new Vector2(800f, 700f);
         }
 
         private void OnEnable()
         {
             m_builderCtrler = new HrAssetBundleController();
+            m_bReadyBuildAssetBundle = false;
+        }
+
+        private void Update()
+        {
+            if (m_bReadyBuildAssetBundle)
+            {
+                m_bReadyBuildAssetBundle = false;
+                BuildAssetBundles();
+            }
         }
 
         private void OnGUI()
         {
+            if (EditorApplication.isCompiling)
+            {
+                EditorGUILayout.HelpBox("Waiting to compile", MessageType.Warning);
+                return;
+            }
             using (new GUILayout.VerticalScope(GUILayout.Width(position.width), GUILayout.Height(position.height)))
             {
                 GUILayout.Space(5f);
@@ -36,8 +53,28 @@ namespace Hr.Editor
                     EditorGUILayout.BeginHorizontal();
                     {
                         EditorGUILayout.LabelField("Product Name", GUILayout.Width(160f));
+                        EditorGUILayout.LabelField(m_builderCtrler.ProductName);
                     }
                     EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField("Company Name", GUILayout.Width(160f));
+                        EditorGUILayout.LabelField(m_builderCtrler.CompanyName);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField("Game Identifier", GUILayout.Width(160f));
+                        EditorGUILayout.LabelField(m_builderCtrler.GameIdentifier);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField("Applicable Game Version", GUILayout.Width(160f));
+                        EditorGUILayout.LabelField(m_builderCtrler.ApplicableGameVersion);
+                    }
+                    EditorGUILayout.EndHorizontal();
+
                 }
                 GUILayout.Space(5f);
 
@@ -158,14 +195,14 @@ namespace Hr.Editor
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
-                        EditorGUILayout.LabelField("Output Package Path", GUILayout.Width(160f));
-                        GUILayout.Label(m_builderCtrler.OutputPackagePath);
+                        EditorGUILayout.LabelField("Assets List Path", GUILayout.Width(160f));
+                        GUILayout.Label(m_builderCtrler.AssetsListPath);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
-                        EditorGUILayout.LabelField("Output Full Path", GUILayout.Width(160f));
-                        GUILayout.Label(m_builderCtrler.OutputFullPath);
+                        EditorGUILayout.LabelField("All AssetBundles Path", GUILayout.Width(160f));
+                        GUILayout.Label(m_builderCtrler.AllAssetBundlesPath);
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
@@ -176,8 +213,24 @@ namespace Hr.Editor
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginHorizontal();
                     {
+                        EditorGUILayout.LabelField("Modified AssetBundle Path", GUILayout.Width(160f));
+                        GUILayout.Label(m_builderCtrler.ModifiedAssetBundlesPath);
+                    }
+                    EditorGUILayout.EndHorizontal();                        
+                    EditorGUILayout.BeginHorizontal();
+                    {
                         EditorGUILayout.LabelField("Build Report Path", GUILayout.Width(160f));
                         GUILayout.Label(m_builderCtrler.BuildReportPath);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField("Editor Resource Path", GUILayout.Width(160f));
+                        m_builderCtrler.EditorResourcePath = EditorGUILayout.TextField(m_builderCtrler.EditorResourcePath);
+                        if (GUILayout.Button("Browse...", GUILayout.Width(80f)))
+                        {
+                            BrowseEditorResourceDirectory();
+                        }
                     }
                     EditorGUILayout.EndHorizontal();
                 }
@@ -195,12 +248,11 @@ namespace Hr.Editor
                     {
                         if (GUILayout.Button("Start Build AssetBundles"))
                         {
-                            EditorUtility.DisplayProgressBar("build", "start build assetbundles...", 0f);
-                            BuildAssetBundles();
-                            EditorUtility.ClearProgressBar();
+                            m_bReadyBuildAssetBundle = true;
                         }
                     }
                     EditorGUI.EndDisabledGroup();
+
                     if (GUILayout.Button("Save", GUILayout.Width(80f)))
                     {
                         EditorUtility.DisplayProgressBar("save", "save configuration...", 0f);
@@ -273,6 +325,16 @@ namespace Hr.Editor
             }
         }
 
+        private void BrowseEditorResourceDirectory()
+        {
+            string directory = EditorUtility.OpenFolderPanel("Select Output Directory", m_builderCtrler.EditorResourcePath, string.Empty);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                m_builderCtrler.EditorResourcePath = directory + "/";
+            }
+        }
+        
+
         private void GetBuildMessage(out string message, out MessageType messageType)
         {
             if (!m_builderCtrler.IsValidOutputDirectory)
@@ -284,20 +346,20 @@ namespace Hr.Editor
 
             message = string.Empty;
             messageType = MessageType.Info;
-            if (Directory.Exists(m_builderCtrler.OutputPackagePath))
+            if (Directory.Exists(m_builderCtrler.AssetsListPath))
             {
-                message += string.Format("{0} will be overwritten.", m_builderCtrler.OutputPackagePath);
+                message += string.Format("{0} will be overwritten.", m_builderCtrler.AssetsListPath);
                 messageType = MessageType.Warning;
             }
 
-            if (Directory.Exists(m_builderCtrler.OutputFullPath))
+            if (Directory.Exists(m_builderCtrler.AllAssetBundlesPath))
             {
                 if (message.Length > 0)
                 {
                     message += " ";
                 }
 
-                message += string.Format("{0} will be overwritten.", m_builderCtrler.OutputFullPath);
+                message += string.Format("{0} will be overwritten.", m_builderCtrler.AllAssetBundlesPath);
                 messageType = MessageType.Warning;
             }
 
@@ -325,5 +387,6 @@ namespace Hr.Editor
         {
             m_builderCtrler.BuildAssetBundles();
         }
+
     }
 }

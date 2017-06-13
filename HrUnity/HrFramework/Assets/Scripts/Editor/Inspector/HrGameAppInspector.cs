@@ -11,15 +11,15 @@ namespace Hr.Editor
         private SerializedProperty m_strGameVersion = null;
         private SerializedProperty m_bNeedSleep = null;
         private SerializedProperty m_bRunInBackGround = null;
-        private SerializedProperty m_strEntryScene = null;
+        private SerializedProperty m_strLaunch = null;
 
 
         private void OnEnable()
         {
             m_strGameVersion = serializedObject.FindProperty("m_strGameVersion");
             m_bNeedSleep = serializedObject.FindProperty("m_bNeverSleep");
-            m_bRunInBackGround = serializedObject.FindProperty("m_bRunInBackGround");
-            m_strEntryScene = serializedObject.FindProperty("m_strEntryScene");
+            m_bRunInBackGround = serializedObject.FindProperty("m_bRunInBackground");
+            m_strLaunch = serializedObject.FindProperty("m_strLaunch");
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -33,7 +33,7 @@ namespace Hr.Editor
             HrGameApp targetInspect = (HrGameApp)target;
 
             m_bNeedSleep.boolValue = EditorGUILayout.PropertyField(m_bNeedSleep);
-            EditorGUILayout.PropertyField(m_bRunInBackGround);
+            m_bRunInBackGround.boolValue = EditorGUILayout.PropertyField(m_bRunInBackGround);
 
             string strGameVersion = EditorGUILayout.DelayedTextField("string GameVersion", m_strGameVersion.stringValue);
             if (strGameVersion != m_strGameVersion.stringValue)
@@ -47,16 +47,17 @@ namespace Hr.Editor
                     m_strGameVersion.stringValue = strGameVersion;
                 }
             }
-            string strEntryScene = EditorGUILayout.DelayedTextField("string EntryScene", m_strEntryScene.stringValue);
-            if (strEntryScene != m_strEntryScene.stringValue)
+
+            string strLaunch = EditorGUILayout.DelayedTextField("string Launch", m_strLaunch.stringValue);
+            if (strLaunch != m_strLaunch.stringValue)
             {
                 if (EditorApplication.isPlaying)
                 {
-                    targetInspect.EntryScene = strEntryScene;
+                    EditorGUILayout.HelpBox("can not edit!", MessageType.Warning);
                 }
                 else
                 {
-                    m_strEntryScene.stringValue = strEntryScene;
+                    m_strLaunch.stringValue = strLaunch;
                 }
             }
 

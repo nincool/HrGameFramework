@@ -4,20 +4,23 @@ using System.Collections.Generic;
 
 namespace Hr
 {
-    public class HrFSMStateMachine<T> : IFSMStateMachine where T : class
+    public class HrFSMStateMachine<T> : IFSMStateMachine
     {
         /// <summary>
         /// 状态机名称
         /// </summary>
         private readonly string m_strName;
+        
         /// <summary>
         /// 状态机持有者
         /// </summary>
         private readonly T m_owner;
+        
         /// <summary>
         /// 所有状态
         /// </summary>
         private readonly Dictionary<string, HrFSMState<T>> m_dicStates;
+        
         /// <summary>
         /// 当前状态
         /// </summary>
@@ -102,51 +105,50 @@ namespace Hr
         /// </summary>
         /// <param name="fElapseSeconds">逻辑流逝时间</param>
         /// <param name="fRealElapseSeconds">真实流逝时间</param>
-        public void Update(float fElapseSeconds, float fRealElapseSeconds)
+        public void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
             if (m_currentState == null)
             {
                 return;
             }
-            m_currentState.OnUpdate(m_owner, fElapseSeconds, fRealElapseSeconds);
+            m_currentState.OnUpdate(fElapseSeconds, fRealElapseSeconds);
         }
 
         public void Shutdown()
         {
             if (m_currentState != null)
             {
-                m_currentState.OnExit(m_owner);
+                m_currentState.OnExit();
                 m_currentState = null;
             }
 
             foreach (var state in m_dicStates)
             {
-                state.Value.OnDestroy(m_owner);
+                state.Value.OnDestroy();
             }
             m_dicStates.Clear();
         }
 
-        public void ChangeState<TState>() where TState : HrFSMState<T>
-        {
-            ChangeState(typeof(TState));
-        } 
-
         public void ChangeState(Type stateType)
         {
-            HrFSMState<T> state = GetState(stateType);
+            var state = GetState(stateType);
             if (state == null)
             {
                 HrLogger.LogError(string.Format("FSM '{0}' can not change state to '{1}' whitch is not exist.", m_strName, stateType.FullName));
             }
+            if (state == m_currentState)
+            {
+                HrLogger.LogError(string.Format("FSM '{0}' change state to '{1}' which is alread active", m_strName, stateType.FullName));
+            }
             if (m_currentState != null)
             {
-                m_currentState.OnExit(m_owner);
+                m_currentState.OnExit();
             }
-            m_currentState = state;
-            m_currentState.OnEnter(m_owner);
+            m_currentState = (HrFSMState<T>)state;
+            m_currentState.OnEnter();
         }
         
-        public void AddState(HrFSMState<T> state)
+        public void AddState(IFSMState state)
         {
             string strStateName = state.GetType().FullName;
             if (m_dicStates.ContainsKey(strStateName))
@@ -155,14 +157,19 @@ namespace Hr
                 return;
             }
 
-            m_dicStates.Add(strStateName, state);
+            m_dicStates.Add(strStateName, (HrFSMState<T>)state);
         }
 
-        public HrFSMState<T> GetState(Type stateType)
+        public IFSMState GetState(Type stateType)
         {
-            HrFSMState<T> state = m_dicStates.HrTryGet(stateType.FullName);
+            var state = m_dicStates.HrTryGet(stateType.FullName);
 
             return state;
+        }
+
+        public IFSMState GetCurrentState()
+        {
+            return m_currentState;
         }
     }
 }

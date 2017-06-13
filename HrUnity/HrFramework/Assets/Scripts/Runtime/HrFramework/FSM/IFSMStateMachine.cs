@@ -1,14 +1,37 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
 namespace Hr
 {
     public interface IFSMStateMachine
     {
-        void Update(float fElapseSeconds, float fRealElapseSeconds);
+        void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
 
         void Shutdown();
+
+        /// <summary>
+        /// 通过类型获取状态
+        /// </summary>
+        /// <param name="stateType"></param>
+        /// <returns></returns>
+        IFSMState GetState(Type stateType);
+
+        /// <summary>
+        /// 添加状态
+        /// </summary>
+        /// <param name="state"></param>
+        void AddState(IFSMState state);
+
+        /// <summary>
+        /// 转换状态
+        /// </summary>
+        /// <param name="stateType"></param>
+        void ChangeState(Type stateType);
+
+        /// <summary>
+        /// 获取当前的状态
+        /// </summary>
+        /// <returns></returns>
+        IFSMState GetCurrentState();
     }
 
 }

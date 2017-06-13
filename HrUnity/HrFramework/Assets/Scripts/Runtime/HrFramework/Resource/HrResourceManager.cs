@@ -6,8 +6,9 @@ using System.Linq;
 using UnityEngine;
 using Hr;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
-namespace Hr
+namespace Hr.Resource
 {
     public enum EnumHrAssetLoadMode
     {
@@ -15,7 +16,7 @@ namespace Hr
         PERSISTENT,
     }
 
-    public class HrResourceManager : HrUnitySingleton<HrResourceManager>
+    public class HrResourceManager : HrModule, IResourceManager
     {
         /// <summary>
         /// 资源加载模式
@@ -59,17 +60,25 @@ namespace Hr
             get { return m_dicAssetBundleInfo; }
         }
 
+        /// <summary>
+        /// 暂时不用
+        /// </summary>
         public string Variant
         {
             set { m_strVariant = value; }
             get { return m_strVariant; }
         }
 
-        public void Init()
+        protected HrLoadAssetEvent m_loadAssetEvent = new HrLoadAssetEvent();
+
+        public override void Init()
         {
             HrResourcePrefab.RegisterType();
+        }
 
-            LoadAssetBundleManifest();
+        public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
+        {
+
         }
 
         public static void AddResourceType(System.Object unityType, System.Object assetType)
@@ -77,6 +86,11 @@ namespace Hr
             ms_dicUnityType2AssetType.Add(unityType, assetType);
         }
 
+        /// <summary>
+        /// 获取AssetBundle的依赖
+        /// </summary>
+        /// <param name="strAssetBundleName"></param>
+        /// <returns>AssetBundle依赖的集合</returns>
         public List<string> GetAssetBundleDependices(string strAssetBundleName)
         {
             List<string> lisRt = null;
@@ -113,10 +127,10 @@ namespace Hr
             }
             m_lisAssetBundleName.AddRange(strAllAssetBundles.ToList<string>());
 
-            
+            ///todo 解析后写入配置文件
             //解析每个AssetBundle的manifest文件，收集里面打入的资源名称 转换为小写
-           foreach (var strAssetBundleName in m_lisAssetBundleName)
-           {
+            foreach (var strAssetBundleName in m_lisAssetBundleName)
+            {
                 string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
                 string strAssetBundleManifest = strAssetBundleFullPath + ".manifest";
                 if (!File.Exists(strAssetBundleManifest))
@@ -151,45 +165,70 @@ namespace Hr
             return true;
         }
 
+        public void LoadSceneSync(string strSceneName, string strAssetBundleName)
+        {
+            HrAssetBundle assetBundle = LoadAssetBundleSync(strAssetBundleName);
+            SceneManager.LoadScene(strSceneName, LoadSceneMode.Additive);
+        }
+
+        /// <summary>
+        /// 手动加载AssetBundle
+        /// </summary>
+        /// <param name="strAssetBundle"></param>
         public HrAssetBundle LoadAssetBundleSync(string strAssetBundleName)
         {
-#if UNITY_EDITOR
-            if (Regex.IsMatch(strAssetBundleName, "[A-Z]"))
-            {
-                HrLogger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
-            }
-#endif
-            HrAssetBundle loadedAssetBundle = null;
-            m_dicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
+            HrAssetBundle loadedAssetBundle = m_dicAssetBundleInfo.HrTryGet(strAssetBundleName);
             if (loadedAssetBundle != null)
             {
+                if (loadedAssetBundle.IsLoaded())
+                {
+                    return loadedAssetBundle;
+                }
+
+                HrLogger.LogWaring(string.Format("LoadAssetBunldeSyn AssetBundle is no null! AssetBundle[{0}]", strAssetBundleName));
+                ///todo 1.判断是否正在加载 2.加载 3.等待加载
                 while (loadedAssetBundle.IsLoading() && !loadedAssetBundle.IsError()) { }
-                
-                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBundleName:" + strAssetBundleName);
 
-                return null;
-
+                return loadedAssetBundle;
             }
 
             string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
-
             if (!File.Exists(strAssetBundleFullPath))
             {
-                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBunde is not exist!:" + strAssetBundleFullPath);
-
+                HrLogger.LogError(string.Format("assetbundle is not existed! [{0}]", strAssetBundleFullPath));
                 return null;
             }
 
-            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath, new Action<HrAssetBundle>(ActionAssetBundleLoadFinished));
+            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath);
+            assetBundle.LoadAssetBundleEvent.LoadAssetSuccessHandler += LoadAssetBundleSuccessHandler;
+            assetBundle.LoadAssetBundleEvent.LoadAssetFailedHandler += LoadAssetBundleFailedHandler;
+            assetBundle.LoadAssetBundleEvent.LoadAssetProgressHandler += LoadAssetBundleProgressHandler;
             assetBundle.LoadSync();
 
             return assetBundle;
         }
 
-        public void ActionAssetBundleLoadFinished(HrAssetBundle assetBundle)
+        private void LoadAssetBundleSuccessHandler(object sender, EventArgs args)
         {
-            Debug.Log("ActionAssetBundleLoadFinished AssetBundle:" + assetBundle.Name);
+            HrLoadAssetSuccessEventArgs eventArgs = args as HrLoadAssetSuccessEventArgs;
+            HrLogger.Log(string.Format("LoadAssetBundleSuccess! assetBundle:{0} duration:{1}", eventArgs.AssetName,  eventArgs.Duration));
+            HrAssetBundle assetBundle = eventArgs.UserData as HrAssetBundle;
 
+            ParseAssetBundle(assetBundle);
+        }
+
+        public void LoadAssetBundleFailedHandler(object sender, EventArgs args)
+        {
+
+        }
+
+        public void LoadAssetBundleProgressHandler(object sender, EventArgs args)
+        {
+
+        }
+
+        private void ParseAssetBundle(HrAssetBundle assetBundle)
+        {
             m_dicAssetBundleInfo.Add(assetBundle.Name, assetBundle);
 
             var strAllAssetsNameArr = assetBundle.MonoAssetBundle.GetAllAssetNames();
@@ -218,8 +257,53 @@ namespace Hr
         }
 
         /// <summary>
-        /// 加载AssetBundle中的资源 如果AssetBundle都没有加载那么同步加载AssetBundle
+        /// 同步加载资源
         /// </summary>
+        /// <param name="strAssetBundleName">加载的AssetBundle名称</param>
+        /// <returns>返回加载的HrAssetBundle对象</returns>
+//        public HrAssetBundle LoadAssetBundleSync(string strAssetBundleName)
+//        {
+//#if UNITY_EDITOR
+//            if (Regex.IsMatch(strAssetBundleName, "[A-Z]"))
+//            {
+//                HrLogger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
+//            }
+//#endif
+//            HrAssetBundle loadedAssetBundle = null;
+//            m_dicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
+//            if (loadedAssetBundle != null)
+//            {
+//                while (loadedAssetBundle.IsLoading() && !loadedAssetBundle.IsError()) { }
+                
+//                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBundleName:" + strAssetBundleName);
+
+//                return null;
+
+//            }
+
+//            string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
+
+//            if (!File.Exists(strAssetBundleFullPath))
+//            {
+//                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBunde is not exist!:" + strAssetBundleFullPath);
+
+//                return null;
+//            }
+
+//            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath, m_loadAssetEvent);
+//            assetBundle.LoadSync();
+
+//            return assetBundle;
+//        }
+
+
+
+        /// <summary>
+        /// 获取单个资源，如果对应的AssetBundle没有加载，那么同步加载AssetBundle
+        /// </summary>
+        /// <typeparam name="T">资源类型</typeparam>
+        /// <param name="strAssetPath">资源的路径</param>
+        /// <returns>资源对象</returns>
         public T LoadAsset<T>(string strAssetPath)
         {
             string strAssetBundleName = m_dicAssetInAssetBundleName.HrTryGet(strAssetPath);

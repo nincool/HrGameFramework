@@ -19,9 +19,14 @@ namespace Hr
                 InitSuccess = true;
         }
 
-        public IFSMStateMachine CreateFSM<T>(string strName, T owner) where T : class
+        public IFSMStateMachine AddFSM<T>(string strName, T owner) where T : class
         {
-            return m_fsmManager.CreateFSM<T>(strName, owner);
+            return m_fsmManager.AddFSM<T>(strName, owner);
+        }
+
+        public bool RemoveFSM(string strName)
+        {
+            return m_fsmManager.RemoveFSM(strName);
         }
     }
 }

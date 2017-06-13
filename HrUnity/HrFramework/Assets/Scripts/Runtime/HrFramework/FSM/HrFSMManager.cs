@@ -13,11 +13,11 @@ namespace Hr
 
         }
 
-        public IFSMStateMachine CreateFSM<T>(string strName, T owner) where T: class
+        public IFSMStateMachine AddFSM<T>(string strName, T owner) where T: class
         {
             if (m_dicStateMachines.HrTryGet(strName) != null)
             {
-                HrLogger.LogError(string.Format("HrFSMManager CreateFSM Error! Already exist fsm:[%s]", strName));
+                HrLogger.LogError(string.Format("HrFSMManager AddFSM Error! Already exist fsm:[%s]", strName));
                 return null;
             }
             HrFSMStateMachine<T> fsm = new HrFSMStateMachine<T>(strName, owner);
@@ -25,10 +25,24 @@ namespace Hr
 
             return fsm;
         }
-
-        public override void Update(float fElapseSeconds, float fRealElapseSeconds)
+        
+        public bool RemoveFSM(string strName)
         {
+            if (m_dicStateMachines.ContainsKey(strName))
+            {
+                m_dicStateMachines.Remove(strName);
 
+                return true;
+            }
+            return false;
+        }
+
+        public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
+        {
+            foreach (var item in m_dicStateMachines.Values)
+            {
+                item.OnUpdate(fElapseSeconds, fRealElapseSeconds);
+            }
         }
     }
 }

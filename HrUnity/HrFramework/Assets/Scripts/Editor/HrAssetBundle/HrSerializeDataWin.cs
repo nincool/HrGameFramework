@@ -59,13 +59,7 @@ namespace Hr.Editor
 
                 if (GUILayout.Button("BuildFromSelection", EditorStyles.miniButton, GUILayout.Width(120), GUILayout.Height(30)))
                 {
-                    var testData = ScriptableObject.CreateInstance<HrSampleData>();
-                    testData.mStrData = "ssssaaaassdd";
-                    testData.mLisData.Add(1);
-                    testData.mLisData.Add(2);
-                    testData.mIntData = 99;
-                    AssetDatabase.CreateAsset(testData, "Assets/ScritableData/test.asset");
-                    AssetDatabase.Refresh();
+
                 }
 
                 EditorGUILayout.EndHorizontal();

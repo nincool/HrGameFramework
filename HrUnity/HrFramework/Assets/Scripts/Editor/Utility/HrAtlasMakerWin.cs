@@ -1,12 +1,7 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Hr.Resource;
 using System.IO;
-using UnityEngine.SceneManagement;
-using Hr;
-using Hr;
+using UnityEditor;
+using UnityEngine;
 
 public class HrAtlasMakerWin : EditorWindow
 {

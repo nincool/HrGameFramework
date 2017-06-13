@@ -1,24 +1,15 @@
-﻿using Hr;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
+using Hr;
 
-namespace Hr
+namespace Hr.Scene
 {
 
-    public class HrSceneManager : HrModule
+    public class HrSceneManager : HrModule, ISceneManager
     {
         private Dictionary<string, HrScene> m_dicScene = new Dictionary<string, HrScene>();
 
-        private HrScene m_runningScene;
-
-        private HrFSMStateMachine<HrSceneManager> m_fsmSceneStateMachine = null;
-
-        public HrScene CurrentScene
-        {
-            get { return m_runningScene; }
-        }
+        private IFSMStateMachine m_fsmSceneStateMachine = null;
 
         public HrSceneManager()
         {
@@ -26,15 +17,35 @@ namespace Hr
 
         public override void Init()
         {
-            m_dicScene.Add(typeof(HrLaunchScene).FullName, new HrLaunchScene());
-
-            m_fsmSceneStateMachine = HrGameWorld.Instance.FSMComponent.CreateFSM<HrSceneManager>(typeof(HrSceneManager).FullName, this) as HrFSMStateMachine<HrSceneManager>;
-            m_fsmSceneStateMachine.AddState(new HrLaunchScene());
+            m_fsmSceneStateMachine = HrGameWorld.Instance.FSMComponent.AddFSM<HrSceneManager>(typeof(HrSceneManager).FullName, this) as HrFSMStateMachine<HrSceneManager>;
         }
 
-        public override void Update(float fElapseSeconds, float fRealElapseSeconds)
+        public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
 
+        }
+
+        public HrScene GetRunningScene()
+        {
+            HrScene scene = m_fsmSceneStateMachine.GetCurrentState() as HrScene;
+            return scene;
+        }
+
+        public void AddScene(string strSceneType)
+        {
+            Type sceneType = Type.GetType(strSceneType);
+            if (sceneType == null)
+            {
+                HrLogger.LogError(string.Format("add scene error! scenetype:{0}", strSceneType));
+                return;
+            }
+
+            var readyToScene = m_fsmSceneStateMachine.GetState(sceneType);
+            if (readyToScene == null)
+            {
+                HrScene scene = (HrScene)Activator.CreateInstance(sceneType, this);
+                m_fsmSceneStateMachine.AddState(scene);
+            }
         }
 
         /// <summary>
@@ -43,13 +54,14 @@ namespace Hr
         /// <param name="sceneType"></param>
         public void SwitchToScene(string strSceneType)
         {
-            var readyToScene = m_dicScene.HrTryGet(strSceneType);
-            if (readyToScene == null)
+            Type sceneType = Type.GetType(strSceneType);
+            if (sceneType == null)
             {
-                HrLogger.LogError("HrSceneManager SwitchToScene Error! SceneType:" + strSceneType);
+                HrLogger.LogError(string.Format("SwitchToScene to error! scenetype:{0}", strSceneType));
                 return;
             }
-            m_fsmSceneStateMachine.ChangeState(Type.GetType(strSceneType));
+
+            m_fsmSceneStateMachine.ChangeState(sceneType);
         }
     }
 }
