@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Hr;
+using System;
 
 namespace Hr.Resource
 {
-    public class HrLoadAssetEventArgs : EventArgs
+    public class HrLoadAssetEventArgs : HrEventArgs
     {
         /// <summary>
         /// 资源名称
@@ -124,17 +122,20 @@ namespace Hr.Resource
 
         public void TriggerLoadSuccess(object sender, string strAssetName, object userData, float fDuration)
         {
-            m_eventLoadAssetSuccessHandler(sender, new HrLoadAssetSuccessEventArgs(strAssetName, userData, fDuration));
+            if (m_eventLoadAssetSuccessHandler != null)
+                m_eventLoadAssetSuccessHandler(sender, new HrLoadAssetSuccessEventArgs(strAssetName, userData, fDuration));
         }
 
         public void TriggerLoadFailed(object sender, string strAssetName, object userData, string strErrorMessage)
         {
-            m_eventLoadAssetFailedHandler(sender, new HrLoadAssetFailedEventArgs(strAssetName, userData, strErrorMessage));
+            if (m_eventLoadAssetFailedHandler != null)
+                m_eventLoadAssetFailedHandler(sender, new HrLoadAssetFailedEventArgs(strAssetName, userData, strErrorMessage));
         }
 
         public void TriggerLoadProgress(object sender, string strAssetName, object userData, float fProgress)
         {
-            m_eventLoadAssetProgressHandler(sender, new HrLoadAssetProgressEventArgs(strAssetName, userData, fProgress));
+            if (m_eventLoadAssetProgressHandler != null)
+                m_eventLoadAssetProgressHandler(sender, new HrLoadAssetProgressEventArgs(strAssetName, userData, fProgress));
         }
     }
 

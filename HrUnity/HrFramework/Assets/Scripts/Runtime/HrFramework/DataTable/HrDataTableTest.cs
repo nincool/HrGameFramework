@@ -35,11 +35,5 @@ namespace Hr.DataTable
         }
     }
 
-    public class HrDataTableTest
-    {
-        private Dictionary<int, HrDataTableTestInfo> m_dicDataTest = new Dictionary<int, HrDataTableTestInfo>();
 
-
-
-    }
 }

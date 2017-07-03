@@ -6,7 +6,7 @@ namespace Hr.Resource
 {
     public class HrResourceScene : HrResource
     {
-        public HrResourceScene(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle) : base(strAssetName, o, assetBundle)
+        public HrResourceScene(string strAssetName, HrAssetFile assetFile) : base(strAssetName, assetFile)
         {
 
         }

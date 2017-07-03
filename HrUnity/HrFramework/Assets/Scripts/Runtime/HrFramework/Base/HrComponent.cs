@@ -8,7 +8,6 @@ namespace Hr
     {
         protected virtual void Awake()
         {
-            //HrGameWorld.Instance.AddHrComponent(this);
         }
 
         protected virtual void Start()

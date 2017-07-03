@@ -8,5 +8,7 @@ namespace Hr
         public abstract void Init();
 
         public abstract void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
+
+        public abstract void Shutdown();
     }
 }

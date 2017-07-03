@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine.SceneManagement;
-using Hr;
+using Hr.Utility;
 
 namespace Hr.Editor
 {

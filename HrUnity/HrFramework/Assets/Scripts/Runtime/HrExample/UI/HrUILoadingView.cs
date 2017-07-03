@@ -1,30 +1,40 @@
-﻿using System.Collections;
+﻿using Hr.Define;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
-namespace Hr
+namespace Hr.UI
 {
     public class HrUILoadingView : HrUIView
     {
         [SerializeField]
-        private Image m_imgProgress = null;
+        private Image m_imgProgress;
 
-        private void Awake()
+        public override int UIID
         {
-            Assert.IsTrue(m_imgProgress != null);
-
-            m_viewType = EnumView.VIEW_LAUNCH_LOADING;
-
-            //HrEventManager.Instance.SendEvent(EnumEvent.EVENT_UI_ONCREATE, this);
+            get
+            {
+                return (int)EnumUIType.UITYPE_LOADING_VIEW;
+            }
         }
 
-        private void Start()
+        public override void OnEnter()
         {
-            HrLogger.Log("HrUILoadingView Start!!!!");
+            base.OnEnter();
+
+            HrLogger.Log("HrUILoadingView OnEnter!");
+
             m_imgProgress.fillAmount = 0.0f;
         }
+
+        public override void Show()
+        {
+            base.Show();
+
+        }
+
     }
 
 }

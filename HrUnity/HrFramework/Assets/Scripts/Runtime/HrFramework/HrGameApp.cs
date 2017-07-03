@@ -75,7 +75,7 @@ namespace Hr
         }
 
         /// <summary>
-        /// 启动Scene
+        /// 启动接口
         /// </summary>
         public string Launch
         {
@@ -83,9 +83,16 @@ namespace Hr
             {
                 return m_strLaunch;
             }
-            set
+        }
+
+        /// <summary>
+        /// 初始化Scene
+        /// </summary>
+        public string EntranceScene
+        {
+            get
             {
-                m_strLaunch = value;
+                return m_strEntryScene;
             }
         }
 

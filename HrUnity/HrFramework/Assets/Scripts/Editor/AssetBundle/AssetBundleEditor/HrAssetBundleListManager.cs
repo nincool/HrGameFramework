@@ -8,6 +8,8 @@ using LitJson;
 using System.IO;
 using System.Text;
 using System;
+using Hr.Utility;
+
 
 namespace Hr.Editor
 {

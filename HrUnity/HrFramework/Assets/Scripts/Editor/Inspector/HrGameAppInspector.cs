@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Hr.Utility;
+using System.Linq;
 
 namespace Hr.Editor
 {
@@ -12,7 +14,10 @@ namespace Hr.Editor
         private SerializedProperty m_bNeedSleep = null;
         private SerializedProperty m_bRunInBackGround = null;
         private SerializedProperty m_strLaunch = null;
+        private SerializedProperty m_strEntranceScene = null;
 
+        private int m_nEntranceLaunchIndex = 0;
+        private int m_nEntranceSceneIndex = 0;
 
         private void OnEnable()
         {
@@ -20,6 +25,7 @@ namespace Hr.Editor
             m_bNeedSleep = serializedObject.FindProperty("m_bNeverSleep");
             m_bRunInBackGround = serializedObject.FindProperty("m_bRunInBackground");
             m_strLaunch = serializedObject.FindProperty("m_strLaunch");
+            m_strEntranceScene = serializedObject.FindProperty("m_strEntryScene");
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -48,17 +54,20 @@ namespace Hr.Editor
                 }
             }
 
-            string strLaunch = EditorGUILayout.DelayedTextField("string Launch", m_strLaunch.stringValue);
-            if (strLaunch != m_strLaunch.stringValue)
+            var lisLaunchTypes = HrType.GetTypeNames(typeof(Hr.Logic.HrLaunch));
+            int nSelectedEntranceLaunchIndex = EditorGUILayout.Popup("Entrance Launch", m_nEntranceLaunchIndex, lisLaunchTypes.ToArray());
+            if (nSelectedEntranceLaunchIndex != m_nEntranceLaunchIndex)
             {
-                if (EditorApplication.isPlaying)
-                {
-                    EditorGUILayout.HelpBox("can not edit!", MessageType.Warning);
-                }
-                else
-                {
-                    m_strLaunch.stringValue = strLaunch;
-                }
+                m_nEntranceLaunchIndex = nSelectedEntranceLaunchIndex;
+                m_strLaunch.stringValue = lisLaunchTypes[nSelectedEntranceLaunchIndex];
+            }
+
+            var lisSceneTypes = HrType.GetTypeNames(typeof(Hr.Scene.HrScene));
+            int nSelectedEntranceSceneIndex = EditorGUILayout.Popup("Entrance Scene", m_nEntranceSceneIndex, lisSceneTypes.ToArray());
+            if (nSelectedEntranceSceneIndex != m_nEntranceSceneIndex)
+            {
+                m_nEntranceSceneIndex = nSelectedEntranceSceneIndex;
+                m_strEntranceScene.stringValue = lisSceneTypes[nSelectedEntranceSceneIndex];
             }
 
             SaveSerializedData();

@@ -2,16 +2,16 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using Hr.EventSystem;
 
-namespace Hr
+namespace Hr.EventSystem
 {
     public sealed class HrEventManager : HrModule, IEventManager
     {
 
-        /// <summary>
-        /// 存储所有监听者，事件ID对应监听者们
-        /// </summary>
-        private Dictionary<int, HashSet<HrEventListener>> m_dicListener = new Dictionary<int, HashSet<HrEventListener>>();
+        private readonly Dictionary<int, EventHandler<HrEventHandlerArgs>> m_dicHandlers = new Dictionary<int, EventHandler<HrEventHandlerArgs>>();
+
+        private readonly Queue<HrEvent> m_queEvents = new Queue<HrEvent>();
 
         public HrEventManager()
         {
@@ -22,51 +22,116 @@ namespace Hr
 
         }
 
-        public void AddListener(HrEventListener handler, params int[] events)
+        public void AddHandler(int nEvent, EventHandler<HrEventHandlerArgs> handler)
         {
-            foreach (var e in events)
+            if (handler == null)
             {
-                var hasListener = m_dicListener.HrTryGet(e);
-                if (hasListener == null)
-                {
-                    hasListener = new HashSet<HrEventListener>();
-                    m_dicListener.Add(e, hasListener);
-                }
-                hasListener.Add(handler);
+                HrLogger.LogError("Add Handler Error! handler is null!");
+                return;
+            }
+
+            if (CheckIsInHandlerList(nEvent, handler))
+            {
+                HrLogger.LogError("Add Handler Error! handler is in handlerlist!");
+                return;
+            }
+
+            var eventHandler = m_dicHandlers.HrTryGet(nEvent);
+            if (eventHandler != null)
+            {
+                eventHandler += handler;
+                //是否为引用
+                m_dicHandlers[nEvent] = eventHandler;
+            }
+            else
+            {
+                m_dicHandlers[nEvent] = eventHandler;
             }
         }
 
-        public void RemoveListener(int e, HrEventListener listener)
+        public void RemoveHandler(int nEvent, EventHandler<HrEventHandlerArgs> handler)
         {
-            var hasListener = m_dicListener.HrTryGet(e);
-            if (hasListener != null)
+            if (handler == null)
             {
-                hasListener.Remove(listener);
+                HrLogger.LogError("Remove Handler Error! handler is null!");
+                return;
+            }
+
+            if (m_dicHandlers.ContainsKey(nEvent))
+            {
+                m_dicHandlers[nEvent] -= handler;
             }
         }
 
-        public void ClearHandler()
+        public void SendEventAsync(object sender, HrEventHandlerArgs args)
         {
-            m_dicListener.Clear();
-        }
-
-        public void SendEvent(int e, params object[] args)
-        {
-            var hasListener = m_dicListener.HrTryGet(e);
-            if (hasListener != null)
+            HrEvent hrEvent = new HrEvent(sender, args);
+            lock (m_queEvents)
             {
-                //有可能在update中调用，所以尽量避免foreach
-                var enuListener = hasListener.GetEnumerator();
-                while (enuListener.MoveNext())
-                {
-                    enuListener.Current(e, args);
-                }
+                m_queEvents.Enqueue(hrEvent);
             }
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
+            while (m_queEvents.Count > 0)
+            {
+                HrEvent e = null;
+                lock (m_queEvents)
+                {
+                    e = m_queEvents.Dequeue();
+                }
 
+                HandleEvent(e.Sender, e.EventArgs);
+            }
+        }
+
+        public bool CheckIsInHandlerList(int nEventID, EventHandler<HrEventHandlerArgs> handler)
+        {
+            if (handler == null)
+            {
+                HrLogger.LogError("handler is null");
+                return false;
+            }
+
+            var eventHandler = m_dicHandlers.HrTryGet(nEventID);
+            if (null != eventHandler)
+            {
+                var lisHandlerList = eventHandler.GetInvocationList();
+                foreach (EventHandler<HrEventHandlerArgs> itemHandler in lisHandlerList)
+                {
+                    if (itemHandler == handler)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override void Shutdown()
+        {
+            lock (m_queEvents)
+            {
+                m_queEvents.Clear();
+            }
+            m_dicHandlers.Clear();
+        }
+
+        public void SendEvent(object sender, HrEventHandlerArgs args)
+        {
+            HandleEvent(sender, args);
+        }
+
+        private void HandleEvent(object sender, HrEventHandlerArgs args)
+        {
+            var handler = m_dicHandlers.HrTryGet(args.EventID);
+            if (handler != null)
+            {
+                handler(sender, args);
+                return;
+            }
         }
     }
 

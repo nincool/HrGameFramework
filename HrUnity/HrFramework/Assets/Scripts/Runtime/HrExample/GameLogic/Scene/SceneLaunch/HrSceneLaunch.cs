@@ -1,14 +1,16 @@
 ﻿
+using Hr.Resource;
+using System.Collections;
+using UnityEngine;
+
 namespace Hr.Scene
 {
     public class HrSceneLaunch : HrScene
     {
-        private const string m_c_strLaunchSceneName = "Assets/Media/Scene/GameExample/Launch";
-        private const string m_c_strAssetBundleName = "scene_launch";
+        private  string m_strAssetBundleName = "scene_launch";
 
         public HrSceneLaunch(HrSceneManager sceneManager) :base(sceneManager)
         {
-
         }
 
         public override void OnEnter()
@@ -16,14 +18,15 @@ namespace Hr.Scene
             base.OnEnter();
             HrLogger.Log("HrSceneLaunchImp OnEnter!");
 
-            HrGameWorld.Instance.ResourceComponent.LoadSceneSync(m_c_strLaunchSceneName, m_c_strAssetBundleName);
+            HrGameWorld.Instance.SceneComponent.LoadSceneSync(HrResourcePath.CombineStreamingAssetsPath(m_strAssetBundleName));
 
             ChangeState<Procedure.HrSceneLaunch.HrProcedureInit>();
+
+            //HrCoroutineManager.StartCoroutine(DelayChangeScene());
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
-
         }
 
         public override void OnExit()
@@ -43,5 +46,11 @@ namespace Hr.Scene
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureCheckVersion(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedurePreload(this));
         }
+
+        //private IEnumerator DelayChangeScene()
+        //{
+        //    yield return new WaitForSecondsRealtime(10f);
+
+        //}
     }
 }

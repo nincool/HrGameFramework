@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace Hr
+namespace Hr.Utility
 {
     public class HrByteBuffer
     {
@@ -195,7 +195,7 @@ namespace Hr
             }
         }
     }
-
+    
     public class HrByteBufferReader : HrByteBuffer
     {
         public HrByteBufferReader(string strFilePath) : base(strFilePath)

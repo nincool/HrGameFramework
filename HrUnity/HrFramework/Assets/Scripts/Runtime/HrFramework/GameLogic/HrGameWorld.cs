@@ -7,36 +7,71 @@ namespace Hr
 {
     public class HrGameWorld : HrSingleton<HrGameWorld>
     {
-
-        /// <summary>
-        /// 游戏组件 持有游戏模块
-        /// </summary>
-        private readonly LinkedList<HrComponent> m_components = new LinkedList<HrComponent>();
-
-        /// <summary>
-        /// 游戏模块 具体的功能实现者
-        /// </summary>
-        private readonly LinkedList<HrModule> m_modules = new LinkedList<HrModule>();
-
+        #region Components
         /// <summary>
         /// 资源组件
         /// </summary>
-        public HrResourceComponent ResourceComponent { get; private set; }
+        public HrResourceComponent ResourceComponent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 配置数据组件
+        /// </summary>
+        public HrDataTableComponent DataTableComponent
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// 事件管理器组件
         /// </summary>
-        public HrEventComponent EventComponent { get; private set; }
+        public HrEventComponent EventComponent
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// 状态机组件
         /// </summary>
-        public HrFSMComponent FSMComponent { get; private set; }
+        public HrFSMComponent FSMComponent
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// 场景管理器组件
         /// </summary>
-        public HrSceneComponent SceneComponent { get; private set; }
+        public HrSceneComponent SceneComponent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// UI组件
+        /// </summary>
+        public HrUIComponent UIComponent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 自动释放管理组件
+        /// </summary>
+        public HrReleasePoolComponent ReleasePoolComonent
+        {
+            get;
+            private set;
+        }
+
+        #endregion
 
         /// <summary>
         /// 组件节点
@@ -65,10 +100,24 @@ namespace Hr
             set;
         }
 
+
+        #region private fields
+        /// <summary>
+        /// 游戏组件 持有游戏模块
+        /// </summary>
+        private readonly LinkedList<HrComponent> m_components = new LinkedList<HrComponent>();
+
+        /// <summary>
+        /// 游戏模块 具体的功能实现者
+        /// </summary>
+        private readonly LinkedList<HrModule> m_modules = new LinkedList<HrModule>();
+
         /// <summary>
         /// 初始化ILaunch
         /// </summary>
         private ILaunch m_launch;
+
+        #endregion
 
         public void Initialize(string strLaunch)
         {
@@ -96,14 +145,6 @@ namespace Hr
             }
         }
 
-        private void InitGameComonent()
-        {
-            EventComponent = GetHrComponent<HrEventComponent>();
-            FSMComponent = GetHrComponent<HrFSMComponent>();
-            ResourceComponent = GetHrComponent<HrResourceComponent>();
-            SceneComponent = GetHrComponent<HrSceneComponent>();
-        }
-
         public void StartGame()
         {
             HrLogger.Log("HrGameWorld Start Game EntryScene:" + EntryScene);
@@ -113,7 +154,64 @@ namespace Hr
             }
         }
 
-        #region HrComponent
+        public T GetHrComponent<T>() where T : HrComponent
+        {
+            var component = (T)GetHrComponent(typeof(T));
+            if (component == null)
+            {
+                component = AddHrComponent<T>();
+                if (component == null)
+                    HrLogger.Log(string.Format("can not find the component '{0}'", typeof(T).FullName));
+            }
+            return component;
+        }
+
+        public HrComponent GetHrComponent(Type type)
+        {
+            LinkedListNode<HrComponent> current = m_components.First;
+            while (current != null)
+            {
+                if (current.Value.GetType() == type)
+                {
+                    return current.Value;
+                }
+
+                current = current.Next;
+            }
+
+            return null;
+        }
+
+        public T GetModule<T>() where T : class
+        {
+            Type type = typeof(T);
+            return GetModule(type) as T;
+        }
+
+        public void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
+        {
+            foreach (var module in m_modules)
+            {
+                module.OnUpdate(fElapseSeconds, fRealElapseSeconds);
+            }
+        }
+
+        #region private methods
+
+        /// <summary>
+        /// 初始化组件 各个组件会自动创建视图Object
+        /// </summary>
+        private void InitGameComonent()
+        {
+            EventComponent = GetHrComponent<HrEventComponent>();
+            FSMComponent = GetHrComponent<HrFSMComponent>();
+            ResourceComponent = GetHrComponent<HrResourceComponent>();
+            DataTableComponent = GetHrComponent<HrDataTableComponent>();
+            SceneComponent = GetHrComponent<HrSceneComponent>();
+            UIComponent = GetHrComponent<HrUIComponent>();
+            ReleasePoolComonent = GetHrComponent<HrReleasePoolComponent>();
+        }
+
         private T AddHrComponent<T>() where T : HrComponent
         {
             Type type = typeof(T);
@@ -163,42 +261,6 @@ namespace Hr
             }
         }
 
-        public T GetHrComponent<T>() where T : HrComponent
-        {
-            var component = (T)GetHrComponent(typeof(T));
-            if (component == null)
-            {
-                component = AddHrComponent<T>();
-                if (component == null)
-                    HrLogger.Log(string.Format("can not find the component '{0}'", typeof(T).FullName));
-            }
-            return component;
-        }
-
-        public HrComponent GetHrComponent(Type type)
-        {
-            LinkedListNode<HrComponent> current = m_components.First;
-            while (current != null)
-            {
-                if (current.Value.GetType() == type)
-                {
-                    return current.Value;
-                }
-
-                current = current.Next;
-            }
-
-            return null;
-        }
-        #endregion
-
-        #region Module
-        public T GetModule<T>() where T : class
-        {
-            Type type = typeof(T);
-            return GetModule(type) as T;
-        }
-
         private HrModule GetModule(Type type)
         {
             foreach (HrModule module in m_modules)
@@ -217,7 +279,7 @@ namespace Hr
             HrModule module = (HrModule)Activator.CreateInstance(type);
             if (module == null)
             {
-                HrLogger.LogError("HrGameWorld CreateModule Error! " + module.GetType().FullName);
+                throw new HrException(string.Format("HrGameWorld CreateModule Error! module name {0} " + module.GetType().FullName));
             }
 
             LinkedListNode<HrModule> current = m_modules.First;
@@ -237,14 +299,5 @@ namespace Hr
             return module;
         }
         #endregion
-
-        public void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
-        {
-            foreach (var module in m_modules)
-            {
-                module.OnUpdate(fElapseSeconds, fRealElapseSeconds);
-            }
-        }
     }
-
 }

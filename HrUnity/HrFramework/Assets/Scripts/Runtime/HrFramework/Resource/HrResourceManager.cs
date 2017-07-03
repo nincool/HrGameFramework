@@ -7,43 +7,32 @@ using UnityEngine;
 using Hr;
 using System.Text.RegularExpressions;
 using UnityEngine.SceneManagement;
+using LitJson;
+using Hr.Utility;
 
 namespace Hr.Resource
 {
-    public enum EnumHrAssetLoadMode
-    {
-        STREAMING,
-        PERSISTENT,
-    }
-
     public class HrResourceManager : HrModule, IResourceManager
     {
         /// <summary>
-        /// 资源加载模式
+        /// DataTable 对应在哪个Binary文件里
         /// </summary>
-        public const EnumHrAssetLoadMode m_assetLoadMode = EnumHrAssetLoadMode.PERSISTENT;
-
-        private string m_strVariant = "";
+        private readonly Dictionary<string, string> m_dicDataTableInBinaryInfo = new Dictionary<string, string>();
 
         /// <summary>
-        /// 所有AssetBundle资源的名称
+        /// 单个资源 ID 对应的路径和 AssetBundle 名称
         /// </summary>
-        private List<string> m_lisAssetBundleName = new List<string>();
+        private readonly Dictionary<int, KeyValuePair<string, string>> m_dicResourceID2PathAndAssetBundle = new Dictionary<int, KeyValuePair<string, string>>();
+
+        /// <summary>
+        /// 单个资源路径对应ID
+        /// </summary>
+        private readonly Dictionary<string, int> m_dicResourcePath2IDInfo = new Dictionary<string, int>();
         
         /// <summary>
-        /// 资源的依赖资源
+        /// 解析的AssetFile
         /// </summary>
-        private Dictionary<string, List<string>> m_dicAssetDependicesInfo = new Dictionary<string, List<string>>();
-
-        /// <summary>
-        /// 单个资源所在的AssetBundle名称
-        /// </summary>
-        private Dictionary<string, string> m_dicAssetInAssetBundleName = new Dictionary<string, string>();
-        
-        /// <summary>
-        /// 加载的AssetBundle
-        /// </summary>
-        private Dictionary<string, HrAssetBundle> m_dicAssetBundleInfo = new Dictionary<string, HrAssetBundle>();
+        private Dictionary<string, HrAssetFile> m_dicAssetFileInfo = new Dictionary<string, HrAssetFile>();
 
         /// <summary>
         /// 具体的资源信息
@@ -55,27 +44,25 @@ namespace Hr.Resource
         /// </summary>
         private static Dictionary<System.Object, System.Object> ms_dicUnityType2AssetType = new Dictionary<object, object>();
 
-        public Dictionary<string, HrAssetBundle> AssetBundlePool
-        {
-            get { return m_dicAssetBundleInfo; }
-        }
-
-        /// <summary>
-        /// 暂时不用
-        /// </summary>
-        public string Variant
-        {
-            set { m_strVariant = value; }
-            get { return m_strVariant; }
-        }
-
-        protected HrLoadAssetEvent m_loadAssetEvent = new HrLoadAssetEvent();
-
         public override void Init()
         {
             HrResourcePrefab.RegisterType();
         }
 
+        public void LoadAssetsConfig()
+        {
+            //加载DataTable 配置
+            LoadDataTableConfig();
+
+            //加载资源信息 配置
+            LoadAssetsListConfig();
+        }
+
+        public override void Shutdown()
+        {
+        }
+
+ 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
 
@@ -86,249 +73,559 @@ namespace Hr.Resource
             ms_dicUnityType2AssetType.Add(unityType, assetType);
         }
 
-        /// <summary>
-        /// 获取AssetBundle的依赖
-        /// </summary>
-        /// <param name="strAssetBundleName"></param>
-        /// <returns>AssetBundle依赖的集合</returns>
-        public List<string> GetAssetBundleDependices(string strAssetBundleName)
+        public void LoadDataTable(string strDataTableName, HrLoadResourceCallBack loadResourceCallBack)
         {
-            List<string> lisRt = null;
-            m_dicAssetDependicesInfo.TryGetValue(strAssetBundleName, out lisRt);
+            //先尝试获取
+            HrResource res = m_dicItemResourceInfo.HrTryGet(strDataTableName);
+            if (res != null)
+            {
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
+                {
+                    loadResourceCallBack.LoadResourceSuccess(res);
+                }
+                return;
+            }
 
-            return lisRt;
+            //加载AssetBinary文件
+            var strBinaryFileName = m_dicDataTableInBinaryInfo.HrTryGet(strDataTableName);
+            if (strBinaryFileName == null)
+            {
+                string strErrorMsg = string.Format("can not find the datatable info! [{0}]", strDataTableName);
+                HrLogger.LogError(strErrorMsg);
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                {
+                    loadResourceCallBack.LoadResourceFailed(strDataTableName, strErrorMsg);
+                }
+                return;
+            }
+            var assetFile = m_dicAssetFileInfo.HrTryGet(strBinaryFileName);
+            if (assetFile == null)
+            {
+                string strErrorMsg = string.Format("can not find the asset file! [{0}]", strBinaryFileName);
+                HrLogger.LogError(strErrorMsg);
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                {
+                    loadResourceCallBack.LoadResourceFailed(strDataTableName, strErrorMsg);
+                }
+                return;
+            }
+            HrAssetBinary assetBinaryFile = assetFile as HrAssetBinary;
+            if (assetBinaryFile.IsLoaded())
+            {
+                HrLogger.LogWarning(string.Format("asset is loaded! filename [{0}]", assetBinaryFile.Name));
+            }
+            else
+            {
+                assetBinaryFile.LoadSync();
+            }
+
+            //重新尝试获取
+            if (assetBinaryFile.IsLoaded())
+            {
+                res = m_dicItemResourceInfo.HrTryGet(strDataTableName);
+                if (res == null)
+                {
+                    string strErrorMsg = string.Format("error! invalid res!!! [{0}]", strDataTableName);
+                    HrLogger.LogError(strErrorMsg);
+                    if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                    {
+                        loadResourceCallBack.LoadResourceFailed(strDataTableName, strErrorMsg);
+                    }
+                    return;
+                }
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
+                {
+                    loadResourceCallBack.LoadResourceSuccess(res);
+                }
+                return;
+            }
+            else
+            {
+                string strErrorMsg = string.Format("load binary file error! [{0}]", assetBinaryFile.Name);
+                HrLogger.LogError(strErrorMsg);
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                {
+                    loadResourceCallBack.LoadResourceFailed(strDataTableName, strErrorMsg);
+                }
+            }
+
+            return;
         }
 
-        private bool LoadAssetBundleManifest()
+        public void LoadResourceSync(int nID, HrLoadResourceCallBack loadResourceCallBack)
         {
-            string strAssetBundleMenifestPath = HrAssetBundleUtility.GetAssetBundleManifestPath();
-            if (!File.Exists(strAssetBundleMenifestPath))
-            {
-                Debug.LogError("LoadAssetBundleManifest Error! Is not existed! ManifestPath:" + strAssetBundleMenifestPath);
-                return false;
-            }
-            AssetBundle assetBundle = AssetBundle.LoadFromFile(strAssetBundleMenifestPath);
-            AssetBundleManifest manifest = assetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-            assetBundle.Unload(false);
+            var resourceInfo = m_dicResourceID2PathAndAssetBundle.HrTryGet(nID);
+            string strAssetPath = resourceInfo.Key;
+            string strAssetBundleName = resourceInfo.Value;
 
-            //获取所有的AssetBundle
-            var strAllAssetBundles = manifest.GetAllAssetBundles();
-            if (!string.IsNullOrEmpty(m_strVariant))
+            var res = m_dicItemResourceInfo.HrTryGet(strAssetPath);
+            if (res == null)
             {
-                strAllAssetBundles = strAllAssetBundles.Where(o => (HrFileUtil.GetFileSuffix(o) == "" || HrFileUtil.GetFileSuffix(o) == m_strVariant)).ToArray<string>();
-            }
-            //查找每个AssetBundle的依赖项
-            foreach (var strAssetName in strAllAssetBundles)
-            {
-                var lisDependicesArr = manifest.GetAllDependencies(strAssetName)
-                    .Select(o =>  o.ToLower() ).ToList<string>();
-                if (lisDependicesArr.Count > 0)
-                    m_dicAssetDependicesInfo.Add(strAssetName, lisDependicesArr);
-            }
-            m_lisAssetBundleName.AddRange(strAllAssetBundles.ToList<string>());
-
-            ///todo 解析后写入配置文件
-            //解析每个AssetBundle的manifest文件，收集里面打入的资源名称 转换为小写
-            foreach (var strAssetBundleName in m_lisAssetBundleName)
-            {
-                string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
-                string strAssetBundleManifest = strAssetBundleFullPath + ".manifest";
-                if (!File.Exists(strAssetBundleManifest))
+                LoadAssetBundleSync(strAssetBundleName, null);
+                HrAssetBundle assetFile = m_dicAssetFileInfo.HrTryGet(strAssetBundleName) as HrAssetBundle;
+                if (assetFile != null && assetFile.IsLoaded() && !assetFile.IsError())
                 {
-                    Debug.LogError("HrResourceManager:LoadAssetBundleManifest error! AssetBundleManifest:" + strAssetBundleManifest + " is not existed!");
-                    continue;
+                    var o = assetFile.MonoAssetBundle.LoadAsset(strAssetPath);
+                    //判断类型
+                    System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
+                    if (type != null)
+                    {
+                        res = Activator.CreateInstance(type, new object[] { strAssetPath, assetFile }) as HrResource;
+                        if (res == null)
+                        {
+                            HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + o.name + " AssetBundle:" + assetFile.Name);
+                            if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                            {
+                                loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not create the instance!");
+                            }
+                        }
+                        else
+                        {
+                            m_dicItemResourceInfo.Add(strAssetPath, res);
+                            if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
+                            {
+                                loadResourceCallBack.LoadResourceSuccess(res);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        HrLogger.LogError("ActionAssetBundleLoadFinished Error! Can not find the asset type:" + o.name);
+                        if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                        {
+                            loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not find the resource's type!");
+                        }
+                    }
+
                 }
-                StreamReader fs = new StreamReader(strAssetBundleManifest);
-                string strLine;
-                bool bStartAssets = false;
-                while ((strLine = fs.ReadLine()) != null)
+                else
                 {
-                    strLine = strLine.Replace("\n", "");
-                    if (!bStartAssets && strLine.IndexOf("Assets:") != -1)
+                    HrLogger.LogError(string.Format("load asset bundle {0} error! ", strAssetBundleName));
+                    if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
                     {
-                        bStartAssets = true;
-                        continue;
-                    }
-                    if (bStartAssets)
-                    {
-                        strLine = strLine.Replace("- ", "").ToLower();
-                        m_dicAssetInAssetBundleName.Add(strLine, strAssetBundleName);
-                    }
-                    if (strLine.IndexOf("Dependencies:") != -1)
-                    {
-                        bStartAssets = false;
-                        break;
+                        loadResourceCallBack.LoadResourceFailed(strAssetPath, string.Format("load asset bundle {0} error! ", strAssetBundleName));
                     }
                 }
             }
-
-            return true;
+            else
+            {
+                if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
+                {
+                    loadResourceCallBack.LoadResourceSuccess(res);
+                }
+            }
         }
 
-        public void LoadSceneSync(string strSceneName, string strAssetBundleName)
+        public void LoadResourceSync(string strResourceName, HrLoadResourceCallBack loadResourceCallBack)
         {
-            HrAssetBundle assetBundle = LoadAssetBundleSync(strAssetBundleName);
-            SceneManager.LoadScene(strSceneName, LoadSceneMode.Additive);
+            int nID = 0;
+            m_dicResourcePath2IDInfo.TryGetValue(strResourceName, out nID);
+            if (nID > 0)
+            {
+                LoadResourceSync(nID, loadResourceCallBack);
+            }
         }
 
         /// <summary>
         /// 手动加载AssetBundle
         /// </summary>
         /// <param name="strAssetBundle"></param>
-        public HrAssetBundle LoadAssetBundleSync(string strAssetBundleName)
+        public void LoadAssetBundleSync(string strAssetBundleName, HrLoadAssetCallBack loadAssetCallBack)
         {
-            HrAssetBundle loadedAssetBundle = m_dicAssetBundleInfo.HrTryGet(strAssetBundleName);
-            if (loadedAssetBundle != null)
+            HrAssetFile loadedAssetFile = m_dicAssetFileInfo.HrTryGet(strAssetBundleName);
+            if (loadedAssetFile != null && loadedAssetFile is HrAssetBundle)
             {
-                if (loadedAssetBundle.IsLoaded())
+                if (loadedAssetFile.IsLoaded())
                 {
-                    return loadedAssetBundle;
+                    //loadAssetCallBack.LoadAssetSuccess?.Invoke(loadedAssetFile);
+                    if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetSuccess != null)
+                        loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                    return;
                 }
 
-                HrLogger.LogWaring(string.Format("LoadAssetBunldeSyn AssetBundle is no null! AssetBundle[{0}]", strAssetBundleName));
-                ///todo 1.判断是否正在加载 2.加载 3.等待加载
-                while (loadedAssetBundle.IsLoading() && !loadedAssetBundle.IsError()) { }
+                if (loadedAssetFile.IsLoading())
+                {
+                    HrLogger.LogWarning(string.Format("try to load assetbundle [{0}] sync, but find that the assetbundle is loading!", strAssetBundleName));
+                    while (true)
+                    {
+                        if (loadedAssetFile.IsLoaded())
+                        {
+                            if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetSuccess != null)
+                                loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                            return;
+                        }
+                        if (loadedAssetFile.IsError())
+                        {
+                            if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetFailed != null)
+                                loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "unkonw error!");
+                            return;
+                        }
+                    }
+                }
 
-                return loadedAssetBundle;
+                if (loadedAssetFile.IsError())
+                {
+                    throw new HrException(string.Format("the assetbundle '{0}' is loading or is error", strAssetBundleName));
+                }
+
+                loadedAssetFile.LoadSync();
+                if (loadedAssetFile.IsLoaded())
+                {
+                    if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetSuccess != null)
+                    {
+                        loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                    }
+                    return;
+                }
+
+                if (loadedAssetFile.IsError())
+                {
+                    if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetFailed != null)
+                        loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "unkonw error!");
+
+                    throw new HrException(string.Format("the assetbundle '{0}' is loading or is error", strAssetBundleName));
+                }
             }
-
-            string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
-            if (!File.Exists(strAssetBundleFullPath))
+            else
             {
-                HrLogger.LogError(string.Format("assetbundle is not existed! [{0}]", strAssetBundleFullPath));
-                return null;
+                if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetFailed != null)
+                    loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "can not find the asset bundle or the asset bundle's type is not HrAssetBundle");
+                return;
+            }
+        }
+
+        public void LoadAssetBundleAsync(string strAssetBundleName, HrLoadAssetCallBack loadAssetCallBack)
+        {
+            HrAssetFile loadedAssetFile = m_dicAssetFileInfo.HrTryGet(strAssetBundleName);
+            if (loadedAssetFile != null && loadedAssetFile is HrAssetBundle)
+            {
+                if (loadedAssetFile.IsLoaded())
+                {
+                    //loadAssetCallBack.LoadAssetSuccess?.Invoke(loadedAssetFile);
+                    if (loadAssetCallBack.LoadAssetSuccess != null)
+                        loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                    return;    
+                }
+
+                if (loadedAssetFile.IsLoading())
+                {
+                    HrLogger.LogWarning(string.Format("try to load assetbundle [{0}] sync, but find that the assetbundle is loading!", strAssetBundleName));
+                    while (true)
+                    {
+                        if (loadedAssetFile.IsLoaded())
+                        {
+                            if (loadAssetCallBack.LoadAssetSuccess != null)
+                                loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                            return;
+                        }
+                        if (loadedAssetFile.IsError())
+                        {
+                            if (loadAssetCallBack.LoadAssetFailed != null)
+                                loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "unkonw error!");
+                            return;
+                        }
+                    }
+                }
+
+                if (loadedAssetFile.IsError())
+                {
+                    throw new HrException(string.Format("the assetbundle '{0}' is loading or is error", strAssetBundleName));
+                }
+
+                loadedAssetFile.LoadAsync(loadAssetCallBack);
+                if (loadedAssetFile.IsLoaded())
+                {
+                    if (loadAssetCallBack.LoadAssetSuccess != null)
+                    {
+                        loadAssetCallBack.LoadAssetSuccess(loadedAssetFile);
+                    }
+                    return;
+                }
+
+                if (loadedAssetFile.IsError())
+                {
+                    if (loadAssetCallBack.LoadAssetFailed != null)
+                        loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "unkonw error!");
+
+                    throw new HrException(string.Format("the assetbundle '{0}' is loading or is error", strAssetBundleName));
+                }
+            }
+            else
+            {
+                if (loadAssetCallBack.LoadAssetFailed != null)
+                    loadAssetCallBack.LoadAssetFailed(strAssetBundleName, "can not find the asset bundle or the asset bundle's type is not HrAssetBundle");
+                return;
+            }
+        }
+
+        public void LoadAssetBundleWithFullPathSync(string strFullPath, HrLoadAssetCallBack loadAssetCallBack)
+        {
+            char[] delimiterChars = { '\\', '/' };
+            string[] strArr = strFullPath.Split(delimiterChars);
+            string strName = strFullPath;
+            if (strArr.Length > 1)
+            {
+                strName = strArr[strArr.Length - 1];
             }
 
-            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath);
+            HrAssetFile assetFile = new HrAssetBundle(strName, strFullPath);
+            assetFile.LoadSync();
+
+            if (assetFile.IsLoaded())
+            {
+                if (loadAssetCallBack != null && loadAssetCallBack.LoadAssetSuccess != null)
+                {
+                    loadAssetCallBack.LoadAssetSuccess(assetFile);
+                }
+                else
+                {
+                    assetFile.Release();
+                }
+            }
+        }
+
+        #region private methods
+
+        private void LoadDataTableConfig()
+        {
+            string strDataTableConfigFilePath = HrResourcePath.GetDataTableConfigFilePath();
+            if (!File.Exists(strDataTableConfigFilePath))
+            {
+                HrLogger.LogError(string.Format("can not find the datatable config file [{0}]", strDataTableConfigFilePath));
+                return;
+            }
+
+            string strData = File.ReadAllText(strDataTableConfigFilePath);
+            JsonData jsonData = JsonMapper.ToObject(strData);
+            IDictionary dicJsonData = jsonData as IDictionary;
+            if (dicJsonData == null)
+            {
+                HrLogger.LogError(string.Format("parse json data error! file [{0}]", strDataTableConfigFilePath));
+                return;
+            }
+
+            int nDataTableIndex = 0;
+            while (true)
+            {
+                string strDataTableItem = string.Format("SheetName_{0}", nDataTableIndex);
+                if (dicJsonData.Contains(strDataTableItem))
+                {
+                    string strBinaryFileName = jsonData[strDataTableItem]["Name"].ToString();
+                    if (m_dicAssetFileInfo.ContainsKey(strBinaryFileName))
+                    {
+                        HrLogger.LogWarning(string.Format("the binaryfile whose  name is '{0}' is existed!", strBinaryFileName));
+
+                        ++nDataTableIndex;
+                        continue;
+                    }
+                    string strBinaryFileFullPath = HrResourcePath.CombineDataTablePath(strBinaryFileName);
+                    var assetBinary = CreateAssetBinary(strBinaryFileName, strBinaryFileFullPath);
+
+                    JsonData sheetNames = jsonData[strDataTableItem]["SheetName"];
+                    if (sheetNames.IsArray)
+                    {
+                        for (int i = 0; i < sheetNames.Count; ++i)
+                        {
+                            string strSheetName = sheetNames[i].ToString();
+                            m_dicDataTableInBinaryInfo.Add(strSheetName, strBinaryFileName);
+                            assetBinary.DataTables.Add(strSheetName);
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+                ++nDataTableIndex;
+            }
+        }
+
+        /// <summary>
+        /// 解析资源配置文件，创建对应资源
+        /// </summary>
+        private void LoadAssetsListConfig()
+        {
+            string strAssetsListConfigFilePath = HrResourcePath.GetAssetBundleAssetsListFilePath();
+            if (!File.Exists(strAssetsListConfigFilePath))
+            {
+                HrLogger.LogError(string.Format("can not find the assets list config file [{0}]", strAssetsListConfigFilePath));
+                return;
+            }
+            string strData = File.ReadAllText(strAssetsListConfigFilePath);
+            JsonData jsonData = JsonMapper.ToObject(strData);
+            IDictionary dicJsonData = jsonData as IDictionary;
+            if (dicJsonData == null)
+            {
+                HrLogger.LogError(string.Format("parse json data error! file [{0}]", strAssetsListConfigFilePath));
+                return;
+            }
+
+            //解析AssetBundle配置信息
+            int nAssetBundleIndex = 0;
+            while (true)
+            {
+                string strAssetBundleItem = string.Format("AssetBundle_{0}", nAssetBundleIndex);
+                if (dicJsonData.Contains(strAssetBundleItem))
+                {
+                    string strAssetBundleName = jsonData[strAssetBundleItem]["AssetBundle"].ToString();
+                    if (m_dicAssetFileInfo.ContainsKey(strAssetBundleName))
+                    {
+                        HrLogger.LogWarning(string.Format("the assetbudlefile whose name is '{0}' is existed!", strAssetBundleName));
+
+                        ++nAssetBundleIndex;
+                        continue;
+                    }
+                    string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
+
+                    var assetBundle = CreateAssetBundle(strAssetBundleName, strAssetBundleFullPath);
+
+                    JsonData dependencies = jsonData[strAssetBundleItem]["Dependencies"];
+                    if (dependencies.IsArray)
+                    {
+                        for (var i = 0; i < dependencies.Count; ++i)
+                        {
+                            assetBundle.AsssetDependicesInfo.Add(dependencies[i].ToString());
+                        }
+                    }
+                    JsonData beDependent = jsonData[strAssetBundleItem]["Bedependent"];
+                    if (beDependent.IsArray)
+                    {
+                        for (var i = 0; i < beDependent.Count; ++i)
+                        {
+                            assetBundle.BeDependentOnAssetInfo.Add(beDependent[i].ToString());
+                        }
+                    }
+
+                }
+                else
+                {
+                    break;
+                }
+                ++nAssetBundleIndex;
+            }
+
+            //解析Resource配置信息
+            int nAssetIndex = 0;
+            while (true)
+            {
+                string strAssetItem = string.Format("Asset_{0}", nAssetIndex);
+                if (dicJsonData.Contains(strAssetItem))
+                {
+                    int nID = (int)jsonData[strAssetItem]["ID"];
+                    string strFilePath = jsonData[strAssetItem]["FilePath"].ToString().ToLower();
+                    string strAssetBundleName = jsonData[strAssetItem]["AssetBundle"].ToString();
+
+                    m_dicResourceID2PathAndAssetBundle.Add(nID, new KeyValuePair<string, string>(strFilePath, strAssetBundleName));
+                    m_dicResourcePath2IDInfo.Add(strFilePath, nID);
+                }
+                else
+                {
+                    break;
+                }
+                ++nAssetIndex;
+            }
+        }
+
+        private HrAssetBinary CreateAssetBinary(string strName, string strFullPath)
+        {
+            HrAssetBinary assetBinary = new HrAssetBinary(strName, strFullPath);
+            assetBinary.LoadAssetBundleEvent.LoadAssetSuccessHandler += LoadAssetBinarySuccessHandler;
+            assetBinary.LoadAssetBundleEvent.LoadAssetProgressHandler += LoadAssetBinaryProgressHandler;
+            assetBinary.LoadAssetBundleEvent.LoadAssetFailedHandler += LoadAssetBinaryFailedHandler;
+
+            m_dicAssetFileInfo.Add(strName, assetBinary);
+
+            return assetBinary;
+        }
+
+        private HrAssetBundle CreateAssetBundle(string strName, string strFullPath)
+        {
+            HrAssetBundle assetBundle = new HrAssetBundle(strName, strFullPath);
             assetBundle.LoadAssetBundleEvent.LoadAssetSuccessHandler += LoadAssetBundleSuccessHandler;
             assetBundle.LoadAssetBundleEvent.LoadAssetFailedHandler += LoadAssetBundleFailedHandler;
             assetBundle.LoadAssetBundleEvent.LoadAssetProgressHandler += LoadAssetBundleProgressHandler;
-            assetBundle.LoadSync();
+
+            m_dicAssetFileInfo.Add(strName, assetBundle);
 
             return assetBundle;
+        }
+
+        private void LoadAssetBinarySuccessHandler(object sender, EventArgs args)
+        {
+            HrLoadAssetSuccessEventArgs eventArgs = args as HrLoadAssetSuccessEventArgs;
+            HrLogger.Log(string.Format("LoadAssetBundleSuccess! assetBundle:{0} duration:{1}", eventArgs.AssetName, eventArgs.Duration));
+            HrAssetBinary assetBinary = eventArgs.UserData as HrAssetBinary;
+
+            ParseBinaryFile(assetBinary);
+        }
+
+        private void LoadAssetBinaryFailedHandler(object sender, EventArgs args)
+        {
+
+        }
+
+        private void LoadAssetBinaryProgressHandler(object sender, EventArgs args)
+        {
+
+        }
+
+        private void ParseBinaryFile(HrAssetBinary assetBinary)
+        {
+            for (var i = 0; i < assetBinary.DataTables.Count; ++i)
+            {
+                string strSheetName = assetBinary.DataTables[i];
+                HrResourceBinary resBinary = new HrResourceBinary(strSheetName, assetBinary);
+                m_dicItemResourceInfo.Add(strSheetName, resBinary);
+            }
         }
 
         private void LoadAssetBundleSuccessHandler(object sender, EventArgs args)
         {
             HrLoadAssetSuccessEventArgs eventArgs = args as HrLoadAssetSuccessEventArgs;
             HrLogger.Log(string.Format("LoadAssetBundleSuccess! assetBundle:{0} duration:{1}", eventArgs.AssetName,  eventArgs.Duration));
-            HrAssetBundle assetBundle = eventArgs.UserData as HrAssetBundle;
+            //HrAssetFile assetBundle = eventArgs.UserData as HrAssetFile;
 
-            ParseAssetBundle(assetBundle);
+            //ParseAssetBundle(assetBundle as HrAssetBundle);
         }
 
-        public void LoadAssetBundleFailedHandler(object sender, EventArgs args)
+        private void LoadAssetBundleFailedHandler(object sender, EventArgs args)
         {
 
         }
 
-        public void LoadAssetBundleProgressHandler(object sender, EventArgs args)
+        private void LoadAssetBundleProgressHandler(object sender, EventArgs args)
         {
 
         }
 
-        private void ParseAssetBundle(HrAssetBundle assetBundle)
-        {
-            m_dicAssetBundleInfo.Add(assetBundle.Name, assetBundle);
+        //private void ParseAssetBundle(HrAssetBundle assetBundle)
+        //{
+        //    var strAllAssetsNameArr = assetBundle.MonoAssetBundle.GetAllAssetNames();
+        //    foreach (var strAssetName in strAllAssetsNameArr)
+        //    {
+        //        var o = assetBundle.MonoAssetBundle.LoadAsset(strAssetName);
+        //        //判断类型
+        //        System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
+        //        if (type != null)
+        //        {
+        //            HrResource res = Activator.CreateInstance(type, new object[] { strAssetName, assetBundle }) as HrResource;
+        //            if (res == null)
+        //            {
+        //                HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + o.name + " AssetBundle:" + assetBundle.Name);
+        //            }
+        //            else
+        //            {
+        //                m_dicItemResourceInfo.Add(strAssetName, res);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            HrLogger.LogError("ActionAssetBundleLoadFinished Error! Can not find the asset type:" + o.name);
+        //        }
+        //    }
+        //}
 
-            var strAllAssetsNameArr = assetBundle.MonoAssetBundle.GetAllAssetNames();
-            foreach (var strAssetName in strAllAssetsNameArr)
-            {
-                var o = assetBundle.MonoAssetBundle.LoadAsset(strAssetName);
-                //判断类型
-                System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
-                if (type != null)
-                {
-                    HrResource res = Activator.CreateInstance(type, new object[] { strAssetName, o, assetBundle }) as HrResource;
-                    if (res == null)
-                    {
-                        HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + o.name + " AssetBundle:" + assetBundle.Name);
-                    }
-                    else
-                    {
-                        m_dicItemResourceInfo.Add(strAssetName, res);
-                    }
-                }
-                else
-                {
-                    HrLogger.LogError("ActionAssetBundleLoadFinished Error! Can not find the asset type:" + o.name);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 同步加载资源
-        /// </summary>
-        /// <param name="strAssetBundleName">加载的AssetBundle名称</param>
-        /// <returns>返回加载的HrAssetBundle对象</returns>
-//        public HrAssetBundle LoadAssetBundleSync(string strAssetBundleName)
-//        {
-//#if UNITY_EDITOR
-//            if (Regex.IsMatch(strAssetBundleName, "[A-Z]"))
-//            {
-//                HrLogger.LogError("LoadAssetBundleSync Error! AssetBundleName has upper case!");
-//            }
-//#endif
-//            HrAssetBundle loadedAssetBundle = null;
-//            m_dicAssetBundleInfo.TryGetValue(strAssetBundleName, out loadedAssetBundle);
-//            if (loadedAssetBundle != null)
-//            {
-//                while (loadedAssetBundle.IsLoading() && !loadedAssetBundle.IsError()) { }
-                
-//                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBundleName:" + strAssetBundleName);
-
-//                return null;
-
-//            }
-
-//            string strAssetBundleFullPath = HrResourcePath.CombineAssetBundlePath(strAssetBundleName);
-
-//            if (!File.Exists(strAssetBundleFullPath))
-//            {
-//                Debug.LogError("HrResourceManager:LoadAssetBundleSync Error! AssetBunde is not exist!:" + strAssetBundleFullPath);
-
-//                return null;
-//            }
-
-//            HrAssetBundle assetBundle = new HrAssetBundle(strAssetBundleName, strAssetBundleFullPath, m_loadAssetEvent);
-//            assetBundle.LoadSync();
-
-//            return assetBundle;
-//        }
-
-
-
-        /// <summary>
-        /// 获取单个资源，如果对应的AssetBundle没有加载，那么同步加载AssetBundle
-        /// </summary>
-        /// <typeparam name="T">资源类型</typeparam>
-        /// <param name="strAssetPath">资源的路径</param>
-        /// <returns>资源对象</returns>
-        public T LoadAsset<T>(string strAssetPath)
-        {
-            string strAssetBundleName = m_dicAssetInAssetBundleName.HrTryGet(strAssetPath);
-            if (string.IsNullOrEmpty(strAssetBundleName))
-            {
-                HrLogger.LogError("LoadAsset Error! Do not find the assetBundleName Asset:" + strAssetPath);
-                return default(T);
-            }
-            HrAssetBundle assetBundle = LoadAssetBundleSync(strAssetBundleName);
-            if (assetBundle == null)
-            {
-                HrLogger.LogError("LoadAsset Error! AssetBundle is null Asset:" + strAssetPath);
-                return default(T);
-            }
-            //同步加载肯定保证已经是加载状态
-            HrResource res = m_dicItemResourceInfo.HrTryGet(strAssetPath);
-            if (res == null)
-            {
-                HrLogger.LogError("LoadAsset Error! Resource is null Asset:" + strAssetPath);
-                return default(T);
-            }
-            System.Type type = ms_dicUnityType2AssetType.HrTryGet(typeof(T)) as System.Type;
-
-            return ((T)(res.m_unityAsset as object));
-        }
+        #endregion
     }
 }
 

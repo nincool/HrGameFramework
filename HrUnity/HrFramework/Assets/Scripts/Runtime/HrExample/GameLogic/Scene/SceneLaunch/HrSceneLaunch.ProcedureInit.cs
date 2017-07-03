@@ -16,7 +16,7 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
             base.OnEnter();
             HrLogger.Log("HrSceneLaunch.HrProcedureInit.OnEnter!");
 
-            InitGameSetting();
+            InitAppSetting();
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
@@ -36,10 +36,8 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
             base.OnDestroy();
         }
 
-        private void InitGameSetting()
+        private void InitAppSetting()
         {
-            ///TODO 设置 QualitySettings.SetQualityLevel
-            
             ///TODO 设置 音量
         }
 

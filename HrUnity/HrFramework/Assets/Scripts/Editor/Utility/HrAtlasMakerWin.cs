@@ -63,35 +63,35 @@ public class HrAtlasMakerWin : EditorWindow
 
             using (new GUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Make Atlas", GUILayout.Width(120)))
-                {
-                    if (!Directory.Exists(m_strDstPath))
-                    {
-                        Directory.CreateDirectory(m_strDstPath);
-                    }
+                //if (GUILayout.Button("Make Atlas", GUILayout.Width(120)))
+                //{
+                //    if (!Directory.Exists(m_strDstPath))
+                //    {
+                //        Directory.CreateDirectory(m_strDstPath);
+                //    }
 
-                    string strSrcPath = HrResourcePath.ms_strWorkingPath + m_strSrcPath + "/";
-                    if (!Directory.Exists(strSrcPath))
-                    {
-                        EditorGUILayout.HelpBox("FilePath:" + strSrcPath + " is not exists! ", MessageType.Warning);
-                        return;
-                    }
+                //    string strSrcPath = HrResourcePath.ms_strWorkingPath + m_strSrcPath + "/";
+                //    if (!Directory.Exists(strSrcPath))
+                //    {
+                //        EditorGUILayout.HelpBox("FilePath:" + strSrcPath + " is not exists! ", MessageType.Warning);
+                //        return;
+                //    }
 
-                    DirectoryInfo rootDirInfo = new DirectoryInfo(HrResourcePath.ms_strWorkingPath + m_strSrcPath);
-                    var pngFileArr = rootDirInfo.GetFiles("*.png", SearchOption.AllDirectories);
-                    foreach (FileInfo pngFile in pngFileArr)
-                    {
-                        string allPath = pngFile.FullName;
-                        string assetPath = allPath.Substring(allPath.IndexOf("Assets"));
-                        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
-                        GameObject go = new GameObject(sprite.name);
-                        go.AddComponent<SpriteRenderer>().sprite = sprite;
-                        allPath = m_strDstPath + "/" + sprite.name + ".prefab";
-                        string prefabPath = allPath.Substring(allPath.IndexOf("Assets"));
-                        PrefabUtility.CreatePrefab(prefabPath, go);
-                        GameObject.DestroyImmediate(go);
-                    }
-                }
+                //    DirectoryInfo rootDirInfo = new DirectoryInfo(HrResourcePath.ms_strWorkingPath + m_strSrcPath);
+                //    var pngFileArr = rootDirInfo.GetFiles("*.png", SearchOption.AllDirectories);
+                //    foreach (FileInfo pngFile in pngFileArr)
+                //    {
+                //        string allPath = pngFile.FullName;
+                //        string assetPath = allPath.Substring(allPath.IndexOf("Assets"));
+                //        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                //        GameObject go = new GameObject(sprite.name);
+                //        go.AddComponent<SpriteRenderer>().sprite = sprite;
+                //        allPath = m_strDstPath + "/" + sprite.name + ".prefab";
+                //        string prefabPath = allPath.Substring(allPath.IndexOf("Assets"));
+                //        PrefabUtility.CreatePrefab(prefabPath, go);
+                //        GameObject.DestroyImmediate(go);
+                //    }
+                //}
             }
         }
     }

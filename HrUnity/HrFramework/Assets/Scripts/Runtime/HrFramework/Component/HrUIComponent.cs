@@ -1,15 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hr.UI;
 
 namespace Hr
 {
     public class HrUIComponent : HrComponent
     {
-
         public bool InitSuccess { get; private set; }
 
-        private HrUIManager m_uiManager;
+        private IUIManager m_uiManager;
+
+        public void AttachUIRoot()
+        {
+            m_uiManager.AttachUIRoot();
+        }
+
+        public void RegisterUIView(HrUIView uiView)
+        {
+            m_uiManager.RegisterUIView(uiView);
+        }
 
         protected override void Awake()
         {
@@ -26,6 +36,8 @@ namespace Hr
         {
             base.Start();
         }
-    }
 
+        
+
+    }
 }

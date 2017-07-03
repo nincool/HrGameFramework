@@ -62,7 +62,7 @@ namespace Hr.Editor
                 {
                     object data = m_sheetData[nRowIndex, nColumnIndex];
 
-                    HrExcelSheetCell sheetCell = new HrExcelSheetCell(data, nRowIndex, nColumnIndex);
+                    HrExcelSheetCell sheetCell = new HrExcelSheetCell(SheetName, data, nRowIndex, nColumnIndex);
                     lisExcelSheetRowCell.Add(sheetCell);
                 }
                 m_lisExcelSheetCell.Add(lisExcelSheetRowCell);
@@ -199,7 +199,7 @@ namespace Hr.Editor
                 {
                     object data = m_sheetData[nRowIndex, nColumnIndex];
 
-                    HrExcelSheetCell sheetCell = new HrExcelSheetConfCell(GetSheetCellType(nRowIndex), GetCellStringType(nRowIndex, nColumnIndex), data, nRowIndex, nColumnIndex);
+                    HrExcelSheetCell sheetCell = new HrExcelSheetConfCell(SheetName, GetSheetCellType(nRowIndex), GetCellStringType(nRowIndex, nColumnIndex), data, nRowIndex, nColumnIndex);
                     lisExcelSheetRowCell.Add(sheetCell);
                 }
                 m_lisExcelSheetCell.Add(lisExcelSheetRowCell);

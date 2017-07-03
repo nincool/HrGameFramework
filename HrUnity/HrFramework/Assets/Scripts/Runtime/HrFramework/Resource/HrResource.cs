@@ -21,31 +21,31 @@ namespace Hr.Resource
         /// <summary>
         /// 对AssetBundle的弱引用
         /// </summary>
-        private WeakReference m_weakRefAssetBundle;
+        protected WeakReference m_weakRefAssetFile;
 
         public string AssetName
         {
             get { return m_strAssetName; }
         }
 
-        public HrAssetBundle RefAssetBundle
+        public HrAssetFile RefAssetFile
         {
             get
             {
-                if (m_weakRefAssetBundle == null || !m_weakRefAssetBundle.IsAlive)
+                if (m_weakRefAssetFile == null || !m_weakRefAssetFile.IsAlive)
                 {
                     return null;
                 }
-                return m_weakRefAssetBundle.Target as HrAssetBundle;
+                return m_weakRefAssetFile.Target as HrAssetFile;
             }
         }
 
-        public HrResource(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle)
+        public HrResource(string strAssetName, HrAssetFile assetFile)
         {
             m_strAssetName = strAssetName;
-            m_unityAsset = o;
-            if (assetBundle != null)
-                m_weakRefAssetBundle = new WeakReference(assetBundle);
+            m_unityAsset = null;
+            if (assetFile != null)
+                m_weakRefAssetFile = new WeakReference(assetFile);
         }
     }
 

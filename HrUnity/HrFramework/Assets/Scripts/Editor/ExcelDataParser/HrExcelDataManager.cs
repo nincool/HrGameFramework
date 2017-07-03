@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using Hr.Utility;
+
 
 namespace Hr.Editor
 {
     public class HrExcelDataManager
     {
         private const string m_c_strConfigurationName = "HrFramework/Configs/ExcelData.json";
+        
 
         public string SourceDirectory
         {
@@ -59,6 +62,12 @@ namespace Hr.Editor
             }
         }
 
+        public string DataTableJsonPath
+        {
+            get;
+            set;
+        }
+
         public string EditorResourcePath
         {
             get;
@@ -89,6 +98,7 @@ namespace Hr.Editor
             SourceDirectory = jsonData["SourceDirectory"].ToString();
             DestinationDirectory = jsonData["DestinationDirection"].ToString();
             EditorResourcePath = jsonData["EditorResourcePath"].ToString();
+            DataTableJsonPath = jsonData["DataTableJsonPath"].ToString();
 
             return true;
         }
@@ -108,6 +118,8 @@ namespace Hr.Editor
                 writer.Write(DestinationDirectory);
                 writer.WritePropertyName("EditorResourcePath");
                 writer.Write(EditorResourcePath);
+                writer.WritePropertyName("DataTableJsonPath");
+                writer.Write(DataTableJsonPath);
                 
                 writer.WriteObjectEnd();
 
@@ -136,7 +148,53 @@ namespace Hr.Editor
                 }
             }
 
+            CreateDataTableInfoJson();
+
             return true;
+        }
+
+        private void CreateDataTableInfoJson()
+        {
+            JsonWriter writer = new JsonWriter();
+
+            writer.WriteObjectStart();
+
+            var strFilePathArr = HrFileUtil.GetAllFilePathsInFolder(DestinationDirectory);
+
+            int nTempIndex = 0;
+            foreach (var item in strFilePathArr)
+            {
+                if (HrFileUtil.GetFileSuffix(item) == "hrbytes")
+                {
+                    HrExcelBinaryReader reader = new HrExcelBinaryReader(item);
+                    reader.ReadBinary();
+
+                    string strSheetName = string.Format("SheetName_{0}", nTempIndex);
+
+                    writer.WritePropertyName(strSheetName);
+                    writer.WriteObjectStart();
+
+                    writer.WritePropertyName("Name");
+                    writer.Write(reader.FileName);
+
+                    writer.WritePropertyName("SheetName");
+                    writer.WriteArrayStart();
+                    for (int i = 0; i < reader.SheetNames.Count; ++i)
+                    {
+                        writer.Write(reader.SheetNames[i]);
+                    }
+                    writer.WriteArrayEnd();
+
+                    writer.WriteObjectEnd();
+
+                    ++nTempIndex;
+                }
+            }
+
+            writer.WriteObjectEnd();
+
+            
+            File.WriteAllText(DataTableJsonPath + "DataTableConfig.json", writer.ToString(), Encoding.UTF8);
         }
 
         public bool Read()
@@ -158,6 +216,8 @@ namespace Hr.Editor
         {
             string strDestinationFilePath = DestinationDirectory + "/";
             HrFileUtil.CopyDirectory(strDestinationFilePath, EditorResourcePath);
+
+            HrFileUtil.CopyDirectory(DataTableJsonPath, EditorResourcePath);
         }
 
     }

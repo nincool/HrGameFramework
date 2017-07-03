@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hr;
+using Hr.Resource;
+using UnityEngine.SceneManagement;
 
 namespace Hr.Scene
 {
@@ -11,8 +13,14 @@ namespace Hr.Scene
 
         private IFSMStateMachine m_fsmSceneStateMachine = null;
 
+        private HrLoadResourceCallBack m_loadSceneCallBack = null;
+
+        private HrLoadAssetCallBack m_loadSceneAssetBundleCallBack = null;
+
         public HrSceneManager()
         {
+            m_loadSceneCallBack = new HrLoadResourceCallBack(LoadSceneSuccess, LoadSceneFailed);
+            m_loadSceneAssetBundleCallBack = new HrLoadAssetCallBack(LoadSceneAssetBundleSuccess, LoadSceneAssetBundleFailed);
         }
 
         public override void Init()
@@ -23,6 +31,12 @@ namespace Hr.Scene
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
 
+        }
+
+
+        public void LoadSceneAssetBundleSync(string strAssetBundleFullPath)
+        {
+            HrGameWorld.Instance.ResourceComponent.LoadAssetBundleWithFullPathSync(strAssetBundleFullPath, m_loadSceneAssetBundleCallBack);
         }
 
         public HrScene GetRunningScene()
@@ -63,5 +77,42 @@ namespace Hr.Scene
 
             m_fsmSceneStateMachine.ChangeState(sceneType);
         }
+
+        public override void Shutdown()
+        {
+
+        }
+
+        #region private fields
+        private void LoadSceneSuccess(HrResource resScene)
+        {
+            HrLogger.Log(string.Format("load scene success! name '{0}'", resScene.AssetName));
+        }
+
+        private void LoadSceneFailed(string strSceneName, string strErrorMsg)
+        {
+            HrLogger.LogError(string.Format("load scene error! msg '{0}'", strErrorMsg));
+        }
+
+        private void LoadSceneAssetBundleSuccess(HrAssetFile assetFile)
+        {
+            HrLogger.Log(string.Format("load scene assetbundle '{0}' success!", assetFile.Name));
+            HrAssetBundle assetBundle = assetFile as HrAssetBundle;
+            if (assetBundle != null)
+            {
+                var scenePaths = assetBundle.MonoAssetBundle.GetAllScenePaths();
+                if (scenePaths.Length > 0)
+                {
+                    SceneManager.LoadScene(scenePaths[0], LoadSceneMode.Additive);
+                }
+                assetBundle.AutoRelease();
+            }
+        }
+
+        private void LoadSceneAssetBundleFailed(string strAssetBundle, string strErrorMsg)
+        {
+
+        }
+        #endregion
     }
 }

@@ -242,6 +242,19 @@ namespace Hr.Editor
                 EditorGUILayout.HelpBox(strBuildMessage, buildMessageType);
                 GUILayout.Space(2f);
 
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.LabelField("Assets List Excel", GUILayout.Width(160f));
+                    m_builderCtrler.AssetsConfigExcel = EditorGUILayout.TextField(m_builderCtrler.AssetsConfigExcel);
+                    if (GUILayout.Button("Browse...", GUILayout.Width(80f)))
+                    {
+                        BrowseAssetsConfigExcel();
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+
+                GUILayout.Space(2f);
+
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUI.BeginDisabledGroup(!m_builderCtrler.IsValidOutputDirectory);
@@ -266,6 +279,7 @@ namespace Hr.Editor
                         EditorUtility.ClearProgressBar(); 
                     }
                 }
+
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     if (GUILayout.Button("Start Zip AssetBundles", GUILayout.Width(160f)))
@@ -386,6 +400,15 @@ namespace Hr.Editor
         private void BuildAssetBundles()
         {
             m_builderCtrler.BuildAssetBundles();
+        }
+
+        private void BrowseAssetsConfigExcel()
+        {
+            string directory = EditorUtility.OpenFilePanel("Select Direction Directory", m_builderCtrler.AssetsConfigExcel, "xlsx");
+            if (!string.IsNullOrEmpty(directory))
+            {
+                m_builderCtrler.AssetsConfigExcel = directory;
+            }
         }
 
     }

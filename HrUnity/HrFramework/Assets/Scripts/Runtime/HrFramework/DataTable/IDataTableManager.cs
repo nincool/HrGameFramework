@@ -12,5 +12,10 @@ namespace Hr.DataTable
         /// </summary>
         /// <param name="resourceManager"></param>
         void SetResourceManager(IResourceManager resourceManager);
+
+        void LoadDataTable(string strDataTable);
+
+        HrDataTable GetDataTable(string strDataTable);
+
     }
 }

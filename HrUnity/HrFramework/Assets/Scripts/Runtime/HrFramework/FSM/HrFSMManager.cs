@@ -44,5 +44,10 @@ namespace Hr
                 item.OnUpdate(fElapseSeconds, fRealElapseSeconds);
             }
         }
+
+        public override void Shutdown()
+        {
+
+        }
     }
 }

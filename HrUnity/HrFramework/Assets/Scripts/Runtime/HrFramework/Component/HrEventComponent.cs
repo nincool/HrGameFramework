@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Hr.EventSystem;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,10 +23,16 @@ namespace Hr
             }
         }
 
-        public void SendEvent(int e, params object[] args)
+        public void AddHandler(int nEvent, EventHandler<HrEventHandlerArgs> handler)
         {
-            m_eventManager.SendEvent(e, args);
+            m_eventManager.AddHandler(nEvent, handler);
         }
-    }
 
+        public void SendEvent(object sender, HrEventHandlerArgs args)
+        {
+            m_eventManager.SendEvent(sender, args);
+        }
+
+
+    }
 }

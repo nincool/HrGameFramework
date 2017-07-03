@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Hr.Resource
 {
-    public class HrResourceText : HrResource
+    public sealed class HrResourceText : HrResource
     {
 
-        public HrResourceText(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle) : base(strAssetName, o, assetBundle)
+        public HrResourceText(string strAssetName, HrAssetFile assetFile) : base(strAssetName,  assetFile)
         {
         }
     }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Hr
+namespace Hr.Utility
 {
     public class HrFileUtil
     {
@@ -61,7 +61,7 @@ namespace Hr
             return Path.Combine(assetPath, pathUnderAssetsFolder);
         }
 
-        public static List<string> GetAllFilePathsInFolder(string strLocalFolderPath, bool bIncludeHidden = false, bool bIncludeMeta = false)
+        public static List<string> GetAllFilePathsInFolder(string strLocalFolderPath, string strSuffix = "", bool bIncludeHidden = false, bool bIncludeMeta = false)
         {
             var lisFilePaths = new List<string>();
 
@@ -74,46 +74,44 @@ namespace Hr
                 return lisFilePaths;
             }
 
-            GetFilePathsRecursively(strLocalFolderPath, lisFilePaths, bIncludeHidden, bIncludeMeta);
+            GetFilePathsRecursively(strLocalFolderPath, lisFilePaths, strSuffix, bIncludeHidden, bIncludeMeta);
 
             return lisFilePaths;
 
         }
 
-        public static List<string> GetFilePathsInFolder(string strFolderPath, bool bIncludeHidden = false, bool bIncludeMeta = false)
+        public static List<string> GetFilePathsInFolder(string strFolderPath, string strSuffix = "", bool bIncludeHidden = false, bool bIncludeMeta = false)
         {
             var filePaths = Directory.GetFiles(strFolderPath).Select(p => p);
 
             if (!bIncludeHidden)
             {
-                filePaths = filePaths.Where(path => !(Path.GetFileName(path).StartsWith(".")));
+                filePaths = filePaths.Where(path => (new FileInfo(path).Attributes & FileAttributes.Hidden) != FileAttributes.Hidden);
             }
+
+            //if (!bIncludeHidden)
+            //{
+            //    filePaths = filePaths.Where(path => !(Path.GetFileName(path).StartsWith(".")));
+            //}
             if (!bIncludeMeta)
             {
                 filePaths = filePaths.Where(path => !HrFileUtil.IsMetaFile(path));
             }
-
+            if (!string.IsNullOrEmpty(strSuffix))
+            {
+                filePaths = filePaths.Where(path => path.EndsWith(strSuffix));
+            }
             // Directory.GetFiles() returns platform dependent delimiter, so make sure replace with "/"
             if (Path.DirectorySeparatorChar != '/')
             {
                 filePaths = filePaths.Select(filePath => filePath.Replace(Path.DirectorySeparatorChar.ToString(), "/"));
             }
 
+
             return filePaths.ToList();
         }
 
-        private static void GetFilePathsRecursively(string strFolderPath, List<string> lisFilePaths, bool bIncludeHidden = false, bool bIncludeMeta = false)
-        {
-            var folders = Directory.GetDirectories(strFolderPath);
 
-            foreach (var folder in folders)
-            {
-                GetFilePathsRecursively(folder, lisFilePaths, bIncludeHidden, bIncludeMeta);
-            }
-
-            var files = GetFilePathsInFolder(strFolderPath, bIncludeHidden, bIncludeMeta);
-            lisFilePaths.AddRange(files);
-        }
 
         public static bool IsMetaFile(string filePath)
         {
@@ -223,6 +221,19 @@ namespace Hr
                 string destFileFullName = sourceFileFullName.Replace(sourcePath, desPath);
                 file.CopyTo(destFileFullName, true);
             }
+        }
+
+        private static void GetFilePathsRecursively(string strFolderPath, List<string> lisFilePaths, string strSuffix = "", bool bIncludeHidden = false, bool bIncludeMeta = false)
+        {
+            var folders = Directory.GetDirectories(strFolderPath);
+
+            foreach (var folder in folders)
+            {
+                GetFilePathsRecursively(folder, lisFilePaths, strSuffix, bIncludeHidden, bIncludeMeta);
+            }
+
+            var files = GetFilePathsInFolder(strFolderPath, strSuffix, bIncludeHidden, bIncludeMeta);
+            lisFilePaths.AddRange(files);
         }
     }
 

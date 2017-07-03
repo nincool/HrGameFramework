@@ -7,14 +7,17 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Hr.Utility;
+
 
 namespace Hr.Editor
 {
     public class HrAssetBundleController
     {
         private const string m_c_strConfigurationName = "HrFramework/Configs/AssetBundleBuilder.json";
-        private const string m_c_strAssetsConfigName = "HrFramework/Configs/AssetsList.xlsx";
         private const string m_c_strAssetsListJsonName = "AssetsList.json";
+
+
 
         private HrAssetBundleContainer m_assetBundleContainer = new HrAssetBundleContainer();
 
@@ -263,6 +266,12 @@ namespace Hr.Editor
             set;
         }
 
+        public string AssetsConfigExcel
+        {
+            get;
+            set;
+        }
+
         public HrAssetBundleController()
         {
             Load();
@@ -312,6 +321,9 @@ namespace Hr.Editor
                 writer.WritePropertyName("EditorResourcePath");
                 writer.Write(EditorResourcePath);
 
+                writer.WritePropertyName("AssetsConfigExcel");
+                writer.Write(AssetsConfigExcel);
+
                 writer.WriteObjectEnd();
 
 
@@ -360,6 +372,7 @@ namespace Hr.Editor
 
             OutputDirectory = jsonData["OutputDirectory"].ToString();
             EditorResourcePath = jsonData["EditorResourcePath"].ToString();
+            AssetsConfigExcel = jsonData["AssetsConfigExcel"].ToString();
 
             m_assetBundleContainer.Load();
 
@@ -461,7 +474,7 @@ namespace Hr.Editor
         private void ReadAssetsListExcelFile(out Dictionary<string, Dictionary<int, string>> dicAssetsListExcel)
         {
             dicAssetsListExcel = new Dictionary<string, Dictionary<int, string>>();
-            string strAssetsListFile = HrFileUtil.GetCombinePath(Application.dataPath, m_c_strAssetsConfigName);
+            string strAssetsListFile = HrFileUtil.GetCombinePath(Application.dataPath, AssetsConfigExcel);
             if (File.Exists(strAssetsListFile))
             {
                 HrExcelExcelReader excelReader = new HrExcelExcelReader(strAssetsListFile);
@@ -500,11 +513,13 @@ namespace Hr.Editor
 
         private void ReadAssetBundleManifestInfo(out Dictionary<string, List<string>> dicAssetBundleAssetsList
             , out Dictionary<string, string> dicAssetInAssetBundle
-            , out Dictionary<string, List<string>> dicAssetBundleDependices)
+            , out Dictionary<string, List<string>> dicAssetBundleDependices
+            , out Dictionary<string, List<string>> dicBeDependentAssetbundle)
         {
             dicAssetBundleAssetsList = new Dictionary<string, List<string>>();
             dicAssetInAssetBundle = new Dictionary<string, string>();
             dicAssetBundleDependices = new Dictionary<string, List<string>>();
+            dicBeDependentAssetbundle = new Dictionary<string, List<string>>();
 
             string strAssetBundlePlatFolderName = "";
             if (WindowsSelected)
@@ -545,6 +560,17 @@ namespace Hr.Editor
                 {
                     dicAssetBundleDependices.Add(strAssetBundleName, lisDependicesArr);
                 }
+                foreach (var itemDependence in lisDependicesArr)
+                {
+                    var lisBeDependent = dicBeDependentAssetbundle.HrTryGet(itemDependence);
+                    if (lisBeDependent == null)
+                    {
+                        List<string> lisDependentValue = new List<string>();
+                        dicBeDependentAssetbundle.Add(itemDependence, lisDependentValue);
+                        lisBeDependent = dicBeDependentAssetbundle[itemDependence];
+                    }
+                    lisBeDependent.Add(strAssetBundleName);
+                }
 
                 //读取每个AssetBundle的Manifest文件，读取里面的Assets Path
                 string strAssetBundleManifest = HrFileUtil.GetCombinePath(Path.GetDirectoryName(strManifestFilePath), string.Format("{0}.manifest", strAssetBundleName));
@@ -556,7 +582,9 @@ namespace Hr.Editor
 
                 string strAssetBundleFilePath = HrFileUtil.GetCombinePath(AllAssetBundlesPath, strAssetBundlePlatFolderName, strAssetBundleName);
                 var assetBundle = AssetBundle.LoadFromFile(strAssetBundleFilePath);
-                var lisAllAssetsList = assetBundle.GetAllAssetNames().ToList<string>();
+                //这里很奇怪 GetAllAssetNames 返回为小写 GetAllScenePaths 返回为大写
+                var lisAllAssetsList = assetBundle.GetAllAssetNames().Select(o => o.ToLower()).ToList<string>();
+                var lisAllScenePaths = assetBundle.GetAllScenePaths().Select(o => o.ToLower()).ToList<string>();
                 dicAssetBundleAssetsList.Add(strAssetBundleName, lisAllAssetsList);
                 assetBundle.Unload(false);
 
@@ -564,13 +592,18 @@ namespace Hr.Editor
                 {
                     dicAssetInAssetBundle.Add(strAssetName, strAssetBundleName);
                 }
+                foreach (var strScene in lisAllScenePaths)
+                {
+                    dicAssetInAssetBundle.Add(strScene, strAssetBundleName);
+                }
             }
         }
 
         private void CreateAssetsListJsonFile(Dictionary<string, Dictionary<int, string>> dicAssetsListExcel
             , Dictionary<string, List<string>> dicAssetBundleAssetsList
             , Dictionary<string, string> dicAssetInAssetBundle
-            , Dictionary<string, List<string>> dicAssetBundleDependencies)
+            , Dictionary<string, List<string>> dicAssetBundleDependencies
+            , Dictionary<string, List<string>> dicBeDependentAssetbundle)
         {
             string strAssetsListJsonFilePath = HrFileUtil.GetCombinePath(AssetsListPath, m_c_strAssetsListJsonName);
             JsonWriter writer = new JsonWriter();
@@ -595,6 +628,19 @@ namespace Hr.Editor
                                 foreach (var strDependice in lisAssetBundleDependencies)
                                 {
                                     writer.Write(strDependice);
+                                }
+                            }
+                        }
+                        writer.WriteArrayEnd();
+                        writer.WritePropertyName("Bedependent");
+                        writer.WriteArrayStart();
+                        {
+                            var lisBeDependent = dicBeDependentAssetbundle.HrTryGet(assetBundleItem.Key);
+                            if (lisBeDependent != null)
+                            {
+                                foreach (var strBeDependent in lisBeDependent)
+                                {
+                                    writer.Write(strBeDependent);
                                 }
                             }
                         }
@@ -649,12 +695,16 @@ namespace Hr.Editor
 
             //2.解析AssetBundle Manifest文件，解析资源文件和依赖项
             Dictionary<string, List<string>> dicAssetBundleAssetsList;
+            //单个资源所在的AssetBundle
             Dictionary<string, string> dicAssetInAssetBundle;
+            //自己依赖的AssetBundle
             Dictionary<string, List<string>> dicAssetBundleDependencies;
-            ReadAssetBundleManifestInfo(out dicAssetBundleAssetsList, out dicAssetInAssetBundle, out dicAssetBundleDependencies);
+            //依赖自己的AssetBundle
+            Dictionary<string, List<string>> dicBeDependentAssetbundle;
+            ReadAssetBundleManifestInfo(out dicAssetBundleAssetsList, out dicAssetInAssetBundle, out dicAssetBundleDependencies, out dicBeDependentAssetbundle);
 
             //3.校验资源 创建Json文件
-            CreateAssetsListJsonFile(dicAssetsListExcel, dicAssetBundleAssetsList, dicAssetInAssetBundle, dicAssetBundleDependencies);
+            CreateAssetsListJsonFile(dicAssetsListExcel, dicAssetBundleAssetsList, dicAssetInAssetBundle, dicAssetBundleDependencies, dicBeDependentAssetbundle);
         }
 
         private bool BuildAssetBundles(BuildTarget buildTarget, List<AssetBundleBuild> lisBuildMap, BuildAssetBundleOptions buildAssetBundleOptions)

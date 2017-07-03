@@ -15,8 +15,6 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
         {
             base.OnEnter();
             HrLogger.Log("HrSceneLaunch.HrProcedureCheckVersion.OnEnter!");
-
-
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)

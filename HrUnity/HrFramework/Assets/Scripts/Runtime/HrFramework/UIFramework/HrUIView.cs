@@ -2,18 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Hr
+namespace Hr.UI
 {
-    public class HrUIView : MonoBehaviour
+    /// <summary>
+    /// UI 显示模式
+    /// </summary>
+    public enum EnumUIMode
     {
-        protected EnumView m_viewType = EnumView.VIEW_UNKNOW;
+        UIMODE_DYNAMIC_POPUP = 0x1,        //动态弹出界面 弹出压入堆栈
+    }
 
-        public EnumView ViewType
+    public class HrUIView : MonoBehaviour, IUIView
+    {
+        /// <summary>
+        /// UI 唯一ID
+        /// </summary>
+        public virtual int UIID
         {
             get
             {
-                return m_viewType;
+                return 0;
             }
+        }
+
+        /// <summary>
+        /// UI 模式
+        /// </summary>
+        public uint UIMode
+        {
+            get;
+            set;
+        } 
+
+        public virtual void Awake()
+        {
+            HrGameWorld.Instance.UIComponent.RegisterUIView(this);
         }
 
         /// <summary>
@@ -29,13 +52,14 @@ namespace Hr
         public virtual void Show()
         {
             HrLogger.Log("HrUIView Show!!!!!");
-            this.gameObject.SetActive(true);
+            if (!this.gameObject.activeSelf)
+                this.gameObject.SetActive(true);
         }
 
         /// <summary>
         ///Update 
         /// </summary>
-        public virtual void Update()
+        public virtual void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
         }
 
@@ -44,7 +68,8 @@ namespace Hr
         /// </summary>
         public virtual void Hide()
         {
-            this.gameObject.SetActive(false);
+            if (this.gameObject.activeSelf)
+                this.gameObject.SetActive(false);
         }
 
         /// <summary>

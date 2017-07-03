@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hr.Resource;
 
 #if UNITY_EDITOR
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ namespace Hr.DataTable
         {
             Name = str;
 #if UNITY_EDITOR
-            const string strMathNamePattern = @"^[a-z]+$";
+            const string strMathNamePattern = @"^[a-zA-Z]+$";
             if (!Regex.IsMatch(str, strMathNamePattern))
             {
                 Debug.LogError("DataTableMemberAttribute name error! name:" + str);
@@ -32,9 +33,10 @@ namespace Hr.DataTable
         }
     }
 
-    public class HrDataTable
+    public abstract class HrDataTable
     {
 
+        public abstract void ParseDataResource(HrResourceBinary resBinary);
 
     }
 

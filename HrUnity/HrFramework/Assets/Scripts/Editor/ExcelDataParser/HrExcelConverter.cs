@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hr.Utility;
+
 
 namespace Hr.Editor
 {
@@ -22,6 +24,7 @@ namespace Hr.Editor
             ConvertSheetData(bufferWriter, excelReader.LisSheetData);
 
             bufferWriter.SaveFile();
+            bufferWriter.Destory();
             return true;
         }
 

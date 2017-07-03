@@ -21,7 +21,7 @@ namespace Hr
             //LogType(EnumLogType.INFO, strContent);
         }
 
-        public static void LogWaring(string strContent)
+        public static void LogWarning(string strContent)
         {
             if (m_enumLogMode == EnumLogType.INFO)
             {

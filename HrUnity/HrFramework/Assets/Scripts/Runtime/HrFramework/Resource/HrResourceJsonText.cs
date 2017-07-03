@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Hr.Resource
 {
-    public class HrResourceJsonText : HrResourceText
+    public class HrResourceJsonText : HrResource
     {
-        public HrResourceJsonText(string strAssetName, UnityEngine.Object o, HrAssetBundle assetBundle) : base(strAssetName, o, assetBundle)
+        public HrResourceJsonText(string strAssetName, HrAssetFile assetFile) : base(strAssetName, assetFile)
         {
 
         }

@@ -1,41 +1,86 @@
-﻿using Hr;
-using System.Collections;
+﻿using Hr.Define;
+using Hr.EventSystem;
+using Hr.Resource;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace Hr
+namespace Hr.UI
 {
-    public class HrUIManager
+    public class HrUIManager : HrModule, IUIManager
     {
-        /// <summary>
-        /// 存储所有面板资源路径， 从配置文件中读取 TODO 配置文件读取
-        /// </summary>
-        private Dictionary<EnumView, string> m_dicViewAssetPath = new Dictionary<EnumView, string>();
+        private Dictionary<int, IUILogic> m_dicUILogic = new Dictionary<int, IUILogic>();
 
         /// <summary>
-        /// 存储所有加载过的面板
+        /// 当前显示的UI界面栈
         /// </summary>
-        private Dictionary<EnumView, HrUIMediator> m_dicUIMediator = new Dictionary<EnumView, HrUIMediator>();
+        private Stack<IUILogic> m_staCurrentUILogic = new Stack<IUILogic>();
 
-        public void Init()
+        /// <summary>
+        /// 场景中UI节点
+        /// </summary>
+        private HrUIRoot m_uiRoot = new HrUIRoot();
+
+        public override void Init()
         {
-            ///For testing
-            m_dicViewAssetPath.Add(EnumView.VIEW_LAUNCH_LOADING, "assets/media/ui/uiprefab/panelloading.prefab");
-
-            InitUI();
-
-            //注册侦听消息 
-            RegistEventListener();
 
         }
-        private void InitUI()
+
+        public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
-            m_dicUIMediator.Add(EnumView.VIEW_LAUNCH_LOADING, new HrUILoadingMediator());
+            
+        }
+
+        public override void Shutdown()
+        {
 
         }
+
+        public void RegisterUIView(HrUIView uiView)
+        {
+            if (uiView.UIID == 0)
+            {
+                HrLogger.LogError(string.Format("when an ui[{0}] register to uimanager, the uimanager find the uiview's id is zeor!", uiView.GetType().FullName));
+                return;
+            }
+
+            IUILogic uiLogic = m_dicUILogic.HrTryGet(uiView.UIID);
+            if (uiLogic != null)
+            {
+                uiLogic.AttachUIView(uiView);
+            }
+            else
+            {
+                string strViewFullName = uiView.GetType().FullName;
+                int nSubStringIndex = strViewFullName.LastIndexOf("View");
+                if (nSubStringIndex == -1)
+                {
+                    throw new HrException(string.Format("find an error ui view! it's name '{0}' is invalid! ", strViewFullName));
+                }
+                string strLogicFullName = strViewFullName.Substring(0, nSubStringIndex);
+                Type tLogic = Type.GetType(strLogicFullName + "Logic");
+                if (tLogic == null)
+                {
+                    throw new HrException(string.Format("find an error ui logic! it's name '{0}' is invalid!", strLogicFullName));
+                }
+                uiLogic = (IUILogic)Activator.CreateInstance(tLogic);
+                uiLogic.AttachUIView(uiView);
+                uiLogic.OnEnter();
+
+                m_dicUILogic.Add(uiView.UIID, uiLogic);
+
+            }
+        }
+
+        public void AttachUIRoot()
+        {
+            m_uiRoot.AttachUIAnchor();
+        }
+
+        #region private methods
 
         private void RegistEventListener()
         {
+            HrGameWorld.Instance.EventComponent.AddHandler(HrEventType.EVENT_UI_SHOW, HandleShowUI);
             //HrEventManager.Instance.AddListener(HandleCreateUI, EnumEvent.EVENT_UI_CREATE);
 
             //HrEventManager.Instance.AddListener(OnUICreate, EnumEvent.EVENT_UI_ONCREATE);
@@ -45,101 +90,26 @@ namespace Hr
             //HrEventManager.Instance.AddListener(HandleUIHide, EnumEvent.EVENT_UI_HIDE);
         }
 
-        /// <summary>
-        /// 逻辑更新
-        /// </summary>
-        public void LogicUpdate()
+        private void HandleShowUI(object sender, HrEventHandlerArgs args)
         {
-            var enuMediator = m_dicUIMediator.GetEnumerator();
-            while (enuMediator.MoveNext())
-            {
-                enuMediator.Current.Value.Update();
-            }
-        }
+            int nPanelType = (int)args.UserData;
 
-        #region EventHandler
-        private void HandleCreateUI(int e, params object[] args)
-        {
-            EnumView viewType = (EnumView)args[0];
-            var uiMediator = m_dicUIMediator.HrTryGet(viewType);
-            if (uiMediator == null)
+            var uiLogic = m_dicUILogic.HrTryGet(nPanelType);
+            if (uiLogic == null)
             {
-                HrLogger.LogError("HrUIManager HandleCreateUI! ViewType:" + viewType);
-                return;
-            }
-            if (uiMediator.View == null)
-            {
-                string strUIAssetPath = m_dicViewAssetPath.HrTryGet(viewType);
-                if (strUIAssetPath != null)
-                {
-                    GameObject obPanel = null;//HrGameWorld.Instance.ResourceComponent.LoadAsset<GameObject>(strUIAssetPath);
-                    if (obPanel != null)
-                    {
-                        //HrGameObjectUtil.InstantiateUI(obPanel, GetUIAnchor(EnumUIAnchor.ANCHOR_CENTER));
-                    }
-                    else
-                        HrLogger.LogError("HrUIManager HandleCreateUI Error! Asset is null:" + strUIAssetPath);
-                }
-                else
-                {
-                    HrLogger.LogError("HrUIManager HandleCureateUI Error! ViewType:" + viewType);
-                }
-            }
-            else
-            {
-                HrLogger.LogError("HrUIManager HandleCreateUI View Alread Created! ViewType:" + viewType);
-            }
-        }
+                HrLogger.Log(string.Format("ready show ui {0}, but the res is not loaded! so we will load the res first", uiLogic));
 
-        private void OnUICreate(int e, params object[] args)
-        {
-            HrUIView uiView = args[0] as HrUIView;
-            if (uiView == null)
-            {
-                HrLogger.LogError("HrUIManager OnUICreate Error!");
-                return;
+                CreateUI(nPanelType);
             }
-            HrUIMediator mediator = m_dicUIMediator.HrTryGet(uiView.ViewType);
-            mediator.View = uiView;
-        }
-
-        private void OnUIDestroy(int e, params object[] args)
-        {
-
-        }
         
-        private void HandleUIShow(int e, params object[] args)
-        {
-            EnumView viewType = (EnumView)args[0];
-            var uiMediator = m_dicUIMediator.HrTryGet(viewType);
-            if (uiMediator == null)
-            {
-                HrLogger.LogError("HrUIManager Show Error! ViewType:" + viewType);
-                return;
-            }
-
-            uiMediator.Show();
         }
 
-        private void HandleUIHide(int e, params object[] args)
+        private void CreateUI(int nPanelType)
         {
-            EnumView viewType = (EnumView)args[0];
-            var uiMediator = m_dicUIMediator.HrTryGet(viewType);
-            if (uiMediator == null)
-            {
-                HrLogger.LogError("HrUIManager Show Hide! ViewType:" + viewType);
-                return;
-            }
-
-            uiMediator.Hide();
+            //HrResource uiResource = HrGameWorld.Instance.ResourceComponent.GetResource(nPanelType);
+            //HrGameObjectUtil.Instantiate(uiResource) 
         }
         #endregion
-
-        //private Transform GetUIAnchor(EnumUIAnchor anchor)
-        //{
-        //    return null;
-        //    //return HrGameWorld.Instance.SceneManager.CurrentScene.UIRoot.GetAnchor(anchor);
-        //}
     }
 
 }
