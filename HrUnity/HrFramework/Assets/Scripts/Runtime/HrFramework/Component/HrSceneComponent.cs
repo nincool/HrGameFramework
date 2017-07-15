@@ -28,10 +28,25 @@ namespace Hr
             base.Start();
         }
 
-        public void LoadSceneSync(string strAssetBundleFullPath)
+        public void LoadSceneAssetBundleSync(string strAssetBundleFullPath)
         {
             m_sceneManager.LoadSceneAssetBundleSync(strAssetBundleFullPath);
         }
+
+        public void LoadSceneSync(int nResID)
+        {
+            m_sceneManager.LoadSceneSync(nResID);
+        }
+
+        public void LoadCachedSceneSync()
+        {
+            m_sceneManager.LoadCachedSceneSync();
+        }
+
+        public void UnloadCurrentScene()
+        {
+            m_sceneManager.UnloadCurrentScene();
+        } 
 
         public void AddScene<T>()
         {

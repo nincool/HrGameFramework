@@ -65,8 +65,8 @@ namespace Hr.DataTable
             string strName = resBinary.AssetName;
             string strTypeName = string.Format("Hr.DataTable.HrDataTable{0}", strName);
 
-#if UNITY_EDITOR
             Type type = GetDataTableType(strTypeName);
+#if UNITY_EDITOR
             if (type == null)
             {
                 HrLogger.LogError(string.Format("data table try to parse dataresource error! can not find data type '{0}'!", strTypeName));

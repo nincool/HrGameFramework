@@ -16,7 +16,7 @@ namespace Hr
         {
             base.Awake();
 
-            m_eventManager = HrGameWorld.Instance.GetModule<HrEventManager>();
+            m_eventManager = HrGameWorld.Instance.GetModule<IEventManager>();
             if (m_eventManager != null)
             {
                 InitSuccess = true;
@@ -33,6 +33,9 @@ namespace Hr
             m_eventManager.SendEvent(sender, args);
         }
 
-
+        public void RemoveHandler(int nEvent, EventHandler<HrEventHandlerArgs> handler)
+        {
+            m_eventManager.RemoveHandler(nEvent, handler);
+        }
     }
 }

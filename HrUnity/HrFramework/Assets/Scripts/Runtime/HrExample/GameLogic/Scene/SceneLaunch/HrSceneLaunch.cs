@@ -1,4 +1,5 @@
 ﻿
+using Hr.EventSystem;
 using Hr.Resource;
 using System.Collections;
 using UnityEngine;
@@ -18,11 +19,10 @@ namespace Hr.Scene
             base.OnEnter();
             HrLogger.Log("HrSceneLaunchImp OnEnter!");
 
-            HrGameWorld.Instance.SceneComponent.LoadSceneSync(HrResourcePath.CombineStreamingAssetsPath(m_strAssetBundleName));
+            HrGameWorld.Instance.EventComponent.AddHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
+            HrGameWorld.Instance.SceneComponent.LoadSceneAssetBundleSync(HrResourcePath.CombineStreamingAssetsPath(m_strAssetBundleName));
 
             ChangeState<Procedure.HrSceneLaunch.HrProcedureInit>();
-
-            //HrCoroutineManager.StartCoroutine(DelayChangeScene());
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
@@ -31,7 +31,7 @@ namespace Hr.Scene
 
         public override void OnExit()
         {
-
+            base.OnExit();
         }
 
         public override void OnDestroy()
@@ -44,13 +44,13 @@ namespace Hr.Scene
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureInit(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureSplash(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureCheckVersion(this));
-            m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedurePreload(this));
         }
 
-        //private IEnumerator DelayChangeScene()
-        //{
-        //    yield return new WaitForSecondsRealtime(10f);
+        private void HandleLoadSceneAssetBundleSuccess(object sender, HrEventHandlerArgs args)
+        {
+            HrGameWorld.Instance.SceneComponent.LoadCachedSceneSync();
 
-        //}
+            HrGameWorld.Instance.EventComponent.RemoveHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
+        }
     }
 }

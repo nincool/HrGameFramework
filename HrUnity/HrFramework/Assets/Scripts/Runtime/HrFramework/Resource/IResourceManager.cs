@@ -41,6 +41,19 @@ namespace Hr.Resource
         /// <param name="strFullPath"></param>
         /// <param name="loadAssetCallBack"></param>
         void LoadAssetBundleWithFullPathSync(string strFullPath, HrLoadAssetCallBack loadAssetCallBack);
+        
+        /// <summary>
+        /// 获取Resource
+        /// </summary>
+        /// <param name="nID">资源的唯一ID</param>
+        /// <returns>返回资源对象，如果加载失败为null</returns>
+        HrResource GetResource(int nID);
 
+        /// <summary>
+        /// 获取Resource
+        /// </summary>
+        /// <param name="strResourceName">资源的路径名称</param>
+        /// <returns>返回资源对象，如果加载失败为null</returns>
+        HrResource GetResource(string strResourceName);
     }
 }

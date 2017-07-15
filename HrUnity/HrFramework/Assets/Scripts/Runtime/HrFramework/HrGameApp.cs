@@ -28,7 +28,7 @@ namespace Hr
         [SerializeField]
         private string m_strEntryScene = string.Empty;
 
-
+       
         public string GameVersion
         {
             get
@@ -96,10 +96,24 @@ namespace Hr
             }
         }
 
+        #region Component Selected
+
+        [SerializeField]
+        private string m_strEventModule;
+        public string EventModule
+        {
+            get
+            {
+                return m_strEventModule;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// 初始化
         /// </summary>
-        protected  void Awake()
+        protected void Awake()
         {
             if (HrEnvironment.IsEditorMode)
             {
@@ -119,8 +133,25 @@ namespace Hr
 
         private void Initialize()
         {
+            //预初始化一些模块
+            PreInitializeGameModule(EventModule);
+
+            HrGameWorld.Instance.EntryScene = EntranceScene;
             HrGameWorld.Instance.ComponentRoot = this.transform;
+
             HrGameWorld.Instance.Initialize(m_strLaunch);
+        }
+
+        private void PreInitializeGameModule(string strModuleType)
+        {
+            if (!string.IsNullOrEmpty(strModuleType))
+            {
+                Type t = Type.GetType(strModuleType);
+                if (t != null)
+                {
+                    HrGameWorld.Instance.GetModule(t);
+                }
+            }
         }
 
         protected virtual void Update()

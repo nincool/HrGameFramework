@@ -4,8 +4,16 @@ namespace Hr
 {
     public interface IFSMStateMachine
     {
+        string Name
+        {
+            get;
+        }
+
         void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
 
+        /// <summary>
+        /// 关闭状态机
+        /// </summary>
         void Shutdown();
 
         /// <summary>

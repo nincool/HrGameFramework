@@ -83,16 +83,7 @@ namespace Hr
         }
 
         /// <summary>
-        /// 游戏根节点
-        /// </summary>
-        public Transform GameRoot
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 初始化的场景
+        /// 初始化的场景String 类型
         /// </summary>
         public string EntryScene
         {
@@ -188,6 +179,23 @@ namespace Hr
             return GetModule(type) as T;
         }
 
+        public HrModule GetModule(Type type)
+        {
+            foreach (HrModule module in m_modules)
+            {
+                if (module.GetType() == type)
+                {
+                    return module;
+                }
+                else if (type.IsInterface && type.IsAssignableFrom(module.GetType()))
+                {
+                    return module;
+                }
+            }
+
+            return CreateModule(type);
+        }
+
         public void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
             foreach (var module in m_modules)
@@ -259,19 +267,6 @@ namespace Hr
 
                 current = current.Next;
             }
-        }
-
-        private HrModule GetModule(Type type)
-        {
-            foreach (HrModule module in m_modules)
-            {
-                if (module.GetType() == type)
-                {
-                    return module;
-                }
-            }
-
-            return CreateModule(type);
         }
 
         private HrModule CreateModule(Type type)

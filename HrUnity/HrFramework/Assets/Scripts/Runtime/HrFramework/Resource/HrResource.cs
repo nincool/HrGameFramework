@@ -11,7 +11,7 @@ namespace Hr.Resource
         /// <summary>
         /// Unity 资源对象
         /// </summary>
-        public UnityEngine.Object m_unityAsset;
+        protected UnityEngine.Object m_unityAsset;
 
         /// <summary>
         /// 资源名称 对应的Assets目录下名称
@@ -28,6 +28,14 @@ namespace Hr.Resource
             get { return m_strAssetName; }
         }
 
+        public UnityEngine.Object UnityAsset
+        {
+            get
+            {
+                return m_unityAsset;
+            }
+        }
+
         public HrAssetFile RefAssetFile
         {
             get
@@ -40,10 +48,10 @@ namespace Hr.Resource
             }
         }
 
-        public HrResource(string strAssetName, HrAssetFile assetFile)
+        public HrResource(string strAssetName, UnityEngine.Object o, HrAssetFile assetFile)
         {
             m_strAssetName = strAssetName;
-            m_unityAsset = null;
+            m_unityAsset = o;
             if (assetFile != null)
                 m_weakRefAssetFile = new WeakReference(assetFile);
         }

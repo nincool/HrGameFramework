@@ -25,7 +25,7 @@ namespace Hr
             if (null == original) return null;
             GameObject go = GameObject.Instantiate(original) as GameObject;
             go.name = original.name;
-            go.transform.parent = parent;
+            AddChildToTarget(parent, go.transform);
             go.transform.localPosition = localPosition;
             go.transform.localRotation = Quaternion.Euler(localRocation);
 
@@ -38,13 +38,69 @@ namespace Hr
                 return null;
             GameObject go = GameObject.Instantiate(original) as GameObject;
             var rtTransform = go.GetComponent<RectTransform>();
-            rtTransform.SetParent(parent);
+            AddChildToTarget(parent, rtTransform);
             rtTransform.localPosition = original.transform.localPosition;
             rtTransform.localRotation = original.transform.localRotation;
             rtTransform.localScale = original.transform.localScale;
 
             return go;
         }
-    }
 
+        /// <summary>
+        /// 查找子节点
+        /// </summary>
+        public static Transform FindDeepChild(GameObject _target, string _childName)
+        {
+            Transform resultTrs = null;
+            resultTrs = _target.transform.Find(_childName);
+            if (resultTrs == null)
+            {
+                foreach (Transform trs in _target.transform)
+                {
+                    resultTrs = HrGameObjectUtil.FindDeepChild(trs.gameObject, _childName);
+                    if (resultTrs != null)
+                        return resultTrs;
+                }
+            }
+            return resultTrs;
+        }
+
+        /// <summary>
+        /// 查找子节点脚本
+        /// </summary>
+        public static T FindDeepChild<T>(GameObject _target, string _childName) where T : Component
+        {
+            Transform resultTrs = HrGameObjectUtil.FindDeepChild(_target, _childName);
+            if (resultTrs != null)
+                return resultTrs.gameObject.GetComponent<T>();
+            return (T)((object)null);
+        }
+
+        /// <summary>
+        /// 添加子节点
+        /// </summary>
+        public static void AddChildToTarget(Transform target, Transform child)
+        {
+            child.SetParent(target);
+            child.localScale = Vector3.one;
+            child.localPosition = Vector3.zero;
+            child.localEulerAngles = Vector3.zero;
+
+            ChangeChildLayer(child, target.gameObject.layer);
+        }
+
+        /// <summary>
+        /// 修改子节点Layer  NGUITools.SetLayer();
+        /// </summary>
+        public static void ChangeChildLayer(Transform t, int layer)
+        {
+            t.gameObject.layer = layer;
+            for (int i = 0; i < t.childCount; ++i)
+            {
+                Transform child = t.GetChild(i);
+                child.gameObject.layer = layer;
+                ChangeChildLayer(child, layer);
+            }
+        }
+    }
 }

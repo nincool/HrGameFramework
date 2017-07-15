@@ -10,10 +10,16 @@ namespace Hr.Resource
 
         protected HrLoadAssetCallBack m_loadDependentCallBack;
 
+        private List<string> m_lisBeDependentOn = new List<string>();
+        private List<string> m_lisAssetDependices = new List<string>();
+        /// <summary>
+        /// 标记已经加载成功的依赖的AssetBundle
+        /// </summary>
+        private List<string> m_lisLoadedDependentAssetBundle = new List<string>();
+
         /// <summary>
         /// 资源的依赖资源
         /// </summary>
-        private List<string> m_lisAssetDependices = new List<string>();
         public List<string> AsssetDependicesInfo
         {
             get
@@ -25,7 +31,6 @@ namespace Hr.Resource
         /// <summary>
         /// 依赖这个AssetBundle的所有AssetBundle
         /// </summary>
-        private List<string> m_lisBeDependentOn = new List<string>();
         public List<string> BeDependentOnAssetInfo
         {
             get
@@ -33,11 +38,6 @@ namespace Hr.Resource
                 return m_lisBeDependentOn;
             }
         }
-
-        /// <summary>
-        /// 标记已经加载成功的依赖的AssetBundle
-        /// </summary>
-        private List<string> m_lisLoadedDependentAssetBundle = new List<string>();
 
         /// <summary>
         /// Unity 的AssetBundle
@@ -118,6 +118,8 @@ namespace Hr.Resource
             {
                 HrLogger.Log(string.Format("release assetbundle '{0}' unload(false)", Name));
                 this.m_assetBundle.Unload(false);
+
+                m_assetBundleStatus = EnumAssetBundleStatus.DECLARED;
             }
         }
     }

@@ -5,7 +5,9 @@ namespace Hr.EventSystem
 {
     public partial class HrEventType
     {
-        public static readonly int EVENT_UI_SHOW = 4;
-        public static readonly int EVENT_UI_HIDE = 5;
+        public const int EVENT_LOAD_SCENE_RESOURCE_SUCCESS = 1;    //加载SceneAssetBundle成功
+
+        public static readonly int EVENT_UI_SHOW = 100;
+        public static readonly int EVENT_UI_HIDE = 101;
     }
 }

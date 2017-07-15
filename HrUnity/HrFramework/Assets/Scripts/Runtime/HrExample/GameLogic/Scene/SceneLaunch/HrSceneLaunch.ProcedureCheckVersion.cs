@@ -31,6 +31,5 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
         {
             base.OnDestroy();
         }
-
     }
 }

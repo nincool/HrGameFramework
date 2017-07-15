@@ -45,7 +45,7 @@ namespace Hr.EventSystem
             }
             else
             {
-                m_dicHandlers[nEvent] = eventHandler;
+                m_dicHandlers[nEvent] = handler;
             }
         }
 

@@ -35,6 +35,17 @@ namespace Hr.UI
 
         }
 
+        public void SetProgressFillAmount(int nTotalAmount, int nFillAmount)
+        {
+            if (nTotalAmount <= 0)
+            {
+                m_imgProgress.fillAmount = 1.0f;
+            }
+            else
+            {
+                m_imgProgress.fillAmount = nFillAmount / nTotalAmount * 1.0f;
+            }
+        }
     }
 
 }

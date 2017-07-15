@@ -53,7 +53,7 @@ namespace Hr.Resource
 
 
 
-        public HrResourceBinary(string strAssetName, HrAssetFile assetFile) : base(strAssetName, assetFile)
+        public HrResourceBinary(string strAssetName, UnityEngine.Object o, HrAssetFile assetFile) : base(strAssetName, o, assetFile)
         {
             ParseData();
         }

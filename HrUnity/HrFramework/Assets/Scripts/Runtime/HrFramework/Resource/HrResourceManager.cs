@@ -62,7 +62,6 @@ namespace Hr.Resource
         {
         }
 
- 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
         {
 
@@ -73,6 +72,11 @@ namespace Hr.Resource
             ms_dicUnityType2AssetType.Add(unityType, assetType);
         }
 
+        /// <summary>
+        /// 加载配置文件数据表
+        /// </summary>
+        /// <param name="strDataTableName"></param>
+        /// <param name="loadResourceCallBack"></param>
         public void LoadDataTable(string strDataTableName, HrLoadResourceCallBack loadResourceCallBack)
         {
             //先尝试获取
@@ -152,11 +156,18 @@ namespace Hr.Resource
             return;
         }
 
+        /// <summary>
+        /// 加载单个资源，会先加载AssetBundle
+        /// </summary>
+        /// <param name="nID"></param>
+        /// <param name="loadResourceCallBack"></param>
         public void LoadResourceSync(int nID, HrLoadResourceCallBack loadResourceCallBack)
         {
             var resourceInfo = m_dicResourceID2PathAndAssetBundle.HrTryGet(nID);
             string strAssetPath = resourceInfo.Key;
             string strAssetBundleName = resourceInfo.Value;
+
+            bool bSceneRes = HrFileUtil.GetFileSuffix(strAssetPath).Equals("unity");
 
             var res = m_dicItemResourceInfo.HrTryGet(strAssetPath);
             if (res == null)
@@ -165,38 +176,45 @@ namespace Hr.Resource
                 HrAssetBundle assetFile = m_dicAssetFileInfo.HrTryGet(strAssetBundleName) as HrAssetBundle;
                 if (assetFile != null && assetFile.IsLoaded() && !assetFile.IsError())
                 {
-                    var o = assetFile.MonoAssetBundle.LoadAsset(strAssetPath);
-                    //判断类型
-                    System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
-                    if (type != null)
+                    if (bSceneRes)
                     {
-                        res = Activator.CreateInstance(type, new object[] { strAssetPath, assetFile }) as HrResource;
-                        if (res == null)
+                        res = new HrResourceScene(strAssetPath, null, assetFile);
+                        
+                    }
+                    else
+                    {
+                        var o = assetFile.MonoAssetBundle.LoadAsset(strAssetPath);
+                        //判断类型
+                        System.Type type = ms_dicUnityType2AssetType.HrTryGet(o.GetType()) as System.Type;
+                        if (type != null)
                         {
-                            HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + o.name + " AssetBundle:" + assetFile.Name);
-                            if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
-                            {
-                                loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not create the instance!");
-                            }
+                            res = Activator.CreateInstance(type, new object[] { strAssetPath, o, assetFile }) as HrResource;
                         }
                         else
                         {
-                            m_dicItemResourceInfo.Add(strAssetPath, res);
-                            if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
+                            HrLogger.LogError("ActionAssetBundleLoadFinished Error! Can not find the asset type:" + o.name);
+                            if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
                             {
-                                loadResourceCallBack.LoadResourceSuccess(res);
+                                loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not find the resource's type!");
                             }
+                        }
+                    }
+                    if (res == null)
+                    {
+                        HrLogger.LogError("ActionAssetBundleLoadFinished Error! assetName:" + strAssetPath + " AssetBundle:" + assetFile.Name);
+                        if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                        {
+                            loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not create the instance!");
                         }
                     }
                     else
                     {
-                        HrLogger.LogError("ActionAssetBundleLoadFinished Error! Can not find the asset type:" + o.name);
-                        if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceFailed != null)
+                        m_dicItemResourceInfo.Add(strAssetPath, res);
+                        if (loadResourceCallBack != null && loadResourceCallBack.LoadResourceSuccess != null)
                         {
-                            loadResourceCallBack.LoadResourceFailed(strAssetPath, "can not find the resource's type!");
+                            loadResourceCallBack.LoadResourceSuccess(res);
                         }
                     }
-
                 }
                 else
                 {
@@ -382,6 +400,24 @@ namespace Hr.Resource
                     assetFile.Release();
                 }
             }
+        }
+
+        public HrResource GetResource(int nID)
+        {
+            var resourceInfo = m_dicResourceID2PathAndAssetBundle.HrTryGet(nID);
+            string strAssetPath = resourceInfo.Key;
+            string strAssetBundleName = resourceInfo.Value;
+
+            HrResource res = m_dicItemResourceInfo.HrTryGet(strAssetPath);
+
+            return res;
+        }
+
+        public HrResource GetResource(string strResourceName)
+        {
+            HrResource res = m_dicItemResourceInfo.HrTryGet(strResourceName);
+
+            return res;
         }
 
         #region private methods
@@ -574,7 +610,7 @@ namespace Hr.Resource
             for (var i = 0; i < assetBinary.DataTables.Count; ++i)
             {
                 string strSheetName = assetBinary.DataTables[i];
-                HrResourceBinary resBinary = new HrResourceBinary(strSheetName, assetBinary);
+                HrResourceBinary resBinary = new HrResourceBinary(strSheetName, null, assetBinary);
                 m_dicItemResourceInfo.Add(strSheetName, resBinary);
             }
         }

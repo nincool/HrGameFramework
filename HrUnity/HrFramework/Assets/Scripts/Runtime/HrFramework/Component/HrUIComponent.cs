@@ -21,6 +21,11 @@ namespace Hr
             m_uiManager.RegisterUIView(uiView);
         }
 
+        public void Clear()
+        {
+            m_uiManager.Clear();
+        }
+
         protected override void Awake()
         {
             base.Awake();

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 224221657554419616}
   - component: {fileID: 222335413201303850}
   - component: {fileID: 114845425641935630}
+  - component: {fileID: 114956655779773432}
   m_Layer: 5
   m_Name: Panel01
   m_TagString: Untagged
@@ -84,7 +85,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114329932845149080}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114956655779773432}
+        m_MethodName: OnClickCloseButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114329932845149080
@@ -141,6 +153,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114956655779773432
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1444826740995470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 691a98ed2317784449d701b0f5db7d98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &222318284684892580
 CanvasRenderer:
   m_ObjectHideFlags: 1

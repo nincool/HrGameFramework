@@ -13,9 +13,8 @@ namespace Hr.Example
         public override void AddScenes()
         {
             HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneLaunch>();
+            HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneWorldPreload>();
             HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneWorld>();
-
-            HrGameWorld.Instance.EntryScene = HrGameApp.Instance.EntranceScene;
         }
     }
 

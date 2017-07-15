@@ -6,7 +6,7 @@ namespace Hr.Resource
 {
     public class HrResourceJsonText : HrResource
     {
-        public HrResourceJsonText(string strAssetName, HrAssetFile assetFile) : base(strAssetName, assetFile)
+        public HrResourceJsonText(string strAssetName, UnityEngine.Object o, HrAssetFile assetFile) : base(strAssetName, o, assetFile)
         {
 
         }

@@ -13,10 +13,27 @@ namespace Hr.Scene
         void LoadSceneAssetBundleSync(string strAssetBundleFullPath);
 
         /// <summary>
+        /// 从缓存的存有Unity Scene的AssetBundle同步加载Scene
+        /// </summary>
+        void LoadCachedSceneSync();
+
+        /// <summary>
+        /// 加载Unity Scene
+        /// </summary>
+        /// <param name="nResourceID">Scene对应的资源ID</param>
+        void LoadSceneSync(int nResourceID);
+
+        /// <summary>
+        /// 卸载当前场景
+        /// </summary>
+        void UnloadCurrentScene();
+
+        /// <summary>
         /// 注册添加场景
         /// </summary>
         /// <param name="strSceneType"></param>
         void AddScene(string strSceneType);
+
 
         HrScene GetRunningScene();
 

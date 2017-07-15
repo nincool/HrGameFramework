@@ -157,6 +157,21 @@ Prefab:
       propertyPath: m_strLaunch
       value: Hr.Example.HrLaunchImp
       objectReference: {fileID: 0}
+    - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
+        type: 2}
+      propertyPath: m_bRunInBackground
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
+        type: 2}
+      propertyPath: m_bNeverSleep
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
+        type: 2}
+      propertyPath: m_strEventModule
+      value: Hr.EventSystem.HrEventManager
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9b827b64c3e392b4b9484f010a4ffb20, type: 2}
   m_IsPrefabParent: 0

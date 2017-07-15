@@ -13,5 +13,7 @@ namespace Hr.EventSystem
 
         void SendEvent(object sender, HrEventHandlerArgs args);
 
+        void RemoveHandler(int nEvent, EventHandler<HrEventHandlerArgs> handler);
+
     }
 }

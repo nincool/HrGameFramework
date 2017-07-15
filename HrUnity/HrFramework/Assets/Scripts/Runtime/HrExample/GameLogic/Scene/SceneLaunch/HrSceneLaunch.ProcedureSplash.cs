@@ -26,7 +26,8 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
 
             if (HrEnvironment.IsEditorMode)
             {
-                m_owner.ChangeState<HrProcedurePreload>();
+                //m_owner.ChangeState<HrProcedurePreload>();
+                HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneWorldPreload>();
             }
             else
             {

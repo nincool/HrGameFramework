@@ -15,5 +15,9 @@ namespace Hr.UI
         /// UI Awake的时候主动注册到UIManager里
         /// </summary>
         void RegisterUIView(HrUIView uiView);
+
+
+        void Clear();
+
     }
 }

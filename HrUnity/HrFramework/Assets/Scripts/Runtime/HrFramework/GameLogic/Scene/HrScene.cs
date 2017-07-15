@@ -23,13 +23,13 @@ namespace Hr.Scene
 
         public HrScene(HrSceneManager owner) : base(owner)
         {
-            m_fsmProcedureStateMachine = HrGameWorld.Instance.FSMComponent.AddFSM<HrScene>(this.GetType().FullName, this) as HrFSMStateMachine<HrScene>;
-
-            AddProcedure();
         }
 
         public override void OnEnter()
         {
+            m_fsmProcedureStateMachine = HrGameWorld.Instance.FSMComponent.AddFSM<HrScene>(this.GetType().FullName, this) as HrFSMStateMachine<HrScene>;
+
+            AddProcedure();
         }
 
         public override void OnUpdate( float fElapseSeconds, float fRealElapseSeconds)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hr.EventSystem
 {
-    public sealed class HrEventHandlerArgs : HrEventArgs
+    public class HrEventHandlerArgs : HrEventArgs
     {
         public int EventID
         {
@@ -19,9 +19,32 @@ namespace Hr.EventSystem
             private set;
         }
 
-        public HrEventHandlerArgs(int nEvent, object UserData)
+        public HrEventHandlerArgs(int nEvent, object data)
         {
             EventID = nEvent;
+            UserData = data;
+        }
+    }
+
+    public class HrEventLoadSceneResourceEventHandler : HrEventHandlerArgs
+    {
+        public HrEventLoadSceneResourceEventHandler(int nEvent, object data) : base(nEvent, data)
+        {
+
+        }
+    }
+
+    public class HrEventUIViewEventHandler : HrEventHandlerArgs
+    {
+        public int PanelType
+        {
+            get;
+            set;
+        }
+
+        public HrEventUIViewEventHandler(int nEvent, object data, int nPanelType) : base(nEvent, data)
+        {
+            PanelType = nPanelType;
         }
     }
 }
