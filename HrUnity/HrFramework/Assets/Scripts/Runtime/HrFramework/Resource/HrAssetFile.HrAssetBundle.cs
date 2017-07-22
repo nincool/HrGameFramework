@@ -15,7 +15,7 @@ namespace Hr.Resource
         /// <summary>
         /// 标记已经加载成功的依赖的AssetBundle
         /// </summary>
-        private List<string> m_lisLoadedDependentAssetBundle = new List<string>();
+        private List<HrAssetBundle> m_lisLoadedDependentAssetBundles = new List<HrAssetBundle>();
 
         /// <summary>
         /// 资源的依赖资源
@@ -55,7 +55,8 @@ namespace Hr.Resource
         private void LoadDependentAssetBundleSuccess(HrAssetFile assetFile)
         {
             HrLogger.Log(string.Format("when try to load assetbundle '{0}', load dependent asset '{1}' success!", Name, assetFile.Name));
-            m_lisLoadedDependentAssetBundle.Add(assetFile.Name);
+            if (!m_lisLoadedDependentAssetBundles.Contains(assetFile as HrAssetBundle))
+                m_lisLoadedDependentAssetBundles.Add(assetFile as HrAssetBundle);
             
             //因为依赖这个AssetBundle，所以引用计数+1
             assetFile.Retain();
@@ -78,16 +79,28 @@ namespace Hr.Resource
             }
 
             this.m_assetBundle = AssetBundle.LoadFromFile(m_strFullPath);
-
-            this.m_assetBundleStatus = EnumAssetBundleStatus.LOADED;
-            if (this.LoadAssetBundleEvent != null)
+            if (this.m_assetBundle == null)
             {
-                LoadAssetBundleEvent.TriggerLoadSuccess(this, m_strName, this, timeCounter.GetTimeElapsed());
+                m_bIsError = true;
+                if (this.LoadAssetBundleEvent != null)
+                {
+                    LoadAssetBundleEvent.TriggerLoadFailed(this, m_strName, this, "unknow");
+                }
+            }
+            else
+            {
+                this.m_assetBundleStatus = EnumAssetBundleStatus.LOADED;
+                if (this.LoadAssetBundleEvent != null)
+                {
+                    LoadAssetBundleEvent.TriggerLoadSuccess(this, m_strName, this, timeCounter.GetTimeElapsed());
+                }
             }
         }
 
-        public override IEnumerator LoadAsync(HrLoadAssetCallBack loadAssetCallback)
+        public override IEnumerator LoadAsync()
         {
+            HrSimpleTimeCounter timeCounter = new HrSimpleTimeCounter();
+
             m_assetBundleLoadMode = EnumAssetBundleLoadMode.LOAD_ASYNC;
 
             if (AsssetDependicesInfo.Count > 0)
@@ -105,11 +118,22 @@ namespace Hr.Resource
             if (this.m_assetBundle == null)
             {
                 HrLogger.LogError(string.Format("can not load the asset bundle '{0}' async ", m_strFullPath));
+                m_bIsError = true;
+                if (this.LoadAssetBundleEvent != null)
+                {
+                    LoadAssetBundleEvent.TriggerLoadFailed(this, m_strName, this, "unknow");
+                }
 
                 yield break;
             }
-
-            yield break;
+            else
+            {
+                this.m_assetBundleStatus = EnumAssetBundleStatus.LOADED;
+                if (this.LoadAssetBundleEvent != null)
+                {
+                    LoadAssetBundleEvent.TriggerLoadSuccess(this, m_strName, this, timeCounter.GetTimeElapsed());
+                }
+            }
         }
 
         protected override void ReleaseImp()
@@ -120,6 +144,15 @@ namespace Hr.Resource
                 this.m_assetBundle.Unload(false);
 
                 m_assetBundleStatus = EnumAssetBundleStatus.DECLARED;
+                
+                //依赖资源引用计数减一
+                foreach (var itemDependent in m_lisLoadedDependentAssetBundles)
+                {
+                    if (itemDependent.IsLoaded())
+                    {
+                        itemDependent.Release();
+                    }
+                }
             }
         }
     }

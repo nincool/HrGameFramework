@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hr.FSM;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,13 +9,13 @@ namespace Hr
     {
         public bool InitSuccess { get; private set; }
 
-        private HrFSMManager m_fsmManager = null;
+        private IFSMManager m_fsmManager = null;
 
         protected override void Awake()
         {
             base.Awake();
 
-            m_fsmManager = HrGameWorld.Instance.GetModule<HrFSMManager>();
+            m_fsmManager = HrGameWorld.Instance.GetModule<IFSMManager>();
             if (m_fsmManager != null)
                 InitSuccess = true;
         }

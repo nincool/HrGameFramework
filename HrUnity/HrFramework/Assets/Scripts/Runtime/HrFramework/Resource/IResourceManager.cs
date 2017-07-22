@@ -18,9 +18,23 @@ namespace Hr.Resource
         /// <param name="loadAssetCallBack"></param>
         void LoadDataTable(string strDataTableName, HrLoadResourceCallBack loadResourceCallBack);
 
-        void LoadResourceSync(int nID, HrLoadResourceCallBack loadResourceCallBack);
+        /// <summary>
+        /// 同步加载单个资源
+        /// </summary>
+        /// <param name="nID">资源ID</param>
+        /// <param name="loadResourceCallBack"></param>
+        bool LoadResourceSync(int nID, HrLoadResourceCallBack loadResourceCallBack);
 
-        void LoadResourceSync(string strResourceName, HrLoadResourceCallBack loadResourceCallBack);
+        /// <summary>
+        /// 同步加载单个资源
+        /// </summary>
+        /// <param name="strResourceName">资源名称</param>
+        /// <param name="loadResourceCallBack"></param>
+        /// <returns></returns>
+        bool LoadResourceSync(string strResourceName, HrLoadResourceCallBack loadResourceCallBack);
+
+        IEnumerator LoadResourceAsync(int nID, HrLoadResourceCallBack loadResourceCallBack);
+
 
         /// <summary>
         /// 加载AssetBundle
@@ -33,7 +47,7 @@ namespace Hr.Resource
         /// </summary>
         /// <param name="strAssetBundleName"></param>
         /// <param name="loadAssetCallBack"></param>
-        void LoadAssetBundleAsync(string strAssetBundleName, HrLoadAssetCallBack loadAssetCallBack);
+        IEnumerator LoadAssetBundleAsync(string strAssetBundleName, HrLoadAssetCallBack loadAssetCallBack);
 
         /// <summary>
         /// 主动加载AssetBundle 并不参与维护 必须自己来维护 
@@ -41,7 +55,13 @@ namespace Hr.Resource
         /// <param name="strFullPath"></param>
         /// <param name="loadAssetCallBack"></param>
         void LoadAssetBundleWithFullPathSync(string strFullPath, HrLoadAssetCallBack loadAssetCallBack);
-        
+
+        /// <summary>
+        /// 异步加载AssetBundle 并不参与维护 必须自己来维护
+        /// </summary>
+        /// <param name="strFullPath"></param>
+        /// <param name="loadAssetCallBack"></param>
+        IEnumerator LoadAssetBundleWithFullPathAsync(string strFullPath, HrLoadAssetCallBack loadAssetCallBack);
         /// <summary>
         /// 获取Resource
         /// </summary>
@@ -55,5 +75,11 @@ namespace Hr.Resource
         /// <param name="strResourceName">资源的路径名称</param>
         /// <returns>返回资源对象，如果加载失败为null</returns>
         HrResource GetResource(string strResourceName);
+
+        /// <summary>
+        /// 获取所有的AssetFiles
+        /// </summary>
+        /// <returns></returns>
+        List<HrAssetFile> GetAllAssetFiles();
     }
 }

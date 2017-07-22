@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Hr.EventSystem;
 using Hr.UI;
 
 namespace Hr
@@ -10,6 +8,27 @@ namespace Hr
         public bool InitSuccess { get; private set; }
 
         private IUIManager m_uiManager;
+        private IEventManager m_eventManager;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            m_uiManager = HrGameWorld.Instance.GetModule<IUIManager>();
+            m_eventManager = HrGameWorld.Instance.GetModule<IEventManager>();
+            if (m_uiManager != null && m_eventManager != null)
+            {
+                InitSuccess = true;
+            }
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
+            m_eventManager.AddHandler(HrEventType.EVENT_SCENE_LOADED_SCENE, HandleLoadedUnityScene);
+            m_eventManager.AddHandler(HrEventType.EVENT_SCENE_UNLOAD_SCENE, HandleUnloadUnityScene);
+        }
 
         public void AttachUIRoot()
         {
@@ -21,28 +40,21 @@ namespace Hr
             m_uiManager.RegisterUIView(uiView);
         }
 
-        public void Clear()
+        public void Reset()
         {
-            m_uiManager.Clear();
+            m_uiManager.Reset();
         }
 
-        protected override void Awake()
+        private void HandleLoadedUnityScene(object sender, HrEventHandlerArgs args)
         {
-            base.Awake();
-
-            m_uiManager = HrGameWorld.Instance.GetModule<HrUIManager>();
-            if (m_uiManager == null)
-            {
-                InitSuccess = false;
-            }
+            HrLogger.Log("Attach UI Canvas");
+            AttachUIRoot();
         }
 
-        protected override void Start()
+        private void HandleUnloadUnityScene(object sender, HrEventHandlerArgs args)
         {
-            base.Start();
+            HrLogger.Log("Reset UI Component!");
+            Reset();
         }
-
-        
-
     }
 }

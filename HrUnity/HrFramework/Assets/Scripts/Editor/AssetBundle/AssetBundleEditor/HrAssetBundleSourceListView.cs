@@ -26,7 +26,7 @@ namespace Hr.Editor
 
         public void OnDrawAssetBundleSource()
         {
-            EditorManager.SourceListManager.FileHierarchy.DrawHierarchy();
+            EditorManager.SourceListManager.OnDrawSourceListHierarchy();
         }
 
         public void OnDrawAddAssetBundleMenu()

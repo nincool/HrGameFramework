@@ -36,8 +36,7 @@ namespace Hr.UI
 
         private void HandleClickBtn3(object sender, HrEventHandlerArgs args)
         {
-            HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneBattleLoading>();
-
+            HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneBattlePreload>();
         }
     }
 }

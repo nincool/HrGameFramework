@@ -99,6 +99,16 @@ namespace Hr
         #region Component Selected
 
         [SerializeField]
+        private string m_strDataTableModule;
+        public string DataTableModule
+        {
+            get
+            {
+                return m_strDataTableModule;
+            }
+        }
+
+        [SerializeField]
         private string m_strEventModule;
         public string EventModule
         {
@@ -108,6 +118,56 @@ namespace Hr
             }
         }
 
+        [SerializeField]
+        private string m_strFSMModule;
+        public string FSMModule
+        {
+            get
+            {
+                return m_strFSMModule;
+            }
+        }
+
+        [SerializeField]
+        private string m_strReleasePoolModule;
+        public string ReleasePoolModule
+        {
+            get
+            {
+                return m_strReleasePoolModule;
+            }
+        }
+
+        [SerializeField]
+        private string m_strResourceModule;
+        public string ResourceModule
+        {
+            get
+            {
+                return m_strResourceModule;
+            }
+        }
+
+        [SerializeField]
+        private string m_strSceneModule;
+        public string SceneModule
+        {
+            get
+            {
+                return m_strSceneModule;
+            }
+        }
+
+        [SerializeField]
+        private string m_strUIModule;
+        public string UIModule
+        {
+            get
+            {
+                return m_strUIModule;
+            }
+        }
+        
         #endregion
 
         /// <summary>
@@ -134,7 +194,14 @@ namespace Hr
         private void Initialize()
         {
             //预初始化一些模块
+            PreInitializeGameModule(DataTableModule);
             PreInitializeGameModule(EventModule);
+            PreInitializeGameModule(FSMModule);
+            PreInitializeGameModule(ReleasePoolModule);
+            PreInitializeGameModule(ResourceModule);
+            PreInitializeGameModule(SceneModule);
+            PreInitializeGameModule(UIModule);
+
 
             HrGameWorld.Instance.EntryScene = EntranceScene;
             HrGameWorld.Instance.ComponentRoot = this.transform;

@@ -5,13 +5,21 @@ namespace Hr.ReleasePool
 {
     public class HrReleasePoolManager : HrModule, IReleasePoolManager
     {
-        private List<HrReleaseStartegy> m_lisObj = new List<HrReleaseStartegy>();
+        private List<HrReleaseStrategy> m_lisObj = new List<HrReleaseStrategy>();
 
         #region IReleasePoolManager
 
-        public void AddObject(HrReleaseStartegy releaseStartegy)
+        public void AddObject(HrReleaseStrategy ReleaseStrategy)
         {
-            m_lisObj.Add(releaseStartegy);
+            m_lisObj.Add(ReleaseStrategy);
+        }
+
+        public void OnChangeScene()
+        {
+            for (var i = 0; i < m_lisObj.Count; ++i)
+            {
+                m_lisObj[i].OnChangeScene();
+            }
         }
 
         #endregion
@@ -40,12 +48,8 @@ namespace Hr.ReleasePool
         }
         #endregion
 
-        private void OnChangeScene()
-        {
-            for (var i = 0; i < m_lisObj.Count; ++i)
-            {
-                m_lisObj[i].OnChangeScene();
-            }
-        }
+
     }
 }
+
+

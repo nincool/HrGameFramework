@@ -25,7 +25,6 @@ namespace Hr.Scene.Procedure.HrSceneWorld
         {
             base.OnUpdate(fElapseSeconds, fRealElapseSeconds);
 
-            HrGameWorld.Instance.UIComponent.AttachUIRoot();
             HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventUIViewEventHandler(HrEventType.EVENT_UI_SHOW, null, (int)EnumUIType.UITYPE_LOBBY_MAIN_VIEW));
             HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventUIViewEventHandler(HrEventType.EVENT_UI_SHOW, null, (int)EnumUIType.UITYPE_TOPBAR_VIEW));
             HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventUIViewEventHandler(HrEventType.EVENT_UI_SHOW, null, (int)EnumUIType.UITYPE_PANEL02_VIEW));

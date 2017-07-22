@@ -271,10 +271,15 @@ namespace Hr
 
         private HrModule CreateModule(Type type)
         {
+            if (type.IsInterface || type.IsAbstract)
+            {
+                throw new HrException(string.Format("HrGameWorld CreateModule Error! type is interface or abstract! name {0}", type.FullName));
+            }
+
             HrModule module = (HrModule)Activator.CreateInstance(type);
             if (module == null)
             {
-                throw new HrException(string.Format("HrGameWorld CreateModule Error! module name {0} " + module.GetType().FullName));
+                throw new HrException(string.Format("HrGameWorld CreateModule Error! module name {0} ", type.FullName));
             }
 
             LinkedListNode<HrModule> current = m_modules.First;

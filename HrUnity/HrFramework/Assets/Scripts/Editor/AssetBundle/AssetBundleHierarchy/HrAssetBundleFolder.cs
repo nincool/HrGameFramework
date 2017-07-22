@@ -68,9 +68,9 @@ namespace Hr.Editor
         public List<HrFileItem> GetAssets()
         {
             List<HrFileItem> lisFileItem = new List<HrFileItem>();
-            foreach (var assetBundle in m_dicAssetBundles.Values)
+            foreach (var itemAssetBundle in m_dicAssetBundles)
             {
-                lisFileItem.AddRange(assetBundle.GetAssets());
+                lisFileItem.AddRange(itemAssetBundle.Value.GetAssets());
             }
 
             return lisFileItem;

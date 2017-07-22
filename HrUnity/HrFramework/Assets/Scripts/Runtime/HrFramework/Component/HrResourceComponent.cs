@@ -1,5 +1,6 @@
 ﻿using Hr.EventSystem;
 using Hr.Resource;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,16 +22,23 @@ namespace Hr
             set;
         }
 
+        /// <summary>
+        /// AssetBundle Instantiate节点
+        /// </summary>
+        public UnityEngine.Transform AssetBundleInstanceRoot
+        {
+            get;
+            set;
+        }
+
         protected override void Awake()
         {
             base.Awake();
 
-            m_resourceManager = HrGameWorld.Instance.GetModule<HrResourceManager>();
+            m_resourceManager = HrGameWorld.Instance.GetModule<IResourceManager>();
             if (m_resourceManager != null)
             {
                 InitSuccess = true;
-
-                HrGameWorld.Instance.GetModule<HrEventManager>();
             }
             else
             {
@@ -58,6 +66,11 @@ namespace Hr
         public void LoadResourceSync(int nID, HrLoadResourceCallBack loadResourceCallBack)
         {
             m_resourceManager.LoadResourceSync(nID, loadResourceCallBack);
+        }
+
+        public void LoadResourceAsync(int nID, HrLoadResourceCallBack loadResourceCallBack)
+        {
+            StartCoroutine(LoadResourceAsyncCoroutine(nID, loadResourceCallBack));
         }
 
         public void LoadAssetBundleSync(string strAssetBundleName, HrLoadAssetCallBack loadAssetCallback)
@@ -99,25 +112,22 @@ namespace Hr
             }
         }
 
-        //public HrResource GetResource(int nID)
-        //{
-        //    return m_resourceManager.GetResource(nID);
-        //}
+        public List<HrAssetFile> GetAllAssetFiles()
+        {
+            return m_resourceManager.GetAllAssetFiles();
+        }
 
-        //public List<string> GetAssetBundleDependices(string strAssetBundleName)
-        //{
-        //    return m_resourceManager.GetAssetBundleDependices(strAssetBundleName);
-        //}
+        #region private methods
 
-        //public HrAssetFile LoadAssetBundleSync(string strAssetBundleName)
-        //{
-        //    return m_resourceManager.LoadAssetBundleSync(strAssetBundleName);
-        //}
-
-        //public T LoadAsset<T>(string strAssetPath)
-        //{
-        //    return m_resourceManager.LoadAsset<T>(strAssetPath);
-        //}
+        private IEnumerator LoadResourceAsyncCoroutine(int nID, HrLoadResourceCallBack loadResourceCallBack)
+        {
+            IEnumerator itor = m_resourceManager.LoadResourceAsync(nID, loadResourceCallBack);
+            while (itor.MoveNext())
+            {
+                yield return null;
+            }
+        }
+        
+        #endregion
     }
-
 }

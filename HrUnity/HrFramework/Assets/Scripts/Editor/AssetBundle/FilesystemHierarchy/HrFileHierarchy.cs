@@ -143,9 +143,9 @@ namespace Hr.Editor.Hierarchy
                     RefreshHierarchy();
                 }
                 GUI.DrawTexture(new Rect(35f + 14f * folder.Depth, 18f * folder.Row , 18f, 18f), HrFileHierarchyFolder.Icon);
-                GUILayout.Space(-220f);
+                GUILayout.Space(-200f);
                 EditorGUILayout.LabelField(string.Empty, GUILayout.Width(15 * folder.Depth));
-                EditorGUILayout.LabelField(string.Format("{0}, {1}", folder.Name, folder.Row));
+                EditorGUILayout.LabelField(string.Format("{0}, {1}, {2}", folder.Name, folder.Row, folder.Depth));
             }
             EditorGUILayout.EndHorizontal();
 

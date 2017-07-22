@@ -21,13 +21,19 @@ namespace Hr
 
         public void Retain()
         {
-            Assert.IsTrue(m_nReferenceCount > 0);
+            if (m_nReferenceCount <= 0)
+            {
+                throw new HrException(string.Format("HrRef Retain Error! RefCount'{0}'", m_nReferenceCount));
+            }
             ++m_nReferenceCount;
         }
 
         public void Release()
         {
-            Assert.IsTrue(m_nReferenceCount > 0);
+            if (m_nReferenceCount <= 0)
+            {
+                throw new HrException(string.Format("HrRef Release Error! RefCount'{0}'", m_nReferenceCount));
+            }
             --m_nReferenceCount;
             if (m_nReferenceCount == 0)
             {

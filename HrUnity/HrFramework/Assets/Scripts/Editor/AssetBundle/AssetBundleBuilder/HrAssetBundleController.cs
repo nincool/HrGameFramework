@@ -605,6 +605,8 @@ namespace Hr.Editor
             , Dictionary<string, List<string>> dicAssetBundleDependencies
             , Dictionary<string, List<string>> dicBeDependentAssetbundle)
         {
+            var lisAssetBundles = m_assetBundleContainer.GetAssetBundles().ToList<HrAssetBundle>();
+
             string strAssetsListJsonFilePath = HrFileUtil.GetCombinePath(AssetsListPath, m_c_strAssetsListJsonName);
             JsonWriter writer = new JsonWriter();
             writer.WriteObjectStart();
@@ -619,6 +621,13 @@ namespace Hr.Editor
                     {
                         writer.WritePropertyName("AssetBundle");
                         writer.Write(assetBundleItem.Key);
+                        var assetBundle = lisAssetBundles.Find(o => o.FullName == assetBundleItem.Key);
+                        if (assetBundle == null)
+                        {
+                            throw new HrException(string.Format("can not find the assetbundle '{0}' ", assetBundleItem.Key));
+                        }
+                        writer.WritePropertyName("ReleaseStrategy");
+                        writer.Write((int)assetBundle.ReleaseStrategy);
                         writer.WritePropertyName("Dependencies");
                         writer.WriteArrayStart();
                         {

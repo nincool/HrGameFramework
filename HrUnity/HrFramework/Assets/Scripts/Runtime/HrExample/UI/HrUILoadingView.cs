@@ -46,6 +46,11 @@ namespace Hr.UI
                 m_imgProgress.fillAmount = nFillAmount / nTotalAmount * 1.0f;
             }
         }
+
+        public void OnDestroy()
+        {
+            HrLogger.Log("Destory");
+        }
     }
 
 }

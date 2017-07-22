@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Hr
+namespace Hr.FSM
 {
     public class HrFSMStateMachine<T> : IFSMStateMachine
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hr.FSM;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,6 +56,8 @@ namespace Hr.Scene
         {
             m_fsmProcedureStateMachine.ChangeState(stateType);
         }
+
+        protected abstract IEnumerator LoadCachedSceneAndInitProcedure();
     }
 
 }

@@ -10,6 +10,8 @@ namespace Hr.ReleasePool
         /// 添加到释放池
         /// </summary>
         /// <param name="refObj"></param>
-        void AddObject(HrReleaseStartegy releaseStartegy);
+        void AddObject(HrReleaseStrategy ReleaseStrategy);
+
+        void OnChangeScene();
     }
 }

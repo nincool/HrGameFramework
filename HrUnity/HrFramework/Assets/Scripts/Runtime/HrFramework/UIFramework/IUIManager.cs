@@ -17,7 +17,7 @@ namespace Hr.UI
         void RegisterUIView(HrUIView uiView);
 
 
-        void Clear();
+        void Reset();
 
     }
 }

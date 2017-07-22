@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Hr.Scene
 {
-    public class HrSceneWorldPreload : HrScene
+    public class HrSceneWorldPreload : HrScenePreload
     {
         private string m_strAssetBundleName = "scene_loading";
 
@@ -18,10 +18,9 @@ namespace Hr.Scene
         {
             base.OnEnter();
 
+            HrLogger.Log("HrSceneWorldPreload OnEnter!");
             HrGameWorld.Instance.EventComponent.AddHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
-            HrGameWorld.Instance.SceneComponent.LoadSceneAssetBundleSync(Resource.HrResourcePath.CombineAssetBundlePath(m_strAssetBundleName));
-
-            ChangeState<Procedure.HrSceneWorldPreload.HrProcedureLoading>();
+            HrGameWorld.Instance.SceneComponent.LoadUnitySceneAssetBundleAsync(Resource.HrResourcePath.CombineAssetBundlePath(m_strAssetBundleName));
         }
 
         protected override void AddProcedure()
@@ -31,8 +30,28 @@ namespace Hr.Scene
 
         private void HandleLoadSceneAssetBundleSuccess(object sender, HrEventHandlerArgs args)
         {
-            HrGameWorld.Instance.SceneComponent.LoadCachedSceneSync();
             HrGameWorld.Instance.EventComponent.RemoveHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
+
+            HrCoroutineManager.StartCoroutine(LoadCachedSceneAndInitProcedure());
+        }
+
+        /// <summary>
+        /// Unity在下一帧加载，但是又保证不了下一帧协成的执行顺序,所以先判断场景是否真正的加载成功了
+        /// </summary>
+        /// <returns></returns>
+        protected override IEnumerator LoadCachedSceneAndInitProcedure()
+        {
+            HrGameWorld.Instance.SceneComponent.LoadUnityCachedSceneSync();
+
+            yield return null;
+
+            while (!HrGameWorld.Instance.SceneComponent.IsCurrentUnitySceneLoaded())
+            {
+                yield return null;
+            }
+
+            HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventHandlerArgs(HrEventType.EVENT_SCENE_LOADED_SCENE, null));
+            ChangeState<Procedure.HrSceneWorldPreload.HrProcedureLoading>();
         }
     }
 }

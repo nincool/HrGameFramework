@@ -1,4 +1,5 @@
 ﻿using Hr.DataTable;
+using Hr.Define;
 using Hr.EventSystem;
 using Hr.Resource;
 using Hr.Utility;
@@ -6,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Hr.Scene.Procedure.HrSceneBattleLoading
+namespace Hr.Scene.Procedure.HrSceneBattlePreload
 {
     public class HrProcedurePreload : HrProcedure
     {
@@ -18,7 +19,6 @@ namespace Hr.Scene.Procedure.HrSceneBattleLoading
 
         private HrLoadResourceCallBack m_loadResourceCallBack;
 
-
         public HrProcedurePreload(HrScene owner) : base(owner)
         {
             m_loadResourceCallBack = new HrLoadResourceCallBack(LoadResourceSuccess, LoadResourceFailed);
@@ -26,6 +26,8 @@ namespace Hr.Scene.Procedure.HrSceneBattleLoading
 
         public override void OnEnter()
         {
+            HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventUIViewEventHandler(HrEventType.EVENT_UI_SHOW, null, (int)EnumUIType.UITYPE_LOADING_VIEW));
+
             PreloadResources();
         }
 
@@ -69,7 +71,7 @@ namespace Hr.Scene.Procedure.HrSceneBattleLoading
             if (m_nPreloadSceneResID > 0)
             {
                 HrGameWorld.Instance.EventComponent.AddHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
-                HrGameWorld.Instance.SceneComponent.LoadSceneSync(m_nPreloadSceneResID);
+                HrGameWorld.Instance.SceneComponent.LoadUnitySceneSync(m_nPreloadSceneResID);
             }
 
             yield return null;
@@ -85,10 +87,10 @@ namespace Hr.Scene.Procedure.HrSceneBattleLoading
 
         private void OnPreloadFinished()
         {
-            HrGameWorld.Instance.UIComponent.Clear();
+            HrGameWorld.Instance.UIComponent.Reset();
 
-            //HrGameWorld.Instance.SceneComponent.UnloadCurrentScene();
-            //HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneWorld>();
+            HrGameWorld.Instance.SceneComponent.UnloadUnityCurrentScene();
+            HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneBattle>();
         }
 
         private void LoadResourceSuccess(HrResource res)

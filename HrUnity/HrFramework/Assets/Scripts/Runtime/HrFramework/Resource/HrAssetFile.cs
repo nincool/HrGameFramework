@@ -23,7 +23,7 @@ namespace Hr.Resource
 
         protected string m_strFullPath;
 
-        protected HrReleaseStartegy m_releaseStartegy;
+        protected HrReleaseStrategy m_ReleaseStrategy;
         /// <summary>
         /// 加载资源事件
         /// </summary>
@@ -44,6 +44,8 @@ namespace Hr.Resource
         /// </summary>
         protected EnumAssetBundleLoadMode m_assetBundleLoadMode = EnumAssetBundleLoadMode.LOAD_SYNC;
 
+        protected bool m_bIsError = false;
+
         public HrAssetFile(string strName, string strFullPath)
         {
             m_strName = strName;
@@ -51,7 +53,7 @@ namespace Hr.Resource
 
             m_assetBundleStatus = EnumAssetBundleStatus.DECLARED;
 
-            m_releaseStartegy = new HrReleaseStartegy(this);
+            m_ReleaseStrategy = new HrReleaseStrategy(this);
         }
 
         public string Name
@@ -72,6 +74,12 @@ namespace Hr.Resource
             get { return m_assetBundleStatus; }
         }
 
+
+        public HrReleaseStrategy ReleaseStrategy
+        {
+            get { return m_ReleaseStrategy; }
+        }
+
         public bool IsLoading()
         {
             return (m_assetBundleStatus == EnumAssetBundleStatus.LOADING);
@@ -84,25 +92,25 @@ namespace Hr.Resource
 
         public bool IsError()
         {
-            return false;
+            return m_bIsError;
         }
 
         public abstract void LoadSync();
 
 
-        public abstract IEnumerator LoadAsync(HrLoadAssetCallBack loadAssetCallback);
+        public abstract IEnumerator LoadAsync();
 
         public void Update(float fElapseSeconds, float fRealElapseSeconds)
         {
             if (IsLoaded())
             {
-                m_releaseStartegy.Update(fElapseSeconds, fRealElapseSeconds);
+                m_ReleaseStrategy.Update(fElapseSeconds, fRealElapseSeconds);
             }
         }
 
         public void AutoRelease()
         {
-            HrGameWorld.Instance.ReleasePoolComonent.AddReleaseStartegyObject(m_releaseStartegy);
+            HrGameWorld.Instance.ReleasePoolComonent.AddReleaseStrategyObject(m_ReleaseStrategy);
         }
     }
 }

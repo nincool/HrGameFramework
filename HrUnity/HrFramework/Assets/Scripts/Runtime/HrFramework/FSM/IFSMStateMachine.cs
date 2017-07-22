@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hr
+namespace Hr.FSM
 {
     public interface IFSMStateMachine
     {

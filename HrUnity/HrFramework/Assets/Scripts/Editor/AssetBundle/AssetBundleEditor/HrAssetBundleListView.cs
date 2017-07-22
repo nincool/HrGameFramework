@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hr.ReleasePool;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -63,11 +64,8 @@ namespace Hr.Editor
                         m_strInputAssetBundleName = EditorGUILayout.TextField(m_strInputAssetBundleName, GUILayout.Width(130f));
                         EditorGUILayout.LabelField("variant:", GUILayout.Width(50f));
                         m_strInputAssetBundleVariant = EditorGUILayout.TextField(m_strInputAssetBundleVariant, GUILayout.Width(100f));
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.BeginHorizontal();
-                    {
-                        if (GUILayout.Button("Add AssetBundle", GUILayout.Width(130), GUILayout.Height(30)))
+
+                        if (GUILayout.Button("Add AssetBundle"))
                         {
                             CancelFocus();
 
@@ -88,6 +86,10 @@ namespace Hr.Editor
                                 EditorUtility.ClearProgressBar();
                             }
                         }
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    {
                         EditorGUI.BeginDisabledGroup(string.IsNullOrEmpty(m_strInputAssetBundleName) || EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle == null);
                         {
                             if (GUILayout.Button("Rename", GUILayout.Width(130f), GUILayout.Height(30f)))
@@ -111,6 +113,18 @@ namespace Hr.Editor
                         }
                         EditorGUI.EndDisabledGroup();
 
+                        EditorGUI.BeginDisabledGroup(EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle == null);
+                        {
+                            if (EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle != null)
+                            {
+                                EnumReleaseStrategy releaseStragety = (EnumReleaseStrategy)EditorGUILayout.EnumPopup(EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle.ReleaseStrategy);
+                                if (releaseStragety != EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle.ReleaseStrategy)
+                                {
+                                    EditorManager.AssetBundleListManager.FileHierarchy.CurSelectedAssetBundle.ReleaseStrategy = releaseStragety;
+                                }
+                            }
+                        }
+                        EditorGUI.EndDisabledGroup();
                     }
                     EditorGUILayout.EndHorizontal();
                 }
@@ -126,3 +140,10 @@ namespace Hr.Editor
     }
 }
 
+//public enum EnumReleaseStrategy
+//{
+//    RELEASE_WAITFORENDOFFRAME,  //下一帧释放
+//    RELEASE_WAITFORSECONDS,     //在等待一定时间释放
+//    RELEASE_SWICHSCENE,         //切换场景释放
+//    RELEASE_RESIDENT,           //常驻内存，在APP退出释放
+//}

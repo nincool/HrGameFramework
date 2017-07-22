@@ -90,7 +90,7 @@ namespace Hr.Editor
                     }
 
                     GUI.DrawTexture(new Rect(18f, 18f * nRowIndex, 18f, 18f), assetBundle.Icon);
-                    EditorGUILayout.LabelField(assetBundle.FullName);
+                    EditorGUILayout.LabelField(string.Format("{0}         [{1}]", assetBundle.FullName, assetBundle.ReleaseStrategy));
 
                     ++nRowIndex;
                 }

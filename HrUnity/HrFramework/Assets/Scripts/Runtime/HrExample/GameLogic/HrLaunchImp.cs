@@ -15,6 +15,8 @@ namespace Hr.Example
             HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneLaunch>();
             HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneWorldPreload>();
             HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneWorld>();
+            HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneBattlePreload>();
+            HrGameWorld.Instance.SceneComponent.AddScene<Hr.Scene.HrSceneBattle>();
         }
     }
 

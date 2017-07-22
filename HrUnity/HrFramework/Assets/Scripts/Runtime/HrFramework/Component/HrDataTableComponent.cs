@@ -12,16 +12,14 @@ namespace Hr
 
         private IDataTableManager m_dataTableManager = null;
 
-
-
         protected override void Awake()
         {
             base.Awake();
 
-            m_dataTableManager = HrGameWorld.Instance.GetModule<HrDataTableManager>();
+            m_dataTableManager = HrGameWorld.Instance.GetModule<IDataTableManager>();
             if (m_dataTableManager != null)
             {
-                m_dataTableManager.SetResourceManager(HrGameWorld.Instance.GetModule<HrResourceManager>());
+                m_dataTableManager.SetResourceManager(HrGameWorld.Instance.GetModule<IResourceManager>());
                 InitSuccess = true;
             }
         }

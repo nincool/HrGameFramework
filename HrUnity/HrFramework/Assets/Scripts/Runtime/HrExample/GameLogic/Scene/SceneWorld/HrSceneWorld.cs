@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hr.EventSystem;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,12 +16,7 @@ namespace Hr.Scene
             base.OnEnter();
             HrLogger.Log("HrSceneWorld OnEnter!");
 
-            HrGameWorld.Instance.UIComponent.Clear();
-            HrGameWorld.Instance.SceneComponent.UnloadCurrentScene();
-            //这一帧其实并没有切换成功，所以应该放在下一帧执行逻辑,同步加载会造成误解
-            HrGameWorld.Instance.SceneComponent.LoadCachedSceneSync();
-
-            ChangeState<Procedure.HrSceneWorld.HrProcedureInit>();
+            HrCoroutineManager.StartCoroutine(LoadCachedSceneAndInitProcedure());
         }
 
         public override void OnUpdate(float fElapseSeconds, float fRealElapseSeconds)
@@ -42,7 +38,21 @@ namespace Hr.Scene
         {
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneWorld.HrProcedureInit(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneWorld.HrProcedureMain(this));
+        }
 
+        protected override IEnumerator LoadCachedSceneAndInitProcedure()
+        {
+            HrGameWorld.Instance.SceneComponent.LoadUnityCachedSceneSync();
+
+            yield return null;
+
+            while (!HrGameWorld.Instance.SceneComponent.IsCurrentUnitySceneLoaded())
+            {
+                yield return null;
+            }
+
+            HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventHandlerArgs(HrEventType.EVENT_SCENE_LOADED_SCENE, null));
+            ChangeState<Procedure.HrSceneWorld.HrProcedureInit>();
         }
     }
 

@@ -323,9 +323,37 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 1759296908712486, guid: f70eb601e3c1e274fa63f9dd80ab543c, type: 2}
+      propertyPath: m_Name
+      value: CheckVersionPanel
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 114928954063628128, guid: f70eb601e3c1e274fa63f9dd80ab543c, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: f70eb601e3c1e274fa63f9dd80ab543c, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1613038694 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1759296908712486, guid: f70eb601e3c1e274fa63f9dd80ab543c,
+    type: 2}
+  m_PrefabInternal: {fileID: 1613038693}
+--- !u!114 &1613038695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1613038694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b7e30e0f4852ff4bb87d7cbb297163f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_imgProgress: {fileID: 1613038696}
+--- !u!114 &1613038696 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114442365389169940, guid: f70eb601e3c1e274fa63f9dd80ab543c,
+    type: 2}
+  m_PrefabInternal: {fileID: 1613038693}
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
 --- !u!1001 &1668115371
 Prefab:
   m_ObjectHideFlags: 0

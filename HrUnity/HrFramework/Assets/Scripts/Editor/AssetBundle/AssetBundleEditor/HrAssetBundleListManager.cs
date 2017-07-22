@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System;
 using Hr.Utility;
-
+using Hr.ReleasePool;
 
 namespace Hr.Editor
 {
@@ -73,7 +73,8 @@ namespace Hr.Editor
                 {
                     string strName = jsonData[strAssetBundle]["Name"].ToString();
                     string strVariant = jsonData[strAssetBundle]["Variant"].ToString();
-                    if (!AddAssetBundle(strName, strVariant))
+                    int nReleaseStrategy = (int)jsonData[strAssetBundle]["ReleaseStragety"];
+                    if (!AddAssetBundle(strName, strVariant, nReleaseStrategy))
                     {
                         string strAssetBundleFullName = !string.IsNullOrEmpty(strVariant) ? string.Format("{0}.{1}", strName, strVariant) : strName;
                         Debug.LogError(string.Format("Can not add AssetBundle '{0}'.", strAssetBundleFullName));
@@ -144,7 +145,8 @@ namespace Hr.Editor
                 writer.Write(assetBundle.Name);
                 writer.WritePropertyName("Variant");
                 writer.Write(assetBundle.Variant);
-
+                writer.WritePropertyName("ReleaseStragety");
+                writer.Write((int)assetBundle.ReleaseStrategy);
 
                 writer.WriteObjectEnd();
 
@@ -177,7 +179,7 @@ namespace Hr.Editor
 
         }
 
-        public bool AddAssetBundle(string strAssetBundleName, string strAssetBundleVariant)
+        public bool AddAssetBundle(string strAssetBundleName, string strAssetBundleVariant, int nReleaseStragety = 0)
         {
             if (!IsValidAssetBundleName(strAssetBundleName, strAssetBundleVariant))
             {
@@ -190,6 +192,7 @@ namespace Hr.Editor
             }
 
             HrAssetBundle assetBundle = HrAssetBundle.Create(strAssetBundleName, strAssetBundleVariant);
+            assetBundle.ReleaseStrategy = (EnumReleaseStrategy)nReleaseStragety;
             m_fileHierarchy.AssetBundleFolder.AssetBundles.Add(assetBundle.FullName, assetBundle);
 
             return true;

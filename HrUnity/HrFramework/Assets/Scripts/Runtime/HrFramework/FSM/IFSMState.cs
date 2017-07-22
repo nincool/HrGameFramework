@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Hr
+namespace Hr.FSM
 {
     public interface IFSMState 
     {

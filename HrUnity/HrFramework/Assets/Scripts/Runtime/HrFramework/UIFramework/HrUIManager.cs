@@ -76,7 +76,7 @@ namespace Hr.UI
             m_uiRoot.AttachUIAnchor();
         }
 
-        public void Clear()
+        public void Reset()
         {
             //隐藏所有UI
             HideAllUIView();

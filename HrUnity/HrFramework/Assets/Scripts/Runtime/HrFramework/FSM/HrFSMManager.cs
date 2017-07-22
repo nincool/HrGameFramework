@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Hr
+namespace Hr.FSM
 {
-    public class HrFSMManager : HrModule
+    public class HrFSMManager : HrModule, IFSMManager
     {
         private readonly Dictionary<string, IFSMStateMachine> m_dicStateMachines = new Dictionary<string, IFSMStateMachine>();
 
@@ -48,22 +48,26 @@ namespace Hr
             {
                 m_dicStateMachines.Add(itemAddFSM.Name, itemAddFSM);
             }
+            m_lisAddFSMCache.Clear();
 
             foreach (var itemRemoveName in m_lisRemoveFSMCache)
             {
                 m_dicStateMachines.Remove(itemRemoveName);
             }
-            m_dicStateMachines.Clear();
+            m_lisRemoveFSMCache.Clear();
 
             int nStateMachineCount = m_dicStateMachines.Count;
-            foreach (var item in m_dicStateMachines.Values)
+            foreach (var item in m_dicStateMachines)
             {
-                item.OnUpdate(fElapseSeconds, fRealElapseSeconds);
+                item.Value.OnUpdate(fElapseSeconds, fRealElapseSeconds);
+#if UNITY_EDITOR
                 if (nStateMachineCount != m_dicStateMachines.Count)
                 {
                     HrLogger.LogError("FSMManager Update Error! can not add or remove stateMachine in update func!!!");
                 }
+#endif
             }
+
         }
 
         public override void Shutdown()

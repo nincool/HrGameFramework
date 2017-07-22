@@ -1,4 +1,5 @@
 ﻿using Hr.DataTable;
+using Hr.Define;
 using Hr.EventSystem;
 using Hr.Resource;
 using Hr.Utility;
@@ -26,7 +27,9 @@ namespace Hr.Scene.Procedure.HrSceneWorldPreload
         public override void OnEnter()
         {
             base.OnEnter();
-            HrLogger.Log("HrSceneLaunch.HrProcedurePreload.OnEnter!");
+            HrLogger.Log("HrSceneWorldPreload.HrProcedurePreload.OnEnter!");
+
+            HrGameWorld.Instance.EventComponent.SendEvent(this, new HrEventUIViewEventHandler(HrEventType.EVENT_UI_SHOW, null, (int)EnumUIType.UITYPE_LOADING_VIEW));
 
             PreloadResources();
 
@@ -53,9 +56,6 @@ namespace Hr.Scene.Procedure.HrSceneWorldPreload
 
         private void PreloadResources()
         {
-            //加载资源配置 这个放在动态更新之前
-            HrGameWorld.Instance.ResourceComponent.LoadAssetsConfig();
-
             //加载配置数据
             LoadDataTables();
 
@@ -105,16 +105,19 @@ namespace Hr.Scene.Procedure.HrSceneWorldPreload
 
         private IEnumerator StartLoadAssetBundles()
         {
+            HrLogger.Log("HrSceneWorldPreload.ProcedureLoad StartLoadAssetBundles!!!!!");
             foreach (var nResourceID in m_lisPreloadResourceID)
             {
-                HrGameWorld.Instance.ResourceComponent.LoadResourceSync(nResourceID, m_loadResourceCallBack);
+                HrLogger.Log(string.Format("HrSceneWorldPreload.ProcedureLoad LoadResourceSync ResourceID'{0}'", nResourceID));
+                HrGameWorld.Instance.ResourceComponent.LoadResourceAsync(nResourceID, m_loadResourceCallBack);
                 yield return null;
             }
 
             if (m_nPreloadSceneResID > 0)
             {
+                HrLogger.Log(string.Format("HrSceneWorldPreload.ProcedureLoad LoadSceneSync SceneResID'{0}'", m_nPreloadSceneResID));
                 HrGameWorld.Instance.EventComponent.AddHandler(HrEventType.EVENT_LOAD_SCENE_RESOURCE_SUCCESS, HandleLoadSceneAssetBundleSuccess);
-                HrGameWorld.Instance.SceneComponent.LoadSceneSync(m_nPreloadSceneResID);
+                HrGameWorld.Instance.SceneComponent.LoadUnitySceneAsync(m_nPreloadSceneResID);
             }
 
             yield return null;
@@ -160,8 +163,8 @@ namespace Hr.Scene.Procedure.HrSceneWorldPreload
 
         private void OnPreloadFinished()
         {
-            //HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneWorld>();
             HrLogger.Log("Load Res Success!!!!!!!!!!!!!!");
+            HrGameWorld.Instance.SceneComponent.SwitchToScene<Hr.Scene.HrSceneWorld>();
         }
 
         private void HandleLoadSceneAssetBundleSuccess(object sender, HrEventHandlerArgs args)

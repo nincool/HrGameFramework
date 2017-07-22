@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using Hr.Utility;
+using Hr.ReleasePool;
 
 namespace Hr.Editor
 {
@@ -47,7 +48,8 @@ namespace Hr.Editor
                 {
                     string strName = jsonData[strAssetBundle]["Name"].ToString();
                     string strVariant = jsonData[strAssetBundle]["Variant"].ToString();
-                    if (!AddAssetBundle(strName, strVariant))
+                    EnumReleaseStrategy releaseStrategy = (EnumReleaseStrategy)(int)jsonData[strAssetBundle]["ReleaseStragety"];
+                    if (!AddAssetBundle(strName, strVariant, releaseStrategy))
                     {
                         string strAssetBundleFullName = strVariant != null ? string.Format("{0}.{1}", strName, strVariant) : strName;
                         Debug.LogError(string.Format("Can not add AssetBundle '{0}'.", strAssetBundleFullName));
@@ -85,9 +87,10 @@ namespace Hr.Editor
             return true;
         }
 
-        private bool AddAssetBundle(string strAssetBundleName, string strVariant)
+        private bool AddAssetBundle(string strAssetBundleName, string strVariant, EnumReleaseStrategy releaseStrategy = EnumReleaseStrategy.RELEASE_WAITFORENDOFFRAME)
         {
             HrAssetBundle assetBundle = HrAssetBundle.Create(strAssetBundleName, strVariant);
+            assetBundle.ReleaseStrategy = releaseStrategy;
             m_dicAssetBundles.Add(assetBundle.FullName, assetBundle);
 
             return true;

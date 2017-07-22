@@ -6,6 +6,7 @@
 // 来自GameFramework 学习框架 眼过千遍不如手过一遍
 //------------------------------------------------------------
 using Hr.Editor.Hierarchy;
+using Hr.ReleasePool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -23,6 +24,8 @@ namespace Hr.Editor
         private static Texture s_CachedSceneIcon = null;
 
         private readonly List<HrFileItem> m_Assets;
+
+        private EnumReleaseStrategy m_releaseStrategy = EnumReleaseStrategy.RELEASE_RESIDENT;
 
         private HrAssetBundle(string name, string variant)
         {
@@ -50,6 +53,18 @@ namespace Hr.Editor
             get
             {
                 return !string.IsNullOrEmpty(Variant) ? string.Format("{0}.{1}", Name, Variant) : Name;
+            }
+        }
+
+        public EnumReleaseStrategy ReleaseStrategy
+        {
+            get
+            {
+                return m_releaseStrategy;
+            }
+            set
+            {
+                m_releaseStrategy = value;
             }
         }
 

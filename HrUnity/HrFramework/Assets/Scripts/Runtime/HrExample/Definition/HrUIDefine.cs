@@ -9,11 +9,12 @@ namespace Hr.Define
     /// </summary>
     public enum EnumUIType
     {
-        UITYPE_LOADING_VIEW = 100,
+        UITYPE_CHECKVIEW_VIEW = 100,
         UITYPE_LOBBY_MAIN_VIEW = 101,
         UITYPE_TOPBAR_VIEW = 102,
         UITYPE_PANEL01_VIEW = 103,
         UITYPE_PANEL02_VIEW = 104,
+        UITYPE_LOADING_VIEW = 105
 
     }
 

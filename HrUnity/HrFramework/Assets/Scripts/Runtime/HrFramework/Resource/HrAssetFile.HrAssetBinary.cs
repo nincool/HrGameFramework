@@ -113,7 +113,7 @@ namespace Hr.Resource
             }
         }
 
-        public override IEnumerator LoadAsync(HrLoadAssetCallBack loadAssetCallback)
+        public override IEnumerator LoadAsync()
         {
             yield break;
         }

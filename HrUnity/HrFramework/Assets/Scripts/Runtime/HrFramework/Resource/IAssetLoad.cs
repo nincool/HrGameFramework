@@ -13,6 +13,6 @@ namespace Hr.Resource
         /// <summary>
         ///   异步加载
         /// </summary>
-        IEnumerator LoadAsync(HrLoadAssetCallBack loadAssetCallback);
+        IEnumerator LoadAsync();
     }
 }

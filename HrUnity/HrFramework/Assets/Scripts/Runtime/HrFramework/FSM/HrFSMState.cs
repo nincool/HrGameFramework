@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Hr
+namespace Hr.FSM
 {
     public abstract class HrFSMState<T> : IFSMState
     {
