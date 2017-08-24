@@ -258,17 +258,32 @@
     <Compile Include="Assets\Scripts\Editor\HrAssetBundle\HrSerializeDataWin.cs" />
     <Compile Include="Assets\Scripts\Editor\HrAssetBundle\HrZipFileWin.cs" />
     <Compile Include="Assets\Scripts\Editor\HrMenuItems.cs" />
+    <Compile Include="Assets\Scripts\Editor\Input\HrBuildInputs.cs" />
     <Compile Include="Assets\Scripts\Editor\Inspector\HrEventComponentInspector.cs" />
     <Compile Include="Assets\Scripts\Editor\Inspector\HrFSMComponentInspector.cs" />
     <Compile Include="Assets\Scripts\Editor\Inspector\HrGameAppInspector.cs" />
     <Compile Include="Assets\Scripts\Editor\Inspector\HrInspector.cs" />
+    <Compile Include="Assets\Scripts\Editor\Inspector\HrPoolComponentInspector.cs" />
+    <Compile Include="Assets\Scripts\Editor\Inspector\HrResourceComponentInspector.cs" />
     <Compile Include="Assets\Scripts\Editor\Inspector\HrSceneComponentInspector.cs" />
     <Compile Include="Assets\Scripts\Editor\Utility\HrAssetUtil.cs" />
     <Compile Include="Assets\Scripts\Editor\Utility\HrAtlasMakerWin.cs" />
     <Compile Include="Assets\Scripts\Editor\Utility\HrFindreference.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Handpainted Forest Environment Free Sample\Terrain Trees\ReadMe.txt" />
+    <None Include="Assets\HrResource\Handpainted Forest Environment Free Sample\Terrain Trees\ReadMe.txt" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_akarami_blend.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_eye.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_eye_blend.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_eyelash_blend.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_fuku.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_fuku_ds.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_hada.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_hada_blend.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_hair.shader" />
+    <None Include="Assets\HrResource\UnityChan\Models\UnityChanShader\Shader\Unitychan_chara_hair_ds.shader" />
+    <None Include="Assets\HrResource\UnityChan\Stage\Shader\AlphaMask.shader" />
+    <None Include="Assets\HrResource\UnityChan\license.txt" />
     <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
     <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Header.txt" />
     <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Normal.txt" />

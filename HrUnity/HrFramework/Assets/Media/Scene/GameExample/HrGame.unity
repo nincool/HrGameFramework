@@ -38,12 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_GIWorkflowMode: 1
+  m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -150,12 +150,12 @@ Prefab:
     - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
         type: 2}
       propertyPath: m_strEntryScene
-      value: Hr.Scene.HrSceneLaunch
+      value: Hr.Test.HrSceneThirdPersonController
       objectReference: {fileID: 0}
     - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
         type: 2}
       propertyPath: m_strLaunch
-      value: Hr.Example.HrLaunchImp
+      value: Hr.Test.HrLaunchTest
       objectReference: {fileID: 0}
     - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
         type: 2}
@@ -201,6 +201,16 @@ Prefab:
         type: 2}
       propertyPath: m_strUIModule
       value: Hr.UI.HrUIManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
+        type: 2}
+      propertyPath: m_strPoolModule
+      value: Hr.ObjectPool.HrPoolManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 114572183290978968, guid: 9b827b64c3e392b4b9484f010a4ffb20,
+        type: 2}
+      propertyPath: m_strInputModule
+      value: Hr.Input.HrInputEasyInput
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9b827b64c3e392b4b9484f010a4ffb20, type: 2}

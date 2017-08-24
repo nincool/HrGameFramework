@@ -29,6 +29,10 @@ namespace Hr.Scene
 
         }
 
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
+
         /// <summary>
         /// 获取当前自定义Scene
         /// </summary>

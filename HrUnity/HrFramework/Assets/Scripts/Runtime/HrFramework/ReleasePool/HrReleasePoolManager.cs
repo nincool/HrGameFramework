@@ -42,6 +42,10 @@ namespace Hr.ReleasePool
             }
         }
 
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
+
         public override void Shutdown()
         {
 

@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace Hr
 {
-    public class HrSceneComponent : HrComponent
+    public sealed class HrSceneComponent : HrComponent
     {
         public bool InitSuccess { get; private set; }
 

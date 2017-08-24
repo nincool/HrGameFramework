@@ -45,6 +45,9 @@ namespace Hr.UI
         {
             
         }
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
 
         public override void Shutdown()
         {
@@ -105,6 +108,7 @@ namespace Hr.UI
             HrEventUIViewEventHandler showUIViewArgs = args as HrEventUIViewEventHandler;
 
             int nPanelType = showUIViewArgs.PanelType;
+            
 
             var uiLogic = m_dicUILogic.HrTryGet(nPanelType);
             if (uiLogic == null)
@@ -117,7 +121,14 @@ namespace Hr.UI
    
             if (uiLogic != null)
             {
-                ShowUIView(uiLogic);
+                if (!m_dicCurrentShowUILogic.ContainsKey(nPanelType))
+                {
+                    ShowUIView(uiLogic);
+                }
+                else
+                {
+                    HrLogger.LogError(string.Format("HandleShowUI the view is displaying! type {0}", nPanelType));
+                }
             }
             else
             {
@@ -132,13 +143,25 @@ namespace Hr.UI
 
             int nPanelType = showUIViewArgs.PanelType;
 
-            var uiLogic = m_dicUILogic.HrTryGet(nPanelType);
-            if (uiLogic == null)
+            IUILogic uiLogic = null;
+            if (nPanelType > 0)
             {
-                HrLogger.Log(string.Format("ready hide ui {0}, but can't find the logic!", nPanelType));
-                return;
+                uiLogic = m_dicUILogic.HrTryGet(nPanelType);
+                if (uiLogic == null)
+                {
+                    HrLogger.Log(string.Format("ready hide ui {0}, but can't find the logic!", nPanelType));
+                    return;
+                }
             }
-            HideUIView(uiLogic);
+
+            if (uiLogic != null)
+            {
+                HideUIView(uiLogic, uiLogic.ShowMode);
+            }
+            else
+            {
+                HideUIView(null, EnumUIShowMode.UI_SHOWMODE_NEEDBACK);
+            }
         }
 
         private void CreateUI(int nPanelType)
@@ -228,8 +251,8 @@ namespace Hr.UI
                     }
                 case EnumUIShowMode.UI_SHOWMODE_NEEDBACK:
                     {
-                        PushUIToStack(uiLogic);
                         ShowAndAddUILogic(uiLogic);
+                        PushUIToStack(uiLogic);
 
                         break;
                     }
@@ -237,9 +260,9 @@ namespace Hr.UI
 
         }
 
-        private void HideUIView(IUILogic uiLogic)
+        private void HideUIView(IUILogic uiLogic, EnumUIShowMode showMode)
         {
-            switch (uiLogic.ShowMode)
+            switch (showMode)
             {
                 case EnumUIShowMode.UI_SHOWMODE_DONOTHING:
                     {
@@ -293,7 +316,7 @@ namespace Hr.UI
 
         private void PopUIFromStack()
         {
-            if (m_staUILogicID.Count > 2)
+            if (m_staUILogicID.Count >= 2)
             {
                 int nID = m_staUILogicID.Pop();
                 IUILogic topUILogic = m_dicCurrentShowUILogic.HrTryGet(nID);

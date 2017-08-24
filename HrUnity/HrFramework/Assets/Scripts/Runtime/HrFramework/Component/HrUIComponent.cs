@@ -3,7 +3,7 @@ using Hr.UI;
 
 namespace Hr
 {
-    public class HrUIComponent : HrComponent
+    public sealed class HrUIComponent : HrComponent
     {
         public bool InitSuccess { get; private set; }
 

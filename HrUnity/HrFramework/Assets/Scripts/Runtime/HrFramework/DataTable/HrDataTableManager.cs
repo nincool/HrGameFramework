@@ -27,6 +27,10 @@ namespace Hr.DataTable
         {
         }
 
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
+
         public override void Shutdown()
         {
 

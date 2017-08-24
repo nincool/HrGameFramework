@@ -5,27 +5,27 @@ using UnityEngine;
 
 namespace Hr.Game
 {
-    public class HrLaunchTest : MonoBehaviour
-    {
+    //public class HrLaunchTest : MonoBehaviour
+    //{
 
-        // Use this for initialization
-        void Start()
-        {
-            Debug.Log("Application.dataPath:" + Application.dataPath);
-            Debug.Log("Application.persistentDataPath:" + Application.persistentDataPath);
-            Debug.Log("Application.streamingAssetsPath" + Application.streamingAssetsPath);
-        }
+    //    // Use this for initialization
+    //    void Start()
+    //    {
+    //        Debug.Log("Application.dataPath:" + Application.dataPath);
+    //        Debug.Log("Application.persistentDataPath:" + Application.persistentDataPath);
+    //        Debug.Log("Application.streamingAssetsPath" + Application.streamingAssetsPath);
+    //    }
 
-        // Update is called once per frame
-        void Update()
-        {
+    //    // Update is called once per frame
+    //    void Update()
+    //    {
 
-        }
+    //    }
 
-        public void OnClickStart()
-        {
-            //StartCoroutine(CopyZipAssetToPersistentPath());
-        }
+    //    public void OnClickStart()
+    //    {
+    //        //StartCoroutine(CopyZipAssetToPersistentPath());
+    //    }
 
         //private IEnumerator CopyZipAssetToPersistentPath()
         //{
@@ -58,5 +58,5 @@ namespace Hr.Game
         //    //if (goAsset != null)
         //    //    GameObject.Instantiate(goAsset);
         //}
-    }
+    //}
 }

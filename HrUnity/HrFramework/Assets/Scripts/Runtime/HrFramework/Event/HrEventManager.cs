@@ -86,6 +86,10 @@ namespace Hr.EventSystem
             }
         }
 
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
+
         public bool CheckIsInHandlerList(int nEventID, EventHandler<HrEventHandlerArgs> handler)
         {
             if (handler == null)

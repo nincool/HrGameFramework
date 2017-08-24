@@ -68,6 +68,10 @@ namespace Hr.Resource
 
         }
 
+        public override void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+        }
+
         public static void AddResourceType(System.Object unityType, System.Object assetType)
         {
             ms_dicUnityType2AssetType.Add(unityType, assetType);

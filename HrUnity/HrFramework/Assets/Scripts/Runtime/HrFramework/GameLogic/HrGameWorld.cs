@@ -1,4 +1,5 @@
 ﻿using Hr.Logic;
+using Hr.ObjectPool;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,6 +46,15 @@ namespace Hr
         }
 
         /// <summary>
+        /// 对象池组件
+        /// </summary>
+        public HrPoolComponent PoolComponent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// 场景管理器组件
         /// </summary>
         public HrSceneComponent SceneComponent
@@ -66,6 +76,12 @@ namespace Hr
         /// 自动释放管理组件
         /// </summary>
         public HrReleasePoolComponent ReleasePoolComonent
+        {
+            get;
+            private set;
+        }
+
+        public HrInputComponent InputComponent
         {
             get;
             private set;
@@ -204,6 +220,14 @@ namespace Hr
             }
         }
 
+        public void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds)
+        {
+            foreach (var module in m_modules)
+            {
+                module.OnUpdateEndOfFrame(fElapseSeconds, fRealElapseSeconds);
+            }
+        }
+
         #region private methods
 
         /// <summary>
@@ -213,11 +237,13 @@ namespace Hr
         {
             EventComponent = GetHrComponent<HrEventComponent>();
             FSMComponent = GetHrComponent<HrFSMComponent>();
+            PoolComponent = GetHrComponent<HrPoolComponent>();
             ResourceComponent = GetHrComponent<HrResourceComponent>();
             DataTableComponent = GetHrComponent<HrDataTableComponent>();
             SceneComponent = GetHrComponent<HrSceneComponent>();
             UIComponent = GetHrComponent<HrUIComponent>();
             ReleasePoolComonent = GetHrComponent<HrReleasePoolComponent>();
+            InputComponent = GetHrComponent<HrInputComponent>();
         }
 
         private T AddHrComponent<T>() where T : HrComponent

@@ -6,7 +6,7 @@ using Hr.Resource;
 
 namespace Hr
 {
-    public class HrDataTableComponent : HrComponent
+    public sealed class HrDataTableComponent : HrComponent
     {
         public bool InitSuccess { get; private set; }
 

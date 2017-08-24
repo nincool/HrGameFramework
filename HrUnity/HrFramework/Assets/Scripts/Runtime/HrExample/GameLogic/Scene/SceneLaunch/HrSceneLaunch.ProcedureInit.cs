@@ -23,7 +23,8 @@ namespace Hr.Scene.Procedure.HrSceneLaunch
         {
             base.OnUpdate(fElapseSeconds, fRealElapseSeconds);
 
-            m_owner.ChangeState<HrProcedureSplash>();
+            //m_owner.ChangeState<HrProcedureSplash>();
+            m_owner.ChangeState<HrProcedureTest>();
         }
 
         public override void OnExit()

@@ -9,6 +9,8 @@ namespace Hr
 
         public abstract void OnUpdate(float fElapseSeconds, float fRealElapseSeconds);
 
+        public abstract void OnUpdateEndOfFrame(float fElapseSeconds, float fRealElapseSeconds);
+
         public abstract void Shutdown();
     }
 }

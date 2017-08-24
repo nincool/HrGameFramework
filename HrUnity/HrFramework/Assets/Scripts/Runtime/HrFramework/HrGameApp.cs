@@ -8,7 +8,7 @@ using Hr.Environment;
 
 namespace Hr
 {
-    public class HrGameApp : HrUnitySingleton<HrGameApp>
+    public sealed class HrGameApp : HrUnitySingleton<HrGameApp>
     {
         /// <summary>
         /// 游戏内置版本号
@@ -129,6 +129,16 @@ namespace Hr
         }
 
         [SerializeField]
+        private string m_strPoolModule;
+        public string PoolModule
+        {
+            get
+            {
+                return m_strPoolModule;
+            }
+        }
+
+        [SerializeField]
         private string m_strReleasePoolModule;
         public string ReleasePoolModule
         {
@@ -167,13 +177,23 @@ namespace Hr
                 return m_strUIModule;
             }
         }
-        
+
+        [SerializeField]
+        private string m_strInputModule;
+        public string InputModule
+        {
+            get
+            {
+                return m_strInputModule;
+            }
+        }
+
         #endregion
 
         /// <summary>
         /// 初始化
         /// </summary>
-        protected void Awake()
+        void Awake()
         {
             if (HrEnvironment.IsEditorMode)
             {
@@ -182,12 +202,13 @@ namespace Hr
             Initialize();
         }
 
-        protected  void Start()
+        void Start()
         {
             HrLogger.Log("HrGameApp Start!");
 
             Application.runInBackground = RunInBackground;
 
+            StartCoroutine(UpdateEndOfFrame());
             HrGameWorld.Instance.StartGame();
         }
 
@@ -197,10 +218,12 @@ namespace Hr
             PreInitializeGameModule(DataTableModule);
             PreInitializeGameModule(EventModule);
             PreInitializeGameModule(FSMModule);
+            PreInitializeGameModule(PoolModule);
             PreInitializeGameModule(ReleasePoolModule);
             PreInitializeGameModule(ResourceModule);
             PreInitializeGameModule(SceneModule);
             PreInitializeGameModule(UIModule);
+            PreInitializeGameModule(InputModule);
 
 
             HrGameWorld.Instance.EntryScene = EntranceScene;
@@ -221,9 +244,23 @@ namespace Hr
             }
         }
 
-        protected virtual void Update()
+        private void Update()
         {
             HrGameWorld.Instance.OnUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+        }
+
+        private IEnumerator UpdateEndOfFrame()
+        {
+            // Create the coroutine here so we don't re-create over and over
+            WaitForEndOfFrame lWaitForEndOfFrame = new WaitForEndOfFrame();
+
+            // Loop endlessly so we can process the input
+            // at the end of each frame, preparing for the next
+            while (true)
+            {
+                yield return lWaitForEndOfFrame;
+                HrGameWorld.Instance.OnUpdateEndOfFrame(Time.deltaTime, Time.unscaledDeltaTime);
+            }
         }
     }
 

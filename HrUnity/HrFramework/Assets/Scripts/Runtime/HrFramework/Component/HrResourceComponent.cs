@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Hr
 {
-    public class HrResourceComponent : HrComponent
+    public sealed class HrResourceComponent : HrComponent
     {
         public bool InitSuccess { get; private set; }
 

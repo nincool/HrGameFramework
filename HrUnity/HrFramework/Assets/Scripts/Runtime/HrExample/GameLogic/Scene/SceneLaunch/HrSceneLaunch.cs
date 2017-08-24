@@ -8,7 +8,7 @@ namespace Hr.Scene
 {
     public class HrSceneLaunch : HrScene
     {
-        private  string m_strAssetBundleName = "scene_launch";
+        private readonly string m_strAssetBundleName = "scene_launch";
 
         public HrSceneLaunch(HrSceneManager sceneManager) :base(sceneManager)
         {
@@ -42,6 +42,7 @@ namespace Hr.Scene
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureSplash(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureCheckVersion(this));
             m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureReadyEnterGame(this));
+            m_fsmProcedureStateMachine.AddState(new Procedure.HrSceneLaunch.HrProcedureTest(this));
         }
 
         private void HandleLoadSceneAssetBundleSuccess(object sender, HrEventHandlerArgs args)

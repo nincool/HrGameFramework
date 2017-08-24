@@ -20,10 +20,12 @@ namespace Hr.Editor
         private SerializedProperty m_strDatatableModule = null;
         private SerializedProperty m_strEventModule = null;
         private SerializedProperty m_strFSMModule = null;
+        private SerializedProperty m_strPoolModule = null;
         private SerializedProperty m_strReleasePoolModule = null;
         private SerializedProperty m_strResourceModule = null;
         private SerializedProperty m_strSceneModule = null;
         private SerializedProperty m_strUIModule = null;
+        private SerializedProperty m_strInputModule = null;
 
         private int m_nEntranceLaunchIndex = 0;
         private int m_nEntranceSceneIndex = 0;
@@ -31,10 +33,12 @@ namespace Hr.Editor
         private int m_nDatatableModuleIndex = 0;
         private int m_nEventModuleIndex = 0;
         private int m_nFSMModuleIndex = 0;
+        private int m_nPoolModuleIndex = 0;
         private int m_nReleasePoolModuleIndex = 0;
         private int m_nResourceModuleIndex = 0;
         private int m_nSceneModuleIndex = 0;
         private int m_nUIModuleIndex = 0;
+        private int m_nInputModuleIndex = 0;
 
         private void OnEnable()
         {
@@ -47,10 +51,12 @@ namespace Hr.Editor
             m_strDatatableModule = serializedObject.FindProperty("m_strDataTableModule");
             m_strEventModule = serializedObject.FindProperty("m_strEventModule");
             m_strFSMModule = serializedObject.FindProperty("m_strFSMModule");
+            m_strPoolModule = serializedObject.FindProperty("m_strPoolModule");
             m_strReleasePoolModule = serializedObject.FindProperty("m_strReleasePoolModule");
             m_strResourceModule = serializedObject.FindProperty("m_strResourceModule");
             m_strSceneModule = serializedObject.FindProperty("m_strSceneModule");
             m_strUIModule = serializedObject.FindProperty("m_strUIModule");
+            m_strInputModule = serializedObject.FindProperty("m_strInputModule");
 
             RefreshSelectedItems();
         }
@@ -60,10 +66,12 @@ namespace Hr.Editor
             RefreshSelected<Hr.DataTable.IDataTableManager>(ref m_nDatatableModuleIndex, m_strDatatableModule.stringValue);
             RefreshSelected<Hr.EventSystem.IEventManager>(ref m_nEventModuleIndex, m_strEventModule.stringValue);
             RefreshSelected<Hr.FSM.IFSMManager>(ref m_nFSMModuleIndex, m_strFSMModule.stringValue);
+            RefreshSelected<Hr.ObjectPool.IPoolManager>(ref m_nPoolModuleIndex, m_strPoolModule.stringValue);
             RefreshSelected<Hr.ReleasePool.IReleasePoolManager>(ref m_nReleasePoolModuleIndex, m_strReleasePoolModule.stringValue);
             RefreshSelected<Hr.Resource.IResourceManager>(ref m_nResourceModuleIndex, m_strResourceModule.stringValue);
             RefreshSelected<Hr.Scene.ISceneManager>(ref m_nSceneModuleIndex, m_strSceneModule.stringValue);
             RefreshSelected<Hr.UI.IUIManager>(ref m_nUIModuleIndex, m_strUIModule.stringValue);
+            RefreshSelected<Hr.Input.IInputManager>(ref m_nInputModuleIndex, m_strInputModule.stringValue);
 
             RefreshSelected<Hr.Logic.HrLaunch>(ref m_nEntranceLaunchIndex, m_strLaunch.stringValue);
             RefreshSelected<Hr.Scene.HrScene>(ref m_nEntranceSceneIndex, m_strEntranceScene.stringValue);
@@ -185,6 +193,26 @@ namespace Hr.Editor
                     }
                 }
 
+                eventTypes = HrType.GetTypeNames(typeof(Hr.ObjectPool.IPoolManager));
+                eventTypes = AddNullToPopupItems(eventTypes);
+                int nSelectedPoolTypeIndex = EditorGUILayout.Popup("Pool Module", m_nPoolModuleIndex, eventTypes);
+                if (nSelectedPoolTypeIndex != m_nPoolModuleIndex)
+                {
+                    if (!EditorApplication.isPlaying)
+                    {
+                        m_nPoolModuleIndex = nSelectedPoolTypeIndex;
+                        m_strPoolModule.stringValue = eventTypes[m_nPoolModuleIndex];
+                        if (string.IsNullOrEmpty(m_strPoolModule.stringValue) || m_strPoolModule.stringValue == "Null")
+                        {
+                            m_strPoolModule.stringValue = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("Error", "Can not change this!", "ok");
+                    }
+                }
+
                 eventTypes = HrType.GetTypeNames(typeof(Hr.ReleasePool.IReleasePoolManager));
                 eventTypes = AddNullToPopupItems(eventTypes);
                 int nSelectedReleasePoolIndex = EditorGUILayout.Popup("ReleasePool Module", m_nReleasePoolModuleIndex, eventTypes);
@@ -264,6 +292,26 @@ namespace Hr.Editor
                         EditorUtility.DisplayDialog("Error", "Can not change this!", "ok");
                     }
                 }
+
+                eventTypes = HrType.GetTypeNames(typeof(Hr.Input.IInputManager));
+                eventTypes = AddNullToPopupItems(eventTypes);
+                int nSelectedInputIndex = EditorGUILayout.Popup("Input Module", m_nInputModuleIndex, eventTypes);
+                if (nSelectedInputIndex != m_nInputModuleIndex)
+                {
+                    if (!EditorApplication.isPlaying)
+                    {
+                        m_nInputModuleIndex = nSelectedInputIndex;
+                        m_strInputModule.stringValue = eventTypes[m_nInputModuleIndex];
+                        if (string.IsNullOrEmpty(m_strInputModule.stringValue) || m_strInputModule.stringValue == "Null")
+                        {
+                            m_strInputModule.stringValue = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("Error", "Can not change this!", "ok");
+                    }
+                }
             }
             EditorGUILayout.EndVertical();
 
@@ -313,6 +361,8 @@ namespace Hr.Editor
                     EditorUtility.DisplayDialog("Error", "Can not change this!", "ok");
                 }
             }
+
+            
 
             SaveSerializedData();
         }

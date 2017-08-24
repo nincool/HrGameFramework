@@ -56,20 +56,8 @@ namespace Hr.Scene.Procedure.HrSceneWorldPreload
 
         private void PreloadResources()
         {
-            //加载配置数据
-            LoadDataTables();
-
             //加载AssetBundle
             LoadAssetBundles();
-        }
-
-        private void LoadDataTables()
-        {
-            //1.加载显示质量配置
-            HrGameWorld.Instance.DataTableComponent.LoadDataTable(HrDataTableDeviceQuality.DataTableDefaultName);
-            //2.加载预加载资源配置
-            HrGameWorld.Instance.DataTableComponent.LoadDataTable(HrDataTablePreloadWorldScene.DataTableDefaultName);
-            HrGameWorld.Instance.DataTableComponent.LoadDataTable(HrDataTablePreloadBattleScene.DataTableDefaultName);
         }
 
         private void LoadAssetBundles()

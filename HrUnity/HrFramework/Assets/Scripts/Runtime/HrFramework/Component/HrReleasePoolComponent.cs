@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Hr
 {
-    public class HrReleasePoolComponent : HrComponent
+    public sealed class HrReleasePoolComponent : HrComponent
     {
         public bool InitSuccess { get; private set; }
 
